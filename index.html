@@ -75,11 +75,8 @@
   .card:hover { transform: translateY(-6px); box-shadow: 0 20px 40px rgba(0,0,0,0.08); }
   
   /* Conteneur Image Glassmorphism (Permet de voir l'image entière sans couper) */
-  .card-img-wrapper { position: relative; width: 100%; height: 260px; background: #000; overflow: hidden; border-bottom: 1px solid var(--line); }
-  .card-img-blur { position: absolute; inset: -20px; background-size: cover; background-position: center; filter: blur(20px); opacity: 0.6; z-index: 1; }
-  .card-carousel { position: relative; display: flex; width: 100%; height: 100%; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; z-index: 2; }
-  .card-carousel::-webkit-scrollbar { display: none; }
-  .card-img { flex: 0 0 100%; height: 100%; object-fit: contain; scroll-snap-align: start; }
+  .card-img-wrapper { position: relative; width: 100%; height: 260px; background: #f3f4f6; overflow: hidden; border-bottom: 1px solid var(--line); }
+  .card-img { width: 100%; height: 100%; object-fit: cover; object-position: center; display: block; }
   .img-count { position: absolute; bottom: 10px; right: 10px; background: rgba(0,0,0,0.6); color: #fff; padding: 4px 8px; border-radius: 12px; font-size: 11px; font-weight: 600; z-index: 3; backdrop-filter: blur(4px); }
 
   .card-body { padding: 20px; flex: 1; display: flex; flex-direction: column; }
@@ -110,6 +107,10 @@
   .detail-dots { position: absolute; bottom: 14px; left: 50%; transform: translateX(-50%); display: flex; gap: 6px; z-index: 3; }
   .detail-dots span { width: 7px; height: 7px; border-radius: 50%; background: rgba(255,255,255,0.45); transition: background 0.2s; }
   .detail-dots span.active { background: #fff; }
+  .detail-nav-btn { position: absolute; top: 50%; transform: translateY(-50%); width: 30px; height: 30px; border-radius: 50%; background: rgba(17,24,39,0.45); border: none; color: #fff; font-size: 13px; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 4; transition: background 0.2s; }
+  .detail-nav-btn:hover { background: rgba(17,24,39,0.7); }
+  .detail-nav-prev { left: 10px; }
+  .detail-nav-next { right: 10px; }
   .detail-section-title { font-family: var(--display); font-size: 15px; font-weight: 700; margin-bottom: 8px; color: var(--text-main); }
   .detail-desc { font-size: 14.5px; color: var(--text-main); line-height: 1.7; white-space: pre-wrap; margin-bottom: 22px; }
   .detail-stats { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 22px; }
@@ -267,6 +268,8 @@
     </div>
     <div class="detail-gallery-wrap">
       <div class="detail-carousel" id="detail-carousel"></div>
+      <button class="detail-nav-btn detail-nav-prev" id="detail-nav-prev" aria-label="Image précédente"><i class="fa-solid fa-chevron-left"></i></button>
+      <button class="detail-nav-btn detail-nav-next" id="detail-nav-next" aria-label="Image suivante"><i class="fa-solid fa-chevron-right"></i></button>
       <div class="detail-dots" id="detail-dots"></div>
     </div>
     <div class="modal-body">
@@ -612,7 +615,6 @@ function renderGrid() {
       const firstUrl = imagesArray[0];
       imagesHtml = `
         <div class="card-img-wrapper">
-          <div class="card-img-blur" style="background-image: url('${firstUrl}')"></div>
           <img src="${firstUrl}" class="card-img" alt="${t.name}" loading="lazy">
         </div>
       `;
@@ -694,6 +696,8 @@ function openDetailModal(tomatoId) {
   const imagesArray = t.imageURLs || (t.imageURL ? [t.imageURL] : []);
   const carousel = document.getElementById('detail-carousel');
   const dots = document.getElementById('detail-dots');
+  const prevBtn = document.getElementById('detail-nav-prev');
+  const nextBtn = document.getElementById('detail-nav-next');
 
   carousel.innerHTML = imagesArray.length > 0
     ? imagesArray.map(url => `
@@ -707,6 +711,17 @@ function openDetailModal(tomatoId) {
   dots.innerHTML = imagesArray.length > 1
     ? imagesArray.map((_, i) => `<span class="${i === 0 ? 'active' : ''}"></span>`).join('')
     : '';
+
+  const showNav = imagesArray.length > 1;
+  prevBtn.style.display = showNav ? 'flex' : 'none';
+  nextBtn.style.display = showNav ? 'flex' : 'none';
+
+  prevBtn.onclick = () => {
+    carousel.scrollBy({ left: -carousel.offsetWidth, behavior: 'smooth' });
+  };
+  nextBtn.onclick = () => {
+    carousel.scrollBy({ left: carousel.offsetWidth, behavior: 'smooth' });
+  };
 
   carousel.onscroll = () => {
     if (imagesArray.length <= 1) return;
