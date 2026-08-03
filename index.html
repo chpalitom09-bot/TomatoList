@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="fr" id="html-root">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TomatoList</title>
+<link rel="icon" type="image/png" href="tomatolist.png">
+<meta name="theme-color" content="#b91c1c">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+<!-- EMPLACEMENT GOOGLE ANALYTICS -->
+<!-- Collez votre script Google Analytics ci-dessous -->
+<script>
+  // Script Google Analytics
+</script>
+<!-- FIN GOOGLE ANALYTICS -->
+
+<style>
+  :root {
+    --primary: #b91c1c; --primary-hover: #991b1b;
+    --bg: #f9fafb; --surface: #ffffff;
+    --text-main: #111827; --text-muted: #6b7280;
+    --border: #e5e7eb;
+    --sans: 'Inter', sans-serif; --display: 'Space Grotesk', sans-serif;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text-main); font-family: var(--sans); -webkit-font-smoothing: antialiased; }
+  a { text-decoration: none; color: inherit; }
+  button, input, select, textarea { font-family: inherit; }
+
+  /* Navbar */
+  .navbar { background: var(--surface); border-bottom: 1px solid var(--border); padding: 16px 24px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; }
+  .brand { font-family: var(--display); font-size: 24px; font-weight: 700; color: var(--primary); letter-spacing: -0.03em; }
+  .nav-actions { display: flex; align-items: center; gap: 16px; }
+  .btn { padding: 10px 16px; border-radius: 8px; font-weight: 600; font-size: 14px; cursor: pointer; transition: all 0.2s; border: none; display: flex; align-items: center; gap: 8px; }
+  .btn-primary { background: var(--primary); color: #fff; }
+  .btn-primary:hover { background: var(--primary-hover); }
+  .btn-outline { background: transparent; border: 1px solid var(--border); color: var(--text-main); }
+  .btn-outline:hover { background: var(--bg); }
+
+  /* Toolbar */
+  .toolbar { max-width: 1200px; margin: 32px auto; padding: 0 24px; display: flex; gap: 16px; flex-wrap: wrap; }
+  .search-box { flex: 1; min-width: 280px; position: relative; }
+  .search-box i { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--text-muted); }
+  .search-box input { width: 100%; padding: 12px 16px 12px 40px; border: 1px solid var(--border); border-radius: 8px; outline: none; font-size: 15px; }
+  .search-box input:focus { border-color: var(--primary); }
+  .filter-box select { padding: 12px 16px; border: 1px solid var(--border); border-radius: 8px; outline: none; background: var(--surface); font-size: 15px; cursor: pointer; }
+
+  /* Grid */
+  .grid { max-width: 1200px; margin: 0 auto 64px; padding: 0 24px; display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 24px; }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; transition: transform 0.2s, box-shadow 0.2s; }
+  .card:hover { transform: translateY(-4px); box-shadow: 0 12px 24px rgba(0,0,0,0.06); }
+  .card-img { width: 100%; height: 200px; object-fit: cover; background: #eee; }
+  .card-body { padding: 20px; }
+  .card-title { font-family: var(--display); font-size: 20px; font-weight: 700; margin-bottom: 8px; }
+  .card-meta { display: flex; gap: 12px; font-size: 13px; color: var(--text-muted); margin-bottom: 12px; flex-wrap: wrap; }
+  .badge { background: var(--bg); padding: 4px 8px; border-radius: 6px; font-weight: 500; border: 1px solid var(--border); display:flex; align-items:center; gap:6px; }
+  .color-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+  .card-desc { font-size: 14px; color: var(--text-muted); line-height: 1.5; margin-bottom: 16px; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+  .card-footer { border-top: 1px solid var(--border); padding-top: 16px; font-size: 12px; color: var(--text-muted); display: flex; justify-content: space-between; }
+
+  /* Modal */
+  .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 1000; opacity: 0; pointer-events: none; transition: opacity 0.2s; padding: 16px; }
+  .modal-overlay.active { opacity: 1; pointer-events: all; }
+  .modal { background: var(--surface); width: 100%; max-width: 600px; border-radius: 16px; max-height: 90vh; overflow-y: auto; box-shadow: 0 24px 48px rgba(0,0,0,0.1); transform: translateY(20px); transition: transform 0.2s; }
+  .modal-overlay.active .modal { transform: translateY(0); }
+  .modal-header { padding: 20px 24px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+  .modal-title { font-family: var(--display); font-size: 20px; font-weight: 700; }
+  .modal-close { background: none; border: none; font-size: 20px; cursor: pointer; color: var(--text-muted); }
+  .modal-body { padding: 24px; }
+  .form-group { margin-bottom: 16px; }
+  .form-group label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 8px; }
+  .form-control { width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 8px; outline: none; font-size: 14px; }
+  .form-control:focus { border-color: var(--primary); }
+  .form-row { display: flex; gap: 16px; }
+  .form-row .form-group { flex: 1; }
+  
+  .img-preview { width: 100%; height: 200px; border: 2px dashed var(--border); border-radius: 8px; margin-bottom: 16px; display: flex; align-items: center; justify-content: center; cursor: pointer; background-size: cover; background-position: center; color: var(--text-muted); flex-direction: column; gap: 8px; }
+  .img-preview.has-img { border-style: solid; }
+  .img-preview i { font-size: 24px; }
+
+  .progress-bar { width: 100%; height: 6px; background: var(--bg); border-radius: 3px; overflow: hidden; display: none; margin-bottom: 16px; }
+  .progress-fill { width: 0%; height: 100%; background: var(--primary); transition: width 0.3s; }
+  .error-msg { color: var(--primary); font-size: 13px; margin-bottom: 16px; display: none; }
+
+  /* Footer */
+  .footer { background: #111; color: #fff; padding: 48px 24px; text-align: center; font-size: 14px; }
+  .credits { margin-top: 24px; color: #888; font-size: 13px; display: flex; justify-content: center; gap: 32px; flex-wrap: wrap; }
+  .credits span { color: #fff; font-weight: 600; }
+
+  @media (max-width: 600px) {
+    .form-row { flex-direction: column; gap: 0; }
+  }
+</style>
+</head>
+<body>
+
+<nav class="navbar">
+  <div class="brand">TomatoList</div>
+  <div class="nav-actions">
+    <button class="btn btn-outline" id="btn-lang"><i class="fa-solid fa-globe"></i> <span id="lang-label">FR</span></button>
+    <button class="btn btn-outline" id="btn-auth" data-i18n="login">Connexion</button>
+    <button class="btn btn-primary" id="btn-add-modal"><i class="fa-solid fa-plus"></i> <span data-i18n="add">Ajouter</span></button>
+  </div>
+</nav>
+
+<div class="toolbar">
+  <div class="search-box">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <input type="text" id="search-input" data-i18n-ph="search_ph" placeholder="Rechercher une variété...">
+  </div>
+  <div class="filter-box">
+    <select id="sort-select">
+      <option value="date" data-i18n="sort_date">Les plus récentes</option>
+      <option value="alpha" data-i18n="sort_alpha">Ordre alphabétique</option>
+    </select>
+  </div>
+  <div class="filter-box">
+    <select id="color-select">
+      <option value="all" data-i18n="color_all">Toutes les couleurs</option>
+      <option value="Rouge" data-i18n="color_red">Rouge</option>
+      <option value="Jaune" data-i18n="color_yellow">Jaune</option>
+      <option value="Noire" data-i18n="color_black">Noire / Pourpre</option>
+      <option value="Verte" data-i18n="color_green">Verte</option>
+      <option value="Orange" data-i18n="color_orange">Orange</option>
+      <option value="Rose" data-i18n="color_pink">Rose</option>
+      <option value="Blanche" data-i18n="color_white">Blanche</option>
+      <option value="Bicolore" data-i18n="color_bicolor">Bicolore / Bigarrée</option>
+    </select>
+  </div>
+</div>
+
+<div class="grid" id="tomatoes-grid">
+  <!-- Les cartes seront générées ici -->
+</div>
+
+<footer class="footer">
+  <div class="brand" style="margin-bottom:16px; color:#fff">TomatoList</div>
+  <p data-i18n="footer_desc">La plateforme collaborative de recensement des variétés de tomates.</p>
+  <div class="credits">
+    <div><span data-i18n="dev_label">Développement :</span> Wikimind</div>
+    <div><span data-i18n="mod_label">Modération Facebook :</span> Pépin de Tomate</div>
+  </div>
+</footer>
+
+<!-- Add Modal -->
+<div class="modal-overlay" id="add-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" data-i18n="add_title">Nouvelle variété</div>
+      <button class="modal-close" id="close-modal"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="modal-body">
+      <div class="error-msg" id="form-error"></div>
+      <div class="progress-bar" id="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
+      
+      <input type="file" id="file-input" accept="image/*" style="display:none">
+      <div class="img-preview" id="img-preview">
+        <i class="fa-solid fa-camera"></i>
+        <span data-i18n="add_image">Cliquez pour ajouter une photo *</span>
+      </div>
+
+      <div class="form-group">
+        <label data-i18n="t_name">Nom de la variété *</label>
+        <input type="text" class="form-control" id="f-name" required>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label data-i18n="t_color">Couleur dominante *</label>
+          <select class="form-control" id="f-color">
+            <option value="Rouge" data-i18n="color_red">Rouge</option>
+            <option value="Jaune" data-i18n="color_yellow">Jaune</option>
+            <option value="Noire" data-i18n="color_black">Noire / Pourpre</option>
+            <option value="Verte" data-i18n="color_green">Verte</option>
+            <option value="Orange" data-i18n="color_orange">Orange</option>
+            <option value="Rose" data-i18n="color_pink">Rose</option>
+            <option value="Blanche" data-i18n="color_white">Blanche</option>
+            <option value="Bicolore" data-i18n="color_bicolor">Bicolore / Bigarrée</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label data-i18n="t_country">Pays d'origine</label>
+          <input type="text" class="form-control" id="f-country">
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label data-i18n="t_weight">Poids moyen (g)</label>
+          <input type="number" class="form-control" id="f-weight">
+        </div>
+        <div class="form-group">
+          <label data-i18n="t_size">Taille</label>
+          <select class="form-control" id="f-size">
+            <option value="" data-i18n="size_any">-</option>
+            <option value="Cerise" data-i18n="size_cherry">Cerise</option>
+            <option value="Petite" data-i18n="size_small">Petite</option>
+            <option value="Moyenne" data-i18n="size_medium">Moyenne</option>
+            <option value="Grosse" data-i18n="size_large">Grosse</option>
+            <option value="Très grosse" data-i18n="size_xl">Très grosse</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label data-i18n="t_desc">Description / Histoire</label>
+        <textarea class="form-control" id="f-desc" rows="4"></textarea>
+      </div>
+
+      <button class="btn btn-primary" style="width:100%; justify-content:center; padding:14px; font-size:16px" id="btn-submit">
+        <span data-i18n="submit">Publier la variété</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.17.0/firebase-app.js";
+import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.17.0/firebase-analytics.js";
+import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.17.0/firebase-auth.js";
+import { getDatabase, ref, onValue, push, get } from "https://www.gstatic.com/firebasejs/12.17.0/firebase-database.js";
+
+// ==========================================
+// CONFIGURATION
+// ==========================================
+const firebaseConfig = {
+  apiKey: "AIzaSyAaz9s2jxsNqYd9FBsVG4u48-BwE8LAXCE",
+  authDomain: "tomatolist-efee0.firebaseapp.com",
+  projectId: "tomatolist-efee0",
+  storageBucket: "tomatolist-efee0.firebasestorage.app",
+  messagingSenderId: "451109980779",
+  appId: "1:451109980779:web:87ae55fc2b4370dfa43f2e",
+  measurementId: "G-Q8KHD0WW38"
+};
+
+// URL DU SCRIPT GOOGLE APPS SCRIPT (À REMPLACER)
+const GAS_URL = "VOTRE_URL_GOOGLE_APPS_SCRIPT_ICI";
+
+const app = initializeApp(firebaseConfig);
+const analytics = getAnalytics(app);
+const auth = getAuth(app);
+const db = getDatabase(app);
+
+// ==========================================
+// ETAT & I18N
+// ==========================================
+let tomatoesData = [];
+let currentUser = null;
+let currentProfileName = "Anonyme";
+let currentImageData = null;
+
+let currentLang = localStorage.getItem('tl_lang') || (navigator.language || 'fr').slice(0,2);
+let TRANSLATIONS = {};
+
+const colorMap = {
+  'Rouge': '#ef4444', 'Jaune': '#eab308', 'Noire': '#4b5563',
+  'Verte': '#22c55e', 'Orange': '#f97316', 'Rose': '#ec4899',
+  'Blanche': '#f3f4f6', 'Bicolore': '#a855f7'
+};
+
+async function loadTranslations() {
+  try {
+    const res = await fetch('lang.json');
+    TRANSLATIONS = await res.json();
+    applyI18n();
+  } catch(e) { console.error("Erreur lang.json"); }
+}
+function tr(key) { return (TRANSLATIONS[currentLang] && TRANSLATIONS[currentLang][key]) || (TRANSLATIONS.fr && TRANSLATIONS.fr[key]) || key; }
+function applyI18n() {
+  document.querySelectorAll('[data-i18n]').forEach(el => el.textContent = tr(el.getAttribute('data-i18n')));
+  document.querySelectorAll('[data-i18n-ph]').forEach(el => el.placeholder = tr(el.getAttribute('data-i18n-ph')));
+  document.getElementById('lang-label').textContent = currentLang.toUpperCase();
+}
+
+document.getElementById('btn-lang').onclick = () => {
+  const langs = ['fr','en','de','es','it','ru','zh','hi'];
+  let idx = langs.indexOf(currentLang);
+  currentLang = langs[(idx + 1) % langs.length];
+  localStorage.setItem('tl_lang', currentLang);
+  applyI18n();
+  renderGrid(); // Refresh texts in cards
+};
+
+// ==========================================
+// AUTHENTIFICATION
+// ==========================================
+onAuthStateChanged(auth, async (user) => {
+  currentUser = user;
+  const btnAuth = document.getElementById('btn-auth');
+  if (user) {
+    btnAuth.textContent = tr('logout');
+    btnAuth.onclick = () => signOut(auth);
+    const snap = await get(ref(db, `users/${user.uid}/profile`));
+    if (snap.exists()) {
+      const p = snap.val();
+      currentProfileName = `${p.firstname} ${p.lastname}`.trim();
+    }
+  } else {
+    btnAuth.textContent = tr('login');
+    btnAuth.onclick = () => window.location.href = 'auth.html';
+    currentProfileName = tr("anonymous");
+  }
+});
+
+// ==========================================
+// LECTURE DES DONNÉES
+// ==========================================
+onValue(ref(db, 'tomatoes'), (snapshot) => {
+  tomatoesData = [];
+  snapshot.forEach(child => {
+    tomatoesData.push({ id: child.key, ...child.val() });
+  });
+  renderGrid();
+});
+
+function renderGrid() {
+  const grid = document.getElementById('tomatoes-grid');
+  const search = document.getElementById('search-input').value.toLowerCase();
+  const sort = document.getElementById('sort-select').value;
+  const color = document.getElementById('color-select').value;
+
+  let filtered = tomatoesData.filter(t => {
+    const matchSearch = (t.name || '').toLowerCase().includes(search) || (t.country || '').toLowerCase().includes(search);
+    const matchColor = color === 'all' || t.color === color;
+    return matchSearch && matchColor;
+  });
+
+  if (sort === 'alpha') filtered.sort((a,b) => (a.name||'').localeCompare(b.name));
+  else filtered.sort((a,b) => (b.createdAt || 0) - (a.createdAt || 0));
+
+  grid.innerHTML = filtered.map(t => {
+    const date = new Date(t.createdAt).toLocaleDateString(currentLang);
+    const colorHex = colorMap[t.color] || '#ccc';
+    return `
+      <div class="card">
+        <img src="${t.imageURL}" class="card-img" alt="${t.name}" loading="lazy">
+        <div class="card-body">
+          <h3 class="card-title">${t.name}</h3>
+          <div class="card-meta">
+            <span class="badge"><i class="color-dot" style="background:${colorHex}"></i> ${tr('color_'+(t.color||'Rouge').toLowerCase()) || t.color}</span>
+            ${t.weight ? `<span class="badge"><i class="fa-solid fa-scale-balanced"></i> ${t.weight}g</span>` : ''}
+            ${t.country ? `<span class="badge"><i class="fa-solid fa-earth-europe"></i> ${t.country}</span>` : ''}
+          </div>
+          <div class="card-desc">${t.description || '-'}</div>
+          <div class="card-footer">
+            <span><i class="fa-solid fa-user"></i> ${t.author || tr('anonymous')}</span>
+            <span>${date}</span>
+          </div>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+document.getElementById('search-input').addEventListener('input', renderGrid);
+document.getElementById('sort-select').addEventListener('change', renderGrid);
+document.getElementById('color-select').addEventListener('change', renderGrid);
+
+// ==========================================
+// AJOUT DE TOMATE & COMPRESSION IMAGE
+// ==========================================
+const modal = document.getElementById('add-modal');
+document.getElementById('btn-add-modal').onclick = () => { modal.classList.add('active'); };
+document.getElementById('close-modal').onclick = () => { modal.classList.remove('active'); resetForm(); };
+
+const imgPreview = document.getElementById('img-preview');
+const fileInput = document.getElementById('file-input');
+imgPreview.onclick = () => fileInput.click();
+
+fileInput.onchange = (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (ev) => {
+    const img = new Image();
+    img.onload = () => {
+      const canvas = document.createElement('canvas');
+      let width = img.width; let height = img.height;
+      const MAX = 1600;
+      if (width > MAX || height > MAX) {
+        if (width > height) { height = Math.round((height * MAX)/width); width = MAX; }
+        else { width = Math.round((width * MAX)/height); height = MAX; }
+      }
+      canvas.width = width; canvas.height = height;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0, width, height);
+      
+      currentImageData = canvas.toDataURL('image/webp', 0.8);
+      imgPreview.style.backgroundImage = `url(${currentImageData})`;
+      imgPreview.innerHTML = '';
+      imgPreview.classList.add('has-img');
+    };
+    img.src = ev.target.result;
+  };
+  reader.readAsDataURL(file);
+};
+
+document.getElementById('btn-submit').onclick = async () => {
+  const name = document.getElementById('f-name').value.trim();
+  const errBox = document.getElementById('form-error');
+  if (!name || !currentImageData) {
+    errBox.textContent = tr('err_required');
+    errBox.style.display = 'block';
+    return;
+  }
+  errBox.style.display = 'none';
+  
+  const progress = document.getElementById('progress-bar');
+  const fill = document.getElementById('progress-fill');
+  const btn = document.getElementById('btn-submit');
+  
+  progress.style.display = 'block';
+  btn.disabled = true;
+  
+  // Simulation de la progression
+  let p = 0;
+  const interval = setInterval(() => { p += 10; if(p>90) p=90; fill.style.width = p+'%'; }, 200);
+
+  try {
+    const res = await fetch(GAS_URL, {
+      method: 'POST',
+      body: JSON.stringify({
+        name: name.replace(/\s+/g, '_') + '_' + Date.now() + '.webp',
+        image: currentImageData
+      })
+    });
+    const result = await res.json();
+    
+    if (!result.success) throw new Error("Upload failed");
+    
+    const tomatoData = {
+      name: name,
+      color: document.getElementById('f-color').value,
+      imageURL: result.url,
+      weight: parseInt(document.getElementById('f-weight').value) || null,
+      averageSize: document.getElementById('f-size').value || null,
+      description: document.getElementById('f-desc').value || "",
+      country: document.getElementById('f-country').value || "",
+      author: currentUser ? currentProfileName : tr('anonymous'),
+      uid: currentUser ? currentUser.uid : null,
+      createdAt: Date.now()
+    };
+
+    await push(ref(db, 'tomatoes'), tomatoData);
+    
+    clearInterval(interval);
+    fill.style.width = '100%';
+    setTimeout(() => { modal.classList.remove('active'); resetForm(); }, 500);
+
+  } catch(e) {
+    clearInterval(interval);
+    errBox.textContent = "Erreur lors de l'envoi de l'image. Avez-vous configuré l'URL Apps Script ?";
+    errBox.style.display = 'block';
+    progress.style.display = 'none';
+    btn.disabled = false;
+  }
+};
+
+function resetForm() {
+  document.getElementById('f-name').value = '';
+  document.getElementById('f-desc').value = '';
+  document.getElementById('f-weight').value = '';
+  document.getElementById('f-country').value = '';
+  currentImageData = null;
+  imgPreview.style.backgroundImage = 'none';
+  imgPreview.innerHTML = '<i class="fa-solid fa-camera"></i><span data-i18n="add_image">Cliquez pour ajouter une photo *</span>';
+  imgPreview.classList.remove('has-img');
+  document.getElementById('progress-bar').style.display = 'none';
+  document.getElementById('progress-fill').style.width = '0%';
+  document.getElementById('btn-submit').disabled = false;
+  document.getElementById('form-error').style.display = 'none';
+  applyI18n();
+}
+
+loadTranslations();
+</script>
+</body>
+</html>
