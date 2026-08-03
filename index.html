@@ -96,6 +96,24 @@
 
   .empty-state { grid-column: 1 / -1; text-align: center; padding: 64px 24px; color: var(--text-muted); }
 
+  /* Carte cliquable */
+  .card { cursor: pointer; }
+
+  /* Modal Détail (vue "fiche produit") */
+  .detail-modal { max-width: 640px; }
+  .detail-gallery-wrap { position: relative; width: 100%; height: 380px; background: #000; overflow: hidden; border-radius: 20px 20px 0 0; }
+  .detail-carousel { position: relative; display: flex; width: 100%; height: 100%; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; z-index: 2; }
+  .detail-carousel::-webkit-scrollbar { display: none; }
+  .detail-carousel-blur { position: absolute; inset: -20px; background-size: cover; background-position: center; filter: blur(24px); opacity: 0.55; z-index: 1; }
+  .detail-img-slide { position: relative; flex: 0 0 100%; height: 100%; scroll-snap-align: start; display: flex; align-items: center; justify-content: center; }
+  .detail-img-slide img { position: relative; z-index: 2; max-width: 100%; max-height: 100%; object-fit: contain; }
+  .detail-dots { position: absolute; bottom: 14px; left: 50%; transform: translateX(-50%); display: flex; gap: 6px; z-index: 3; }
+  .detail-dots span { width: 7px; height: 7px; border-radius: 50%; background: rgba(255,255,255,0.45); transition: background 0.2s; }
+  .detail-dots span.active { background: #fff; }
+  .detail-section-title { font-family: var(--display); font-size: 15px; font-weight: 700; margin-bottom: 8px; color: var(--text-main); }
+  .detail-desc { font-size: 14.5px; color: var(--text-main); line-height: 1.7; white-space: pre-wrap; margin-bottom: 22px; }
+  .detail-stats { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 22px; }
+
   /* Modal & Form Upload Multi-images */
   .modal-overlay { position: fixed; inset: 0; background: rgba(17, 24, 39, 0.6); backdrop-filter: blur(4px); display: flex; align-items: center; justify-content: center; z-index: 1000; opacity: 0; pointer-events: none; transition: opacity 0.25s; padding: 16px; }
   .modal-overlay.active { opacity: 1; pointer-events: all; }
@@ -240,6 +258,37 @@
     <div><span data-i18n="mod_label">Modération Facebook :</span> Pépin de Tomate</div>
   </div>
 </footer>
+
+<!-- Detail Modal (fiche produit) -->
+<div class="modal-overlay" id="detail-modal">
+  <div class="modal detail-modal">
+    <div class="modal-header" style="position:absolute; top:12px; right:12px; left:auto; border:none; padding:0; background:transparent; z-index:20;">
+      <button class="modal-close" id="close-detail-modal" style="background:rgba(17,24,39,0.55); color:#fff; border:none;"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="detail-gallery-wrap">
+      <div class="detail-carousel" id="detail-carousel"></div>
+      <div class="detail-dots" id="detail-dots"></div>
+    </div>
+    <div class="modal-body">
+      <div class="modal-title" id="detail-title" style="margin-bottom:12px;"></div>
+      <div class="card-meta" id="detail-meta" style="margin-bottom:20px;"></div>
+
+      <div class="detail-section-title" data-i18n="t_desc">Description / Histoire</div>
+      <p class="detail-desc" id="detail-desc">-</p>
+
+      <div class="card-footer">
+        <div class="card-footer-left" id="detail-author"></div>
+        <div style="display:flex; gap:12px; align-items:center;">
+          <span id="detail-date" style="font-size:12px; color:var(--text-muted)"></span>
+          <button class="like-btn" id="detail-like-btn">
+            <i class="fa-regular fa-heart"></i>
+            <span id="detail-like-count">0</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 
 <!-- Add Modal -->
 <div class="modal-overlay" id="add-modal">
@@ -517,6 +566,7 @@ onValue(ref(db, 'tomatoes'), (snapshot) => {
   tomatoesData = [];
   snapshot.forEach(child => { tomatoesData.push({ id: child.key, ...child.val() }); });
   renderGrid();
+  if (detailCurrentId) refreshDetailLikeBtn();
 });
 
 function renderGrid() {
@@ -573,7 +623,7 @@ function renderGrid() {
     }
 
     return `
-      <div class="card">
+      <div class="card" data-id="${t.id}">
         <div style="position:relative">
           <div class="card-carousel">
             ${imagesHtml}
@@ -622,22 +672,116 @@ function renderGrid() {
 
 document.getElementById('search-input').addEventListener('input', renderGrid);
 
+async function toggleLike(tomatoId) {
+  if (!currentUser) return showToast('Connectez-vous pour ajouter aux favoris', 'fa-lock');
+  const tomato = tomatoesData.find(t => t.id === tomatoId);
+  if (!tomato) return;
+
+  const isLiked = tomato.likes && tomato.likes[currentUser.uid];
+  const updates = {};
+  updates[`tomatoes/${tomatoId}/likes/${currentUser.uid}`] = isLiked ? null : true;
+  updates[`users/${currentUser.uid}/likes/${tomatoId}`] = isLiked ? null : true;
+
+  try { await update(ref(db), updates); } catch(err) { showToast("Erreur lors de l'action.", 'fa-triangle-exclamation'); }
+}
+
 document.getElementById('tomatoes-grid').addEventListener('click', async (e) => {
   const likeBtn = e.target.closest('.like-btn');
   if (likeBtn) {
-    if (!currentUser) return showToast('Connectez-vous pour ajouter aux favoris', 'fa-lock');
-    const tomatoId = likeBtn.getAttribute('data-id');
-    const tomato = tomatoesData.find(t => t.id === tomatoId);
-    if (!tomato) return;
-    
-    const isLiked = tomato.likes && tomato.likes[currentUser.uid];
-    const updates = {};
-    updates[`tomatoes/${tomatoId}/likes/${currentUser.uid}`] = isLiked ? null : true;
-    updates[`users/${currentUser.uid}/likes/${tomatoId}`] = isLiked ? null : true;
-    
-    try { await update(ref(db), updates); } catch(err) { showToast("Erreur lors de l'action.", 'fa-triangle-exclamation'); }
+    toggleLike(likeBtn.getAttribute('data-id'));
+    return;
+  }
+  const card = e.target.closest('.card');
+  if (card) {
+    openDetailModal(card.getAttribute('data-id'));
   }
 });
+
+// ----------------- MODAL DÉTAIL (Fiche produit) -----------------
+let detailCurrentId = null;
+
+function openDetailModal(tomatoId) {
+  const t = tomatoesData.find(x => x.id === tomatoId);
+  if (!t) return;
+  detailCurrentId = tomatoId;
+
+  const imagesArray = t.imageURLs || (t.imageURL ? [t.imageURL] : []);
+  const carousel = document.getElementById('detail-carousel');
+  const dots = document.getElementById('detail-dots');
+
+  carousel.innerHTML = imagesArray.length > 0
+    ? imagesArray.map(url => `
+        <div class="detail-img-slide">
+          <div class="detail-carousel-blur" style="background-image:url('${url}')"></div>
+          <img src="${url}" alt="${t.name}">
+        </div>
+      `).join('')
+    : `<div class="detail-img-slide" style="background:#eee"></div>`;
+
+  dots.innerHTML = imagesArray.length > 1
+    ? imagesArray.map((_, i) => `<span class="${i === 0 ? 'active' : ''}"></span>`).join('')
+    : '';
+
+  carousel.onscroll = () => {
+    if (imagesArray.length <= 1) return;
+    const index = Math.round(carousel.scrollLeft / carousel.offsetWidth);
+    dots.querySelectorAll('span').forEach((d, i) => d.classList.toggle('active', i === index));
+  };
+
+  document.getElementById('detail-title').textContent = t.name;
+
+  const colorBg = colorMap[t.color] || '#ccc';
+  let countryBadge = '';
+  if (t.country) {
+    const countryObj = countriesList.find(c => c.name === t.country);
+    if (countryObj) {
+      countryBadge = `<span class="badge"><img src="https://flagcdn.com/w20/${countryObj.code}.png" style="width:14px;border-radius:2px" alt=""> ${t.country}</span>`;
+    }
+  }
+  const sizeLabel = t.averageSize ? (tr('size_' + t.averageSize.toLowerCase()) || t.averageSize) : '';
+
+  document.getElementById('detail-meta').innerHTML = `
+    <span class="badge"><i class="color-dot" style="background:${colorBg}"></i> ${tr('color_' + (t.color || 'Rouge').toLowerCase()) || t.color}</span>
+    ${t.weight ? `<span class="badge"><i class="fa-solid fa-scale-balanced"></i> ${t.weight}g</span>` : ''}
+    ${sizeLabel ? `<span class="badge"><i class="fa-solid fa-ruler"></i> ${sizeLabel}</span>` : ''}
+    ${countryBadge}
+  `;
+
+  document.getElementById('detail-desc').textContent = t.description || '-';
+  document.getElementById('detail-author').innerHTML = `<i class="fa-solid fa-user" style="color:var(--text-muted)"></i> ${t.author || 'Anonyme'}`;
+  document.getElementById('detail-date').textContent = new Date(t.createdAt).toLocaleDateString(currentLang);
+
+  refreshDetailLikeBtn();
+
+  document.getElementById('detail-modal').classList.add('active');
+}
+
+function refreshDetailLikeBtn() {
+  const t = tomatoesData.find(x => x.id === detailCurrentId);
+  if (!t) return;
+  const likesCount = t.likes ? Object.keys(t.likes).length : 0;
+  const isLiked = currentUser && t.likes && t.likes[currentUser.uid];
+  const btn = document.getElementById('detail-like-btn');
+  btn.classList.toggle('liked', !!isLiked);
+  btn.querySelector('i').className = isLiked ? 'fa-solid fa-heart' : 'fa-regular fa-heart';
+  document.getElementById('detail-like-count').textContent = likesCount;
+}
+
+document.getElementById('detail-like-btn').onclick = () => {
+  if (detailCurrentId) toggleLike(detailCurrentId);
+};
+
+document.getElementById('close-detail-modal').onclick = () => {
+  document.getElementById('detail-modal').classList.remove('active');
+  detailCurrentId = null;
+};
+document.getElementById('detail-modal').addEventListener('click', (e) => {
+  if (e.target.id === 'detail-modal') {
+    document.getElementById('detail-modal').classList.remove('active');
+    detailCurrentId = null;
+  }
+});
+
 
 
 // ----------------- PUBLICATION MULTI-IMAGES -----------------
