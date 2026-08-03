@@ -204,12 +204,20 @@
   .lightbox-overlay img { max-width: 100%; max-height: 100%; object-fit: contain; }
   .lightbox-close { position: absolute; top: 20px; right: 24px; background: rgba(255,255,255,0.15); border: none; color: #fff; width: 40px; height: 40px; border-radius: 50%; font-size: 18px; cursor: pointer; }
 
-  /* Carte du monde */
-  .map-wrap { position: relative; width: 100%; border-radius: 12px; overflow: hidden; background: #dbeafe; }
-  .map-wrap img { width: 100%; display: block; }
-  .map-dot { position: absolute; width: 14px; height: 14px; background: var(--primary); border: 2px solid #fff; border-radius: 50%; transform: translate(-50%, -50%); cursor: pointer; box-shadow: 0 2px 6px rgba(0,0,0,0.3); transition: transform 0.15s; }
-  .map-dot:hover { transform: translate(-50%, -50%) scale(1.4); }
-  .map-dot-count { position: absolute; top: -7px; right: -7px; background: var(--text-main); color: #fff; font-size: 9px; font-weight: 700; border-radius: 50%; width: 15px; height: 15px; display: flex; align-items: center; justify-content: center; }
+  /* Carte du monde interactive (zoom/pan) */
+  .map-viewport { position: relative; width: 100%; aspect-ratio: 2 / 1; border-radius: 12px; overflow: hidden; background: #dbeafe; touch-action: none; cursor: grab; user-select: none; }
+  .map-viewport.grabbing { cursor: grabbing; }
+  .map-inner { position: absolute; top: 0; left: 0; width: 100%; height: 100%; transform-origin: 0 0; will-change: transform; }
+  .map-inner img { width: 100%; height: 100%; display: block; object-fit: fill; pointer-events: none; -webkit-user-drag: none; }
+  .map-controls { position: absolute; bottom: 12px; right: 12px; display: flex; flex-direction: column; gap: 6px; z-index: 10; }
+  .map-ctrl-btn { width: 34px; height: 34px; border-radius: 8px; border: 1px solid var(--line); background: rgba(255,255,255,0.92); color: var(--text-main); font-size: 15px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 6px rgba(0,0,0,0.15); }
+  .map-ctrl-btn:hover { background: #fff; }
+  .map-hint { position: absolute; top: 10px; left: 12px; background: rgba(17,24,39,0.55); color: #fff; font-size: 11px; padding: 5px 10px; border-radius: 20px; z-index: 10; pointer-events: none; }
+  .map-pin { position: absolute; transform: translate(-50%, -100%); display: flex; flex-direction: column; align-items: center; cursor: pointer; }
+  .map-pin-flag { width: 22px; height: 16px; object-fit: cover; border-radius: 3px; border: 1.5px solid #fff; box-shadow: 0 2px 5px rgba(0,0,0,0.35); margin-bottom: 2px; }
+  .map-dot { position: relative; width: 12px; height: 12px; background: var(--primary); border: 2px solid #fff; border-radius: 50%; box-shadow: 0 2px 5px rgba(0,0,0,0.3); }
+  .map-dot-count { position: absolute; top: -6px; right: -8px; background: var(--text-main); color: #fff; font-size: 9px; font-weight: 700; border-radius: 50%; width: 15px; height: 15px; display: flex; align-items: center; justify-content: center; }
+  .map-pin:hover .map-pin-flag { transform: scale(1.15); }
 
   /* Tomates similaires */
   .similar-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; margin-top: 8px; }
@@ -362,8 +370,16 @@
       <button class="modal-close" id="close-map-modal"><i class="fa-solid fa-xmark"></i></button>
     </div>
     <div class="modal-body">
-      <div class="map-wrap" id="map-wrap">
-        <img src="https://upload.wikimedia.org/wikipedia/commons/8/83/Equirectangular_projection_SW.jpg" alt="World map">
+      <div class="map-viewport" id="map-viewport">
+        <div class="map-hint"><i class="fa-solid fa-arrows-up-down-left-right"></i> <span data-i18n="map_hint">Glissez, molette ou pincez pour zoomer</span></div>
+        <div class="map-inner" id="map-inner">
+          <img src="https://upload.wikimedia.org/wikipedia/commons/8/83/Equirectangular_projection_SW.jpg" alt="World map" draggable="false">
+        </div>
+        <div class="map-controls">
+          <button class="map-ctrl-btn" id="map-zoom-in" type="button" title="Zoom +"><i class="fa-solid fa-plus"></i></button>
+          <button class="map-ctrl-btn" id="map-zoom-out" type="button" title="Zoom -"><i class="fa-solid fa-minus"></i></button>
+          <button class="map-ctrl-btn" id="map-zoom-reset" type="button" title="Réinitialiser"><i class="fa-solid fa-compress"></i></button>
+        </div>
       </div>
     </div>
   </div>
@@ -1041,10 +1057,126 @@ document.getElementById('author-modal').addEventListener('click', (e) => {
   if (e.target.id === 'author-modal') document.getElementById('author-modal').classList.remove('active');
 });
 
-// ----------------- CARTE DU MONDE -----------------
+// ----------------- CARTE DU MONDE (zoom / pan / drapeaux) -----------------
+const mapViewport = document.getElementById('map-viewport');
+const mapInner = document.getElementById('map-inner');
+
+const mapState = { scale: 1, x: 0, y: 0, minScale: 1, maxScale: 8 };
+
+function applyMapTransform() {
+  mapInner.style.transform = `translate(${mapState.x}px, ${mapState.y}px) scale(${mapState.scale})`;
+}
+
+function clampMapPosition() {
+  // Empêche de faire glisser la carte complètement hors du cadre
+  const vw = mapViewport.clientWidth;
+  const vh = mapViewport.clientHeight;
+  const scaledW = vw * mapState.scale;
+  const scaledH = vh * mapState.scale;
+  const minX = Math.min(0, vw - scaledW);
+  const minY = Math.min(0, vh - scaledH);
+  mapState.x = Math.max(minX, Math.min(0, mapState.x));
+  mapState.y = Math.max(minY, Math.min(0, mapState.y));
+}
+
+function zoomMapAt(factor, clientX, clientY) {
+  const rect = mapViewport.getBoundingClientRect();
+  const originX = clientX !== undefined ? clientX - rect.left : rect.width / 2;
+  const originY = clientY !== undefined ? clientY - rect.top : rect.height / 2;
+
+  const newScale = Math.max(mapState.minScale, Math.min(mapState.maxScale, mapState.scale * factor));
+  const realFactor = newScale / mapState.scale;
+
+  mapState.x = originX - (originX - mapState.x) * realFactor;
+  mapState.y = originY - (originY - mapState.y) * realFactor;
+  mapState.scale = newScale;
+
+  clampMapPosition();
+  applyMapTransform();
+}
+
+function resetMapView() {
+  mapState.scale = 1; mapState.x = 0; mapState.y = 0;
+  applyMapTransform();
+}
+
+// Molette souris = zoom centré sur le curseur
+mapViewport.addEventListener('wheel', (e) => {
+  e.preventDefault();
+  const factor = e.deltaY < 0 ? 1.2 : 1 / 1.2;
+  zoomMapAt(factor, e.clientX, e.clientY);
+}, { passive: false });
+
+// Glisser-déposer (souris + doigt) via Pointer Events, + pincement à 2 doigts
+const activePointers = new Map();
+let dragStart = null;
+let pinchStartDist = null;
+let pinchStartScale = 1;
+let pinchMidpoint = null;
+
+function getPointersArray() { return Array.from(activePointers.values()); }
+function dist(a, b) { return Math.hypot(a.x - b.x, a.y - b.y); }
+function midpoint(a, b) { return { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 }; }
+
+mapViewport.addEventListener('pointerdown', (e) => {
+  mapViewport.setPointerCapture(e.pointerId);
+  activePointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+  if (activePointers.size === 1) {
+    dragStart = { x: e.clientX, y: e.clientY, origX: mapState.x, origY: mapState.y };
+    mapViewport.classList.add('grabbing');
+  } else if (activePointers.size === 2) {
+    const [p1, p2] = getPointersArray();
+    pinchStartDist = dist(p1, p2);
+    pinchStartScale = mapState.scale;
+    pinchMidpoint = midpoint(p1, p2);
+    dragStart = null;
+  }
+});
+
+mapViewport.addEventListener('pointermove', (e) => {
+  if (!activePointers.has(e.pointerId)) return;
+  activePointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+
+  if (activePointers.size === 2) {
+    const [p1, p2] = getPointersArray();
+    const newDist = dist(p1, p2);
+    if (pinchStartDist) {
+      const factor = (newDist / pinchStartDist) * pinchStartScale / mapState.scale;
+      zoomMapAt(factor, pinchMidpoint.x, pinchMidpoint.y);
+    }
+  } else if (dragStart && activePointers.size === 1) {
+    mapState.x = dragStart.origX + (e.clientX - dragStart.x);
+    mapState.y = dragStart.origY + (e.clientY - dragStart.y);
+    clampMapPosition();
+    applyMapTransform();
+  }
+});
+
+function endMapPointer(e) {
+  activePointers.delete(e.pointerId);
+  mapViewport.classList.remove('grabbing');
+  if (activePointers.size < 2) { pinchStartDist = null; }
+  if (activePointers.size === 1) {
+    const [p] = getPointersArray();
+    dragStart = { x: p.x, y: p.y, origX: mapState.x, origY: mapState.y };
+  } else if (activePointers.size === 0) {
+    dragStart = null;
+  }
+}
+mapViewport.addEventListener('pointerup', endMapPointer);
+mapViewport.addEventListener('pointercancel', endMapPointer);
+mapViewport.addEventListener('pointerleave', (e) => { if (activePointers.has(e.pointerId)) endMapPointer(e); });
+
+// Boutons de zoom
+document.getElementById('map-zoom-in').onclick = () => zoomMapAt(1.4);
+document.getElementById('map-zoom-out').onclick = () => zoomMapAt(1 / 1.4);
+document.getElementById('map-zoom-reset').onclick = () => resetMapView();
+
+// Double-clic / double-tap = zoom rapide
+mapViewport.addEventListener('dblclick', (e) => zoomMapAt(1.6, e.clientX, e.clientY));
+
 function renderMap() {
-  const wrap = document.getElementById('map-wrap');
-  wrap.querySelectorAll('.map-dot').forEach(d => d.remove());
+  mapInner.querySelectorAll('.map-pin').forEach(d => d.remove());
 
   const counts = {};
   tomatoesData.forEach(t => {
@@ -1058,24 +1190,30 @@ function renderMap() {
     const [lat, lon] = COUNTRY_COORDS[c.code];
     const x = ((lon + 180) / 360) * 100;
     const y = ((90 - lat) / 180) * 100;
-    const dot = document.createElement('div');
-    dot.className = 'map-dot';
-    dot.style.left = x + '%';
-    dot.style.top = y + '%';
-    dot.title = `${countryName} (${counts[countryName]})`;
-    dot.innerHTML = `<span class="map-dot-count">${counts[countryName]}</span>`;
-    dot.onclick = () => {
+
+    const pin = document.createElement('div');
+    pin.className = 'map-pin';
+    pin.style.left = x + '%';
+    pin.style.top = y + '%';
+    pin.title = `${countryName} (${counts[countryName]})`;
+    pin.innerHTML = `
+      <img class="map-pin-flag" src="https://flagcdn.com/w40/${c.code}.png" alt="${countryName}">
+      <div class="map-dot"><span class="map-dot-count">${counts[countryName]}</span></div>
+    `;
+    pin.addEventListener('click', (e) => {
+      e.stopPropagation();
       currentCountry = countryName;
       document.getElementById('country-filter-select').value = countryName;
       document.getElementById('map-modal').classList.remove('active');
       renderGrid();
       document.getElementById('tomatoes-grid').scrollIntoView({ behavior: 'smooth' });
-    };
-    wrap.appendChild(dot);
+    });
+    mapInner.appendChild(pin);
   });
 }
 document.getElementById('btn-open-map').onclick = () => {
   renderMap();
+  resetMapView();
   document.getElementById('map-modal').classList.add('active');
 };
 document.getElementById('close-map-modal').onclick = () => document.getElementById('map-modal').classList.remove('active');
