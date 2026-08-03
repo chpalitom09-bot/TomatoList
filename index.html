@@ -59,19 +59,29 @@
   .filter-pill.active { background: var(--text-main); color: #fff; border-color: var(--text-main); }
   .filter-pill.active .color-dot { border-color: rgba(255,255,255,0.2); }
 
-  /* Grid */
+  /* Grid & Cards */
   .grid { max-width: 1200px; margin: 0 auto 64px; padding: 0 24px; display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 24px; }
-  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; overflow: hidden; transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s; }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; overflow: hidden; transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s; display: flex; flex-direction: column; }
   .card:hover { transform: translateY(-6px); box-shadow: 0 20px 40px rgba(0,0,0,0.08); }
   .card-img { width: 100%; height: 220px; object-fit: cover; background: #eee; border-bottom: 1px solid var(--border); }
-  .card-body { padding: 20px; }
+  .card-body { padding: 20px; flex: 1; display: flex; flex-direction: column; }
   .card-title { font-family: var(--display); font-size: 20px; font-weight: 700; margin-bottom: 10px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .card-meta { display: flex; gap: 8px; font-size: 13px; color: var(--text-muted); margin-bottom: 14px; flex-wrap: wrap; }
   .badge { background: var(--bg); padding: 5px 10px; border-radius: 8px; font-weight: 500; border: 1px solid var(--border); display:flex; align-items:center; gap:6px; }
   .color-dot { width: 12px; height: 12px; border-radius: 50%; display: inline-block; box-shadow: inset 0 1px 3px rgba(0,0,0,0.1); border: 1px solid rgba(0,0,0,0.05); }
-  .card-desc { font-size: 14px; color: var(--text-muted); line-height: 1.6; margin-bottom: 16px; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
-  .card-footer { border-top: 1px solid var(--border); padding-top: 16px; font-size: 12px; color: var(--text-muted); display: flex; justify-content: space-between; align-items: center; }
+  .card-desc { font-size: 14px; color: var(--text-muted); line-height: 1.6; margin-bottom: 16px; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; flex: 1; }
   
+  .card-footer { border-top: 1px solid var(--border); padding-top: 16px; font-size: 13px; color: var(--text-muted); display: flex; justify-content: space-between; align-items: center; }
+  .card-footer-left { display: flex; align-items: center; gap: 8px; font-weight: 500; }
+  .card-footer-right { display: flex; align-items: center; gap: 14px; }
+  
+  .like-btn { background: none; border: none; cursor: pointer; display: flex; align-items: center; gap: 6px; color: var(--text-muted); font-size: 14px; font-weight: 600; font-family: var(--sans); transition: all 0.2s; padding: 4px 8px; border-radius: 6px; margin: -4px -8px; }
+  .like-btn:hover { color: var(--primary); background: #fef2f2; }
+  .like-btn:active { transform: scale(0.95); }
+  .like-btn.liked { color: var(--primary); }
+  .like-btn.liked i { animation: popHeart 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+  @keyframes popHeart { 0% { transform: scale(1); } 50% { transform: scale(1.3); } 100% { transform: scale(1); } }
+
   .empty-state { grid-column: 1 / -1; text-align: center; padding: 64px 24px; color: var(--text-muted); }
   .empty-state i { font-size: 48px; margin-bottom: 16px; opacity: 0.5; }
 
@@ -101,12 +111,15 @@
   .progress-fill { width: 0%; height: 100%; background: var(--primary); transition: width 0.3s; }
   .error-msg { color: #d92d20; background: #fef2f2; border: 1px solid #fecaca; padding: 12px; border-radius: 8px; font-size: 13.5px; margin-bottom: 20px; display: none; }
 
-  /* Footer */
+  .toast-container { position: fixed; bottom: 32px; left: 50%; transform: translateX(-50%); z-index: 9999; display: flex; flex-direction: column; gap: 10px; pointer-events: none; }
+  .toast { background: var(--text-main); color: #fff; padding: 12px 24px; border-radius: 10px; font-size: 14px; font-weight: 500; box-shadow: 0 10px 25px rgba(0,0,0,0.15); opacity: 0; transform: translateY(20px); animation: slideUpToast 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards, fadeOutToast 0.4s 3s forwards; display: flex; align-items: center; gap: 10px; }
+  @keyframes slideUpToast { to { opacity: 1; transform: translateY(0); } }
+  @keyframes fadeOutToast { to { opacity: 0; transform: translateY(20px); } }
+
   .footer { background: #111; color: #fff; padding: 48px 24px; text-align: center; font-size: 14px; }
   .credits { margin-top: 24px; color: #888; font-size: 13px; display: flex; justify-content: center; gap: 32px; flex-wrap: wrap; }
   .credits span { color: #fff; font-weight: 600; }
 
-  /* Mobile Responsive */
   @media (max-width: 768px) {
     .navbar { padding: 12px 16px; }
     .brand { font-size: 20px; }
@@ -149,6 +162,7 @@
       <div class="pill-group" id="sort-group">
         <button class="filter-pill active" data-val="date" data-i18n="sort_date">Les plus récentes</button>
         <button class="filter-pill" data-val="alpha" data-i18n="sort_alpha">Ordre alphabétique</button>
+        <button class="filter-pill" data-val="likes"><i class="fa-solid fa-heart" style="color:var(--primary); font-size:12px"></i> Plus populaires</button>
       </div>
     </div>
     <div class="filter-group">
@@ -169,8 +183,11 @@
 </div>
 
 <div class="grid" id="tomatoes-grid">
-  <!-- Les cartes seront générées ici -->
+  <!-- Les cartes seront générées ici par JavaScript -->
 </div>
+
+<!-- Conteneur pour les Toasts élégants -->
+<div class="toast-container" id="toast-container"></div>
 
 <footer class="footer">
   <div class="brand" style="margin-bottom:16px; color:#fff">TomatoList</div>
@@ -257,11 +274,9 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.17.0/firebase-app.js";
 import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.17.0/firebase-analytics.js";
 import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.17.0/firebase-auth.js";
-import { getDatabase, ref, onValue, push, get } from "https://www.gstatic.com/firebasejs/12.17.0/firebase-database.js";
+import { getDatabase, ref, onValue, push, get, update } from "https://www.gstatic.com/firebasejs/12.17.0/firebase-database.js";
 
-// ==========================================
-// CONFIGURATION
-// ==========================================
+// Configuration Firebase
 const firebaseConfig = {
   apiKey: "AIzaSyAaz9s2jxsNqYd9FBsVG4u48-BwE8LAXCE",
   authDomain: "tomatolist-efee0.firebaseapp.com",
@@ -269,20 +284,18 @@ const firebaseConfig = {
   storageBucket: "tomatolist-efee0.firebasestorage.app",
   messagingSenderId: "451109980779",
   appId: "1:451109980779:web:87ae55fc2b4370dfa43f2e",
-  measurementId: "G-Q8KHD0WW38"
+  measurementId: "G-Q8KHD0WW38",
+  databaseURL: "https://tomatolist-efee0-default-rtdb.europe-west1.firebasedatabase.app"
 };
 
-// URL DU SCRIPT GOOGLE APPS SCRIPT (À REMPLACER)
-const GAS_URL = "VOTRE_URL_GOOGLE_APPS_SCRIPT_ICI";
+// URL DU SCRIPT GOOGLE APPS SCRIPT MISE À JOUR :
+const GAS_URL = "https://script.google.com/macros/s/AKfycbxVu24YbDkU7jbGKQt9kw2BdAo-Qj-_jympy35mMlMoS4guNFyxqqBhIxlts0_WZ1pgvg/exec";
 
 const app = initializeApp(firebaseConfig);
 const analytics = getAnalytics(app);
 const auth = getAuth(app);
 const db = getDatabase(app);
 
-// ==========================================
-// ETAT & I18N
-// ==========================================
 let tomatoesData = [];
 let currentUser = null;
 let currentProfileName = "Anonyme";
@@ -290,12 +303,11 @@ let currentImageData = null;
 
 let currentSort = 'date';
 let currentColor = 'all';
-
 let currentLang = localStorage.getItem('tl_lang') || (navigator.language || 'fr').slice(0,2);
 let TRANSLATIONS = {};
 
 const FALLBACK_TEXTS = {
-  'filters': 'Filtres', 'sort_by': 'Trier par', 'color': 'Couleur', 'no_results': 'Aucune variété trouvée correspondant à vos critères.'
+  'filters': 'Filtres', 'sort_by': 'Trier par', 'color': 'Couleur', 'no_results': 'Aucune variété trouvée.', 'login_to_like': 'Connectez-vous pour ajouter aux favoris.'
 };
 
 const colorMap = {
@@ -304,11 +316,20 @@ const colorMap = {
   'Blanche': '#f3f4f6', 'Bicolore': 'linear-gradient(135deg, #ef4444 50%, #eab308 50%)'
 };
 
+function showToast(msg, icon = 'fa-circle-info') {
+  const container = document.getElementById('toast-container');
+  const toast = document.createElement('div');
+  toast.className = 'toast';
+  toast.innerHTML = `<i class="fa-solid ${icon}"></i> <span>${msg}</span>`;
+  container.appendChild(toast);
+  setTimeout(() => { if (toast.parentNode) toast.remove(); }, 3500);
+}
+
 async function loadTranslations() {
   try {
     const res = await fetch('lang.json');
     TRANSLATIONS = await res.json();
-  } catch(e) { console.error("Fichier lang.json non trouvé, utilisation des textes par défaut."); }
+  } catch(e) { console.warn("Fichier lang.json non trouvé, textes par défaut."); }
   applyI18n();
 }
 function tr(key) { 
@@ -319,11 +340,8 @@ function tr(key) {
 }
 function applyI18n() {
   document.querySelectorAll('[data-i18n]').forEach(el => {
-    if(el.tagName === 'SPAN' && el.classList.contains('hide-mobile')) {
-      el.textContent = tr(el.getAttribute('data-i18n'));
-    } else {
-      el.textContent = tr(el.getAttribute('data-i18n'));
-    }
+    if(el.tagName === 'SPAN' && el.classList.contains('hide-mobile')) el.textContent = tr(el.getAttribute('data-i18n'));
+    else el.textContent = tr(el.getAttribute('data-i18n'));
   });
   document.querySelectorAll('[data-i18n-ph]').forEach(el => el.placeholder = tr(el.getAttribute('data-i18n-ph')));
   document.getElementById('lang-label').textContent = currentLang.toUpperCase();
@@ -331,16 +349,12 @@ function applyI18n() {
 
 document.getElementById('btn-lang').onclick = () => {
   const langs = ['fr','en','de','es','it','ru','zh','hi'];
-  let idx = langs.indexOf(currentLang);
-  currentLang = langs[(idx + 1) % langs.length];
+  currentLang = langs[(langs.indexOf(currentLang) + 1) % langs.length];
   localStorage.setItem('tl_lang', currentLang);
   applyI18n();
   renderGrid();
 };
 
-// ==========================================
-// UI : FILTRES CUSTOMS (Toggle & Boutons)
-// ==========================================
 document.getElementById('btn-toggle-filters').onclick = () => {
   document.getElementById('filters-panel').classList.toggle('active');
 };
@@ -363,17 +377,13 @@ document.querySelectorAll('#color-group .filter-pill').forEach(btn => {
   };
 });
 
-
-// ==========================================
-// AUTHENTIFICATION
-// ==========================================
 onAuthStateChanged(auth, async (user) => {
   currentUser = user;
   const authLabel = document.getElementById('auth-label');
   const btnAuth = document.getElementById('btn-auth');
   if (user) {
     authLabel.textContent = tr('logout');
-    btnAuth.onclick = () => signOut(auth);
+    btnAuth.onclick = () => { signOut(auth); showToast('Déconnexion réussie', 'fa-check'); };
     const snap = await get(ref(db, `users/${user.uid}/profile`));
     if (snap.exists()) {
       const p = snap.val();
@@ -384,11 +394,9 @@ onAuthStateChanged(auth, async (user) => {
     btnAuth.onclick = () => window.location.href = 'auth.html';
     currentProfileName = tr("anonymous");
   }
+  renderGrid(); // Refresh grid to update heart icons
 });
 
-// ==========================================
-// LECTURE DES DONNÉES
-// ==========================================
 onValue(ref(db, 'tomatoes'), (snapshot) => {
   tomatoesData = [];
   snapshot.forEach(child => {
@@ -408,6 +416,9 @@ function renderGrid() {
   });
 
   if (currentSort === 'alpha') filtered.sort((a,b) => (a.name||'').localeCompare(b.name));
+  else if (currentSort === 'likes') {
+    filtered.sort((a,b) => (Object.keys(b.likes || {}).length) - (Object.keys(a.likes || {}).length));
+  }
   else filtered.sort((a,b) => (b.createdAt || 0) - (a.createdAt || 0));
 
   if (filtered.length === 0) {
@@ -418,6 +429,11 @@ function renderGrid() {
   grid.innerHTML = filtered.map(t => {
     const date = new Date(t.createdAt).toLocaleDateString(currentLang);
     const colorBg = colorMap[t.color] || '#ccc';
+    
+    // Logique du bouton Like
+    const likesCount = t.likes ? Object.keys(t.likes).length : 0;
+    const isLiked = currentUser && t.likes && t.likes[currentUser.uid];
+    
     return `
       <div class="card">
         <img src="${t.imageURL}" class="card-img" alt="${t.name}" loading="lazy">
@@ -429,9 +445,18 @@ function renderGrid() {
             ${t.country ? `<span class="badge"><i class="fa-solid fa-earth-europe"></i> ${t.country}</span>` : ''}
           </div>
           <div class="card-desc">${t.description || '-'}</div>
+          
           <div class="card-footer">
-            <span><i class="fa-solid fa-user"></i> ${t.author || tr('anonymous')}</span>
-            <span>${date}</span>
+            <div class="card-footer-left">
+              <i class="fa-solid fa-user" style="color:var(--text-muted)"></i> ${t.author || tr('anonymous')}
+            </div>
+            <div class="card-footer-right">
+              <span style="font-size: 12px">${date}</span>
+              <button class="like-btn ${isLiked ? 'liked' : ''}" data-id="${t.id}">
+                <i class="${isLiked ? 'fa-solid' : 'fa-regular'} fa-heart"></i>
+                <span>${likesCount}</span>
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -441,9 +466,34 @@ function renderGrid() {
 
 document.getElementById('search-input').addEventListener('input', renderGrid);
 
-// ==========================================
-// AJOUT DE TOMATE & COMPRESSION IMAGE
-// ==========================================
+// Gestionnaire global pour les Likes
+document.getElementById('tomatoes-grid').addEventListener('click', async (e) => {
+  const likeBtn = e.target.closest('.like-btn');
+  if (likeBtn) {
+    if (!currentUser) {
+      showToast(tr('login_to_like') || 'Connectez-vous pour ajouter aux favoris', 'fa-lock');
+      return;
+    }
+    const tomatoId = likeBtn.getAttribute('data-id');
+    const tomato = tomatoesData.find(t => t.id === tomatoId);
+    if (!tomato) return;
+    
+    const isLiked = tomato.likes && tomato.likes[currentUser.uid];
+    
+    // Multi-path update : met à jour le compteur sur la tomate ET dans le noeud profil du user
+    const updates = {};
+    updates[`tomatoes/${tomatoId}/likes/${currentUser.uid}`] = isLiked ? null : true;
+    updates[`users/${currentUser.uid}/likes/${tomatoId}`] = isLiked ? null : true;
+    
+    try {
+      await update(ref(db), updates);
+      // L'UI se mettra à jour toute seule grâce au listener onValue
+    } catch(err) {
+      showToast("Une erreur est survenue.", 'fa-triangle-exclamation');
+    }
+  }
+});
+
 const modal = document.getElementById('add-modal');
 document.getElementById('btn-add-modal').onclick = () => { modal.classList.add('active'); };
 document.getElementById('close-modal').onclick = () => { modal.classList.remove('active'); resetForm(); };
@@ -484,7 +534,7 @@ document.getElementById('btn-submit').onclick = async () => {
   const name = document.getElementById('f-name').value.trim();
   const errBox = document.getElementById('form-error');
   if (!name || !currentImageData) {
-    errBox.textContent = tr('err_required');
+    errBox.textContent = tr('err_required') || 'Champs requis manquants.';
     errBox.style.display = 'block';
     return;
   }
@@ -512,6 +562,7 @@ document.getElementById('btn-submit').onclick = async () => {
     
     if (!result.success) throw new Error("Upload failed");
     
+    // Création de l'objet sans restriction de compte (Anonyme par défaut si non connecté)
     const tomatoData = {
       name: name,
       color: document.getElementById('f-color').value,
@@ -520,8 +571,8 @@ document.getElementById('btn-submit').onclick = async () => {
       averageSize: document.getElementById('f-size').value || null,
       description: document.getElementById('f-desc').value || "",
       country: document.getElementById('f-country').value || "",
-      author: currentUser ? currentProfileName : tr('anonymous'),
-      uid: currentUser ? currentUser.uid : null,
+      author: currentUser ? currentProfileName : tr('anonymous') || 'Anonyme',
+      uid: currentUser ? currentUser.uid : null, // null si anonyme
       createdAt: Date.now()
     };
 
@@ -529,7 +580,7 @@ document.getElementById('btn-submit').onclick = async () => {
     
     clearInterval(interval);
     fill.style.width = '100%';
-    setTimeout(() => { modal.classList.remove('active'); resetForm(); }, 500);
+    setTimeout(() => { modal.classList.remove('active'); resetForm(); showToast('Variété publiée avec succès !', 'fa-seedling'); }, 500);
 
   } catch(e) {
     clearInterval(interval);
