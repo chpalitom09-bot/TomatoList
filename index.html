@@ -19,8 +19,7 @@
   :root {
     --primary: #b91c1c; --primary-hover: #991b1b;
     --bg: #f9fafb; --surface: #ffffff;
-    --text-main: #111827; --text-muted: #6b7280;
-    --border: #e5e7eb;
+    --text-main: #111827; --text-muted: #6b7280; --line: #e5e7eb; --line-h: #d1d5db;
     --sans: 'Inter', sans-serif; --display: 'Space Grotesk', sans-serif;
   }
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -29,111 +28,128 @@
   button, input, select, textarea { font-family: inherit; }
 
   /* Navbar */
-  .navbar { background: var(--surface); border-bottom: 1px solid var(--border); padding: 16px 24px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; }
+  .navbar { background: var(--surface); border-bottom: 1px solid var(--line); padding: 16px 24px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; }
   .brand { font-family: var(--display); font-size: 24px; font-weight: 700; color: var(--primary); letter-spacing: -0.03em; }
   .nav-actions { display: flex; align-items: center; gap: 12px; }
   .btn { padding: 10px 16px; border-radius: 9px; font-weight: 600; font-size: 14px; cursor: pointer; transition: all 0.2s; border: none; display: flex; align-items: center; justify-content: center; gap: 8px; }
   .btn-primary { background: var(--primary); color: #fff; }
   .btn-primary:hover { background: var(--primary-hover); transform: translateY(-1px); }
-  .btn-outline { background: transparent; border: 1px solid var(--border); color: var(--text-main); }
+  .btn-outline { background: transparent; border: 1px solid var(--line); color: var(--text-main); }
   .btn-outline:hover { background: var(--bg); }
 
-  /* Menu Langue Déroulant */
+  /* Menu Langue */
   .lang-dropdown { position: relative; }
-  .lang-menu { position: absolute; top: calc(100% + 8px); right: 0; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); min-width: 130px; display: none; flex-direction: column; overflow: hidden; z-index: 200; }
+  .lang-menu { position: absolute; top: calc(100% + 8px); right: 0; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); min-width: 130px; display: none; flex-direction: column; overflow: hidden; z-index: 200; }
   .lang-menu.active { display: flex; animation: slideDown 0.2s cubic-bezier(0.16, 1, 0.3, 1); }
   .lang-menu button { padding: 12px 16px; border: none; background: none; text-align: left; cursor: pointer; font-size: 14px; font-weight: 500; transition: background 0.2s; color: var(--text-main); }
   .lang-menu button:hover { background: var(--bg); }
   .lang-menu button.active { font-weight: 700; background: var(--bg); color: var(--primary); }
 
-  /* Toolbar & Custom Filters */
+  /* Toolbar */
   .toolbar-wrap { max-width: 1200px; margin: 32px auto 24px; }
   .toolbar { padding: 0 24px; display: flex; gap: 12px; margin-bottom: 16px; }
   .search-box { flex: 1; position: relative; }
   .search-box i { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: var(--text-muted); }
-  .search-box input { width: 100%; padding: 14px 16px 14px 44px; border: 1px solid var(--border); border-radius: 10px; outline: none; font-size: 15px; background: var(--surface); transition: border-color 0.2s, box-shadow 0.2s; }
-  .search-box input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(185, 28, 28, 0.1); }
+  .search-box input { width: 100%; padding: 14px 16px 14px 44px; border: 1px solid var(--line); border-radius: 10px; outline: none; font-size: 15px; background: var(--surface); transition: border-color 0.2s; }
+  .search-box input:focus { border-color: var(--primary); }
   
-  .filters-panel { display: none; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 24px; margin: 0 24px; box-shadow: 0 12px 24px rgba(0,0,0,0.04); animation: slideDown 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
+  .filters-panel { display: none; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 24px; margin: 0 24px; box-shadow: 0 12px 24px rgba(0,0,0,0.04); animation: slideDown 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
   .filters-panel.active { display: block; }
   @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
   
   .filter-group { margin-bottom: 24px; }
   .filter-group:last-child { margin-bottom: 0; }
   .filter-title { font-size: 13px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 12px; }
+  
+  /* PILULES PREMIUM (Filtres) */
   .pill-group { display: flex; flex-wrap: wrap; gap: 10px; }
-  .filter-pill { padding: 8px 16px; border: 1px solid var(--border); border-radius: 20px; background: var(--surface); color: var(--text-main); cursor: pointer; font-size: 14px; font-weight: 500; transition: all 0.2s; display: flex; align-items: center; gap: 8px; }
-  .filter-pill:hover { border-color: var(--text-muted); background: var(--bg); }
-  .filter-pill.active { background: var(--text-main); color: #fff; border-color: var(--text-main); }
-  .filter-pill.active .color-dot { border-color: rgba(255,255,255,0.2); }
+  .filter-pill { padding: 10px 16px; border: 1px solid var(--line); border-radius: 30px; background: var(--surface); color: var(--text-muted); cursor: pointer; font-size: 14px; font-weight: 500; transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1); display: flex; align-items: center; gap: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
+  .filter-pill:hover { border-color: var(--line-h); transform: translateY(-1px); box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+  .filter-pill.active { background: var(--surface); color: var(--text-main); font-weight: 600; box-shadow: 0 0 0 1.5px var(--text-main); border-color: transparent; }
+  .filter-pill .color-dot { width: 16px; height: 16px; border-radius: 50%; display: inline-block; box-shadow: inset 0 2px 4px rgba(0,0,0,0.2), 0 0 0 1px rgba(0,0,0,0.05); }
+  .foryou-pill { background: linear-gradient(135deg, #fef2f2, #fff); border-color: #fca5a5 !important; color: var(--primary) !important; }
 
-  /* Grid & Cards */
-  .grid { max-width: 1200px; margin: 0 auto 64px; padding: 0 24px; display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 24px; }
-  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; overflow: hidden; transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s; display: flex; flex-direction: column; }
+  /* CARDS & IMAGES CADRÉES */
+  .grid { max-width: 1200px; margin: 0 auto 64px; padding: 0 24px; display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 24px; }
+  .card { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; overflow: hidden; transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s; display: flex; flex-direction: column; }
   .card:hover { transform: translateY(-6px); box-shadow: 0 20px 40px rgba(0,0,0,0.08); }
-  .card-img { width: 100%; height: 220px; object-fit: cover; background: #eee; border-bottom: 1px solid var(--border); }
+  
+  /* Conteneur Image Glassmorphism (Permet de voir l'image entière sans couper) */
+  .card-img-wrapper { position: relative; width: 100%; height: 260px; background: #000; overflow: hidden; border-bottom: 1px solid var(--line); }
+  .card-img-blur { position: absolute; inset: -20px; background-size: cover; background-position: center; filter: blur(20px); opacity: 0.6; z-index: 1; }
+  .card-carousel { position: relative; display: flex; width: 100%; height: 100%; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; z-index: 2; }
+  .card-carousel::-webkit-scrollbar { display: none; }
+  .card-img { flex: 0 0 100%; height: 100%; object-fit: contain; scroll-snap-align: start; }
+  .img-count { position: absolute; bottom: 10px; right: 10px; background: rgba(0,0,0,0.6); color: #fff; padding: 4px 8px; border-radius: 12px; font-size: 11px; font-weight: 600; z-index: 3; backdrop-filter: blur(4px); }
+
   .card-body { padding: 20px; flex: 1; display: flex; flex-direction: column; }
   .card-title { font-family: var(--display); font-size: 20px; font-weight: 700; margin-bottom: 10px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .card-meta { display: flex; gap: 8px; font-size: 13px; color: var(--text-muted); margin-bottom: 14px; flex-wrap: wrap; }
-  .badge { background: var(--bg); padding: 5px 10px; border-radius: 8px; font-weight: 500; border: 1px solid var(--border); display:flex; align-items:center; gap:6px; }
-  .color-dot { width: 12px; height: 12px; border-radius: 50%; display: inline-block; box-shadow: inset 0 1px 3px rgba(0,0,0,0.1); border: 1px solid rgba(0,0,0,0.05); }
+  .badge { background: var(--bg); padding: 5px 10px; border-radius: 8px; font-weight: 500; border: 1px solid var(--line); display:flex; align-items:center; gap:6px; }
   .card-desc { font-size: 14px; color: var(--text-muted); line-height: 1.6; margin-bottom: 16px; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; flex: 1; }
   
-  .card-footer { border-top: 1px solid var(--border); padding-top: 16px; font-size: 13px; color: var(--text-muted); display: flex; justify-content: space-between; align-items: center; }
+  .card-footer { border-top: 1px solid var(--line); padding-top: 16px; font-size: 13px; color: var(--text-muted); display: flex; justify-content: space-between; align-items: center; }
   .card-footer-left { display: flex; align-items: center; gap: 8px; font-weight: 500; }
-  .card-footer-right { display: flex; align-items: center; gap: 14px; }
-  
-  .like-btn { background: none; border: none; cursor: pointer; display: flex; align-items: center; gap: 6px; color: var(--text-muted); font-size: 14px; font-weight: 600; font-family: var(--sans); transition: all 0.2s; padding: 4px 8px; border-radius: 6px; margin: -4px -8px; }
+  .like-btn { background: none; border: none; cursor: pointer; display: flex; align-items: center; gap: 6px; color: var(--text-muted); font-size: 14px; font-weight: 600; transition: all 0.2s; padding: 4px 8px; border-radius: 6px; margin: -4px -8px; }
   .like-btn:hover { color: var(--primary); background: #fef2f2; }
-  .like-btn:active { transform: scale(0.95); }
   .like-btn.liked { color: var(--primary); }
-  .like-btn.liked i { animation: popHeart 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
-  @keyframes popHeart { 0% { transform: scale(1); } 50% { transform: scale(1.3); } 100% { transform: scale(1); } }
 
   .empty-state { grid-column: 1 / -1; text-align: center; padding: 64px 24px; color: var(--text-muted); }
-  .empty-state i { font-size: 48px; margin-bottom: 16px; opacity: 0.5; }
 
-  /* Modal */
+  /* Modal & Form Upload Multi-images */
   .modal-overlay { position: fixed; inset: 0; background: rgba(17, 24, 39, 0.6); backdrop-filter: blur(4px); display: flex; align-items: center; justify-content: center; z-index: 1000; opacity: 0; pointer-events: none; transition: opacity 0.25s; padding: 16px; }
   .modal-overlay.active { opacity: 1; pointer-events: all; }
   .modal { background: var(--surface); width: 100%; max-width: 600px; border-radius: 20px; max-height: 90vh; overflow-y: auto; box-shadow: 0 24px 48px rgba(0,0,0,0.2); transform: scale(0.95) translateY(20px); transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1); }
   .modal-overlay.active .modal { transform: scale(1) translateY(0); }
-  .modal-header { padding: 20px 24px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; background: var(--surface); z-index: 10; }
+  .modal-header { padding: 20px 24px; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; background: var(--surface); z-index: 10; }
   .modal-title { font-family: var(--display); font-size: 20px; font-weight: 700; }
-  .modal-close { background: var(--bg); border: 1px solid var(--border); width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 16px; cursor: pointer; color: var(--text-muted); transition: all 0.2s; }
-  .modal-close:hover { background: var(--text-main); color: #fff; border-color: var(--text-main); }
+  .modal-close { background: var(--bg); border: 1px solid var(--line); width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 16px; cursor: pointer; color: var(--text-muted); }
   .modal-body { padding: 24px; }
   
+  /* Upload Gallery UI */
+  .upload-gallery { display: flex; gap: 12px; overflow-x: auto; padding-bottom: 12px; margin-bottom: 16px; }
+  .upload-gallery::-webkit-scrollbar { height: 6px; }
+  .upload-gallery::-webkit-scrollbar-thumb { background: var(--line-h); border-radius: 6px; }
+  .upload-item { position: relative; width: 100px; height: 100px; border-radius: 12px; overflow: hidden; flex-shrink: 0; border: 1px solid var(--line); }
+  .upload-item img { width: 100%; height: 100%; object-fit: cover; }
+  .upload-item .del-btn { position: absolute; top: 4px; right: 4px; background: rgba(0,0,0,0.6); color: white; border: none; width: 20px; height: 20px; border-radius: 50%; font-size: 10px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+  .add-img-btn { width: 100px; height: 100px; border: 2px dashed var(--line-h); border-radius: 12px; display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--text-muted); cursor: pointer; flex-shrink: 0; transition: border-color 0.2s; background: var(--bg); }
+  .add-img-btn:hover { border-color: var(--primary); color: var(--primary); }
+  .add-img-btn i { font-size: 24px; margin-bottom: 4px; }
+  .add-img-btn span { font-size: 11px; font-weight: 600; }
+
   .form-group { margin-bottom: 20px; }
   .form-group label { display: block; font-size: 13.5px; font-weight: 600; margin-bottom: 8px; color: var(--text-main); }
-  .form-control { width: 100%; padding: 12px 14px; border: 1px solid var(--border); border-radius: 10px; outline: none; font-size: 14px; background: var(--bg); transition: border-color 0.2s, background 0.2s; font-family: inherit; }
+  .form-control { width: 100%; padding: 12px 14px; border: 1px solid var(--line); border-radius: 10px; outline: none; font-size: 14px; background: var(--bg); transition: border-color 0.2s; font-family: inherit; }
   .form-control:focus { border-color: var(--primary); background: #fff; }
   .form-row { display: flex; gap: 16px; }
   .form-row .form-group { flex: 1; }
   
-  /* Custom Country Select pour forcer l'affichage des drapeaux (FlagCDN) */
+  /* Toggle Anonyme */
+  .pref-block { border: 1px solid var(--line); border-radius: 12px; padding: 16px; margin: 16px 0; display: flex; align-items: flex-start; justify-content: space-between; gap: 14px; background: var(--bg); }
+  .pref-block-title { font-size: 13.5px; font-weight: 600; margin-bottom: 3px; color: var(--text-main); }
+  .pref-block-sub { font-size: 12px; color: var(--text-muted); line-height: 1.4; }
+  .toggle { position: relative; width: 42px; height: 24px; background: var(--line-h); border-radius: 99px; cursor: pointer; flex-shrink: 0; transition: background .18s; border: none; }
+  .toggle.on { background: var(--primary); }
+  .toggle::after { content: ''; position: absolute; top: 2px; left: 2px; width: 20px; height: 20px; background: #fff; border-radius: 50%; transition: transform .18s; box-shadow: 0 1px 3px rgba(0,0,0,0.2); }
+  .toggle.on::after { transform: translateX(18px); }
+
   .custom-select-wrapper { position: relative; width: 100%; }
-  .custom-select-btn { width: 100%; padding: 12px 14px; background: var(--bg); border: 1px solid var(--border); border-radius: 10px; text-align: left; cursor: pointer; display: flex; align-items: center; justify-content: space-between; font-size: 14px; color: var(--text-main); transition: border-color 0.2s; }
-  .custom-select-btn:focus { border-color: var(--primary); background: #fff; outline: none; }
-  .custom-select-btn img { width: 22px; border-radius: 2px; margin-right: 10px; object-fit: cover; box-shadow: 0 0 2px rgba(0,0,0,0.1); }
-  .custom-select-menu { position: absolute; top: 100%; left: 0; right: 0; background: #fff; border: 1px solid var(--border); border-radius: 10px; margin-top: 4px; max-height: 220px; overflow-y: auto; z-index: 100; display: none; box-shadow: 0 10px 25px rgba(0,0,0,0.1); padding: 8px; }
+  .custom-select-btn { width: 100%; padding: 12px 14px; background: var(--bg); border: 1px solid var(--line); border-radius: 10px; text-align: left; cursor: pointer; display: flex; align-items: center; justify-content: space-between; font-size: 14px; color: var(--text-main); }
+  .custom-select-btn img { width: 22px; border-radius: 2px; margin-right: 10px; object-fit: cover; }
+  .custom-select-menu { position: absolute; top: 100%; left: 0; right: 0; background: #fff; border: 1px solid var(--line); border-radius: 10px; margin-top: 4px; max-height: 220px; overflow-y: auto; z-index: 100; display: none; padding: 8px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
   .custom-select-menu.active { display: block; }
-  .custom-search-input { width: 100%; padding: 10px 12px; border: 1px solid var(--border); border-radius: 8px; outline: none; font-size: 14px; margin-bottom: 8px; }
-  .custom-option { padding: 10px 12px; cursor: pointer; display: flex; align-items: center; transition: background 0.2s; font-size: 14px; border-radius: 6px; }
+  .custom-search-input { width: 100%; padding: 10px 12px; border: 1px solid var(--line); border-radius: 8px; outline: none; font-size: 14px; margin-bottom: 8px; }
+  .custom-option { padding: 10px 12px; cursor: pointer; display: flex; align-items: center; font-size: 14px; border-radius: 6px; }
   .custom-option:hover { background: var(--bg); }
-  .custom-option img { width: 22px; border-radius: 2px; margin-right: 10px; box-shadow: 0 0 2px rgba(0,0,0,0.1); }
+  .custom-option img { width: 22px; border-radius: 2px; margin-right: 10px; }
 
-  .img-preview { width: 100%; height: 220px; border: 2px dashed var(--border); border-radius: 12px; margin-bottom: 20px; display: flex; align-items: center; justify-content: center; cursor: pointer; background-color: var(--bg); background-size: cover; background-position: center; color: var(--text-muted); flex-direction: column; gap: 12px; transition: border-color 0.2s; }
-  .img-preview:hover { border-color: var(--text-muted); }
-  .img-preview.has-img { border-style: solid; border-color: transparent; }
-  .img-preview i { font-size: 28px; }
-
-  .progress-bar { width: 100%; height: 6px; background: var(--bg); border-radius: 3px; overflow: hidden; display: none; margin-bottom: 16px; }
+  .progress-bar { width: 100%; height: 6px; background: var(--line); border-radius: 3px; overflow: hidden; display: none; margin-bottom: 16px; }
   .progress-fill { width: 0%; height: 100%; background: var(--primary); transition: width 0.3s; }
   .error-msg { color: #d92d20; background: #fef2f2; border: 1px solid #fecaca; padding: 12px; border-radius: 8px; font-size: 13.5px; margin-bottom: 20px; display: none; }
 
   .toast-container { position: fixed; bottom: 32px; left: 50%; transform: translateX(-50%); z-index: 9999; display: flex; flex-direction: column; gap: 10px; pointer-events: none; }
-  .toast { background: var(--text-main); color: #fff; padding: 12px 24px; border-radius: 10px; font-size: 14px; font-weight: 500; box-shadow: 0 10px 25px rgba(0,0,0,0.15); opacity: 0; transform: translateY(20px); animation: slideUpToast 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards, fadeOutToast 0.4s 3s forwards; display: flex; align-items: center; gap: 10px; }
+  .toast { background: var(--text-main); color: #fff; padding: 12px 24px; border-radius: 10px; font-size: 14px; font-weight: 500; opacity: 0; transform: translateY(20px); animation: slideUpToast 0.3s forwards, fadeOutToast 0.4s 3s forwards; display: flex; align-items: center; gap: 10px; }
   @keyframes slideUpToast { to { opacity: 1; transform: translateY(0); } }
   @keyframes fadeOutToast { to { opacity: 0; transform: translateY(20px); } }
 
@@ -142,15 +158,10 @@
   .credits span { color: #fff; font-weight: 600; }
 
   @media (max-width: 768px) {
-    .navbar { padding: 12px 16px; }
-    .brand { font-size: 20px; }
     .hide-mobile { display: none !important; }
     .btn { padding: 10px; border-radius: 8px; }
     .btn i { margin: 0; font-size: 16px; }
-    .nav-actions { gap: 8px; }
-    .toolbar { padding: 0 16px; margin-bottom: 12px; }
-    .filters-panel { margin: 0 16px 24px; padding: 16px; }
-    .grid { padding: 0 16px; gap: 16px; }
+    .grid { grid-template-columns: 1fr; }
     .form-row { flex-direction: column; gap: 0; }
   }
 </style>
@@ -169,9 +180,6 @@
       <div class="lang-menu" id="lang-menu">
         <button data-lang="fr">Français</button>
         <button data-lang="en">English</button>
-        <button data-lang="de">Deutsch</button>
-        <button data-lang="es">Español</button>
-        <button data-lang="it">Italiano</button>
       </div>
     </div>
     
@@ -195,6 +203,7 @@
     <div class="filter-group">
       <div class="filter-title" data-i18n="sort_by">Trier par</div>
       <div class="pill-group" id="sort-group">
+        <button class="filter-pill foryou-pill" data-val="foryou"><i class="fa-solid fa-sparkles"></i> <span data-i18n="sort_foryou">Pour vous</span></button>
         <button class="filter-pill active" data-val="date" data-i18n="sort_date">Les plus récentes</button>
         <button class="filter-pill" data-val="alpha" data-i18n="sort_alpha">Ordre alphabétique</button>
         <button class="filter-pill" data-val="likes"><i class="fa-solid fa-heart" style="color:var(--primary); font-size:12px"></i> Plus populaires</button>
@@ -210,7 +219,7 @@
         <button class="filter-pill" data-val="Verte"><i class="color-dot" style="background:#22c55e"></i> <span data-i18n="color_green">Verte</span></button>
         <button class="filter-pill" data-val="Orange"><i class="color-dot" style="background:#f97316"></i> <span data-i18n="color_orange">Orange</span></button>
         <button class="filter-pill" data-val="Rose"><i class="color-dot" style="background:#ec4899"></i> <span data-i18n="color_pink">Rose</span></button>
-        <button class="filter-pill" data-val="Blanche"><i class="color-dot" style="background:#f3f4f6; border:1px solid #e5e7eb"></i> <span data-i18n="color_white">Blanche</span></button>
+        <button class="filter-pill" data-val="Blanche"><i class="color-dot" style="background:#f9fafb; border:1px solid #d1d5db"></i> <span data-i18n="color_white">Blanche</span></button>
         <button class="filter-pill" data-val="Bicolore"><i class="color-dot" style="background:linear-gradient(135deg, #ef4444 50%, #eab308 50%)"></i> <span data-i18n="color_bicolor">Bicolore</span></button>
       </div>
     </div>
@@ -218,10 +227,9 @@
 </div>
 
 <div class="grid" id="tomatoes-grid">
-  <!-- Les cartes seront générées ici par JavaScript -->
+  <!-- JavaScript -->
 </div>
 
-<!-- Conteneur pour les Toasts élégants -->
 <div class="toast-container" id="toast-container"></div>
 
 <footer class="footer">
@@ -244,10 +252,22 @@
       <div class="error-msg" id="form-error"></div>
       <div class="progress-bar" id="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
       
-      <input type="file" id="file-input" accept="image/*" style="display:none">
-      <div class="img-preview" id="img-preview">
-        <i class="fa-solid fa-camera"></i>
-        <span data-i18n="add_image">Cliquez pour ajouter une photo *</span>
+      <input type="file" id="file-input" accept="image/*" multiple style="display:none">
+      
+      <label class="field-label" style="margin-bottom:8px">Photos de la variété *</label>
+      <div class="upload-gallery" id="upload-gallery">
+        <div class="add-img-btn" id="btn-add-img">
+          <i class="fa-solid fa-camera"></i>
+          <span>Ajouter</span>
+        </div>
+      </div>
+
+      <div class="pref-block">
+        <div class="pref-block-text">
+          <div class="pref-block-title" data-i18n="anon_title">Publier en anonyme</div>
+          <div class="pref-block-sub" data-i18n="anon_sub">Votre nom public ne sera pas affiché.</div>
+        </div>
+        <button class="toggle on" id="toggle-anon" type="button"></button>
       </div>
 
       <div class="form-group">
@@ -280,7 +300,6 @@
               <input type="text" class="custom-search-input" id="f-country-search" placeholder="Rechercher..." autocomplete="off">
               <div id="f-country-list"></div>
             </div>
-            <!-- Champ caché pour stocker la valeur -->
             <input type="hidden" id="f-country-value" value="">
           </div>
         </div>
@@ -309,7 +328,7 @@
         <textarea class="form-control" id="f-desc" rows="4"></textarea>
       </div>
 
-      <button class="btn btn-primary" style="width:100%; justify-content:center; padding:16px; font-size:16px; margin-top:8px;" id="btn-submit">
+      <button class="btn btn-primary" style="width:100%; justify-content:center; padding:16px; font-size:16px;" id="btn-submit">
         <span data-i18n="submit">Publier la variété</span>
       </button>
     </div>
@@ -318,11 +337,10 @@
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.17.0/firebase-app.js";
-import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.17.0/firebase-analytics.js";
 import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.17.0/firebase-auth.js";
 import { getDatabase, ref, onValue, push, get, update } from "https://www.gstatic.com/firebasejs/12.17.0/firebase-database.js";
+import { sortTomatoes } from "./algo.js";
 
-// Configuration Firebase
 const firebaseConfig = {
   apiKey: "AIzaSyAaz9s2jxsNqYd9FBsVG4u48-BwE8LAXCE",
   authDomain: "tomatolist-efee0.firebaseapp.com",
@@ -334,33 +352,29 @@ const firebaseConfig = {
   databaseURL: "https://tomatolist-efee0-default-rtdb.europe-west1.firebasedatabase.app"
 };
 
-// L'URL du script de Google (App Script)
 const GAS_URL = "https://script.google.com/macros/s/AKfycbxVu24YbDkU7jbGKQt9kw2BdAo-Qj-_jympy35mMlMoS4guNFyxqqBhIxlts0_WZ1pgvg/exec";
 
 const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);
 const auth = getAuth(app);
 const db = getDatabase(app);
 
 let tomatoesData = [];
 let countriesList = [];
 let currentUser = null;
-let currentProfileName = "Anonyme";
-let currentImageData = null;
+let currentProfile = null; // Contiendra {firstname, lastname, favoriteColors...}
+let currentImagesData = []; // Tableau de base64
 
 let currentSort = 'date';
 let currentColor = 'all';
+let isAnon = true; // Toggle Anonyme activé par défaut
+
 let currentLang = localStorage.getItem('tl_lang') || (navigator.language || 'fr').slice(0,2);
 let TRANSLATIONS = {};
-
-const FALLBACK_TEXTS = {
-  'filters': 'Filtres', 'sort_by': 'Trier par', 'color': 'Couleur', 'no_results': 'Aucune variété trouvée.', 'login_to_like': 'Connectez-vous pour ajouter aux favoris.'
-};
 
 const colorMap = {
   'Rouge': '#ef4444', 'Jaune': '#eab308', 'Noire': '#4b5563',
   'Verte': '#22c55e', 'Orange': '#f97316', 'Rose': '#ec4899',
-  'Blanche': '#f3f4f6', 'Bicolore': 'linear-gradient(135deg, #ef4444 50%, #eab308 50%)'
+  'Blanche': '#f9fafb', 'Bicolore': 'linear-gradient(135deg, #ef4444 50%, #eab308 50%)'
 };
 
 function showToast(msg, icon = 'fa-circle-info') {
@@ -372,85 +386,59 @@ function showToast(msg, icon = 'fa-circle-info') {
   setTimeout(() => { if (toast.parentNode) toast.remove(); }, 3500);
 }
 
-// ----------------- LANGUE (MENU DÉROULANT) -----------------
+// ----------------- LANGUE & UI -----------------
 async function loadTranslations() {
   try {
     const res = await fetch('lang.json');
     TRANSLATIONS = await res.json();
-  } catch(e) { console.warn("Fichier lang.json non trouvé, textes par défaut."); }
+  } catch(e) {}
   applyI18n();
 }
-function tr(key) { 
-  return (TRANSLATIONS[currentLang] && TRANSLATIONS[currentLang][key]) || 
-         (TRANSLATIONS.fr && TRANSLATIONS.fr[key]) || 
-         FALLBACK_TEXTS[key] || 
-         key; 
-}
+function tr(key) { return (TRANSLATIONS[currentLang] && TRANSLATIONS[currentLang][key]) || (TRANSLATIONS.fr && TRANSLATIONS.fr[key]) || key; }
 function applyI18n() {
   document.querySelectorAll('[data-i18n]').forEach(el => {
     if(el.tagName === 'SPAN' && el.classList.contains('hide-mobile')) el.textContent = tr(el.getAttribute('data-i18n'));
     else el.textContent = tr(el.getAttribute('data-i18n'));
   });
-  document.querySelectorAll('[data-i18n-ph]').forEach(el => el.placeholder = tr(el.getAttribute('data-i18n-ph')));
   document.getElementById('lang-label').textContent = currentLang.toUpperCase();
-  
-  // Highlight active lang in menu
-  document.querySelectorAll('#lang-menu button').forEach(btn => {
-    btn.classList.toggle('active', btn.dataset.lang === currentLang);
-  });
 }
-
 document.getElementById('btn-lang-dropdown').onclick = (e) => {
-  e.stopPropagation();
-  document.getElementById('lang-menu').classList.toggle('active');
+  e.stopPropagation(); document.getElementById('lang-menu').classList.toggle('active');
 };
 document.querySelectorAll('#lang-menu button').forEach(btn => {
   btn.onclick = (e) => {
     currentLang = e.currentTarget.dataset.lang;
     localStorage.setItem('tl_lang', currentLang);
-    applyI18n();
-    renderGrid();
+    applyI18n(); renderGrid();
     document.getElementById('lang-menu').classList.remove('active');
   };
 });
 document.addEventListener('click', (e) => {
-  if (!e.target.closest('.lang-dropdown')) {
-    document.getElementById('lang-menu').classList.remove('active');
-  }
-  // Fermer le sélecteur de pays s'il est ouvert et qu'on clique ailleurs
-  if (!e.target.closest('.custom-select-wrapper')) {
-    document.getElementById('f-country-menu').classList.remove('active');
-  }
+  if (!e.target.closest('.lang-dropdown')) document.getElementById('lang-menu').classList.remove('active');
+  if (!e.target.closest('.custom-select-wrapper')) document.getElementById('f-country-menu').classList.remove('active');
 });
 
-// ----------------- PAYS (SÉLECTEUR DÉROULANT PERSONNALISÉ) -----------------
+// ----------------- PAYS -----------------
 async function loadCountries() {
   try {
     const res = await fetch('pays.json');
     countriesList = await res.json();
     renderCountryList();
-  } catch (e) {
-    console.warn("Fichier pays.json non trouvé.");
-  }
+  } catch (e) {}
 }
 function renderCountryList(filterText = '') {
   const container = document.getElementById('f-country-list');
-  const lowerFilter = filterText.toLowerCase();
-  
-  const filtered = countriesList.filter(c => c.name.toLowerCase().includes(lowerFilter));
-  
+  const filtered = countriesList.filter(c => c.name.toLowerCase().includes(filterText.toLowerCase()));
   container.innerHTML = filtered.map(c => `
     <div class="custom-option" data-name="${c.name}" data-code="${c.code}">
       <img src="https://flagcdn.com/w20/${c.code}.png" alt="${c.name}">
       <span>${c.name}</span>
     </div>
   `).join('');
-
   container.querySelectorAll('.custom-option').forEach(opt => {
     opt.onclick = () => {
       const name = opt.getAttribute('data-name');
       const code = opt.getAttribute('data-code');
-      // On met l'image et le texte dans le bouton
       document.getElementById('f-country-btn').innerHTML = `<div style="display:flex;align-items:center"><img src="https://flagcdn.com/w20/${code}.png" alt=""> <span>${name}</span></div> <i class="fa-solid fa-chevron-down" style="color:var(--text-muted)"></i>`;
       document.getElementById('f-country-value').value = name;
       document.getElementById('f-country-menu').classList.remove('active');
@@ -458,18 +446,13 @@ function renderCountryList(filterText = '') {
   });
 }
 document.getElementById('f-country-btn').onclick = (e) => {
-  document.getElementById('f-country-menu').classList.toggle('active');
-  document.getElementById('f-country-search').focus();
+  e.stopPropagation(); document.getElementById('f-country-menu').classList.toggle('active');
 };
-document.getElementById('f-country-search').oninput = (e) => {
-  renderCountryList(e.target.value);
-};
+document.getElementById('f-country-search').oninput = (e) => renderCountryList(e.target.value);
 
 
-document.getElementById('btn-toggle-filters').onclick = () => {
-  document.getElementById('filters-panel').classList.toggle('active');
-};
-
+// ----------------- FILTRES -----------------
+document.getElementById('btn-toggle-filters').onclick = () => document.getElementById('filters-panel').classList.toggle('active');
 document.querySelectorAll('#sort-group .filter-pill').forEach(btn => {
   btn.onclick = (e) => {
     document.querySelectorAll('#sort-group .filter-pill').forEach(b => b.classList.remove('active'));
@@ -478,7 +461,6 @@ document.querySelectorAll('#sort-group .filter-pill').forEach(btn => {
     renderGrid();
   };
 });
-
 document.querySelectorAll('#color-group .filter-pill').forEach(btn => {
   btn.onclick = (e) => {
     document.querySelectorAll('#color-group .filter-pill').forEach(b => b.classList.remove('active'));
@@ -488,31 +470,52 @@ document.querySelectorAll('#color-group .filter-pill').forEach(btn => {
   };
 });
 
+// ----------------- AUTHENTIFICATION & TOGGLE ANONYME -----------------
+const anonToggle = document.getElementById('toggle-anon');
+
 onAuthStateChanged(auth, async (user) => {
   currentUser = user;
   const authLabel = document.getElementById('auth-label');
   const btnAuth = document.getElementById('btn-auth');
+  
   if (user) {
-    authLabel.textContent = tr('logout');
+    authLabel.textContent = tr('logout') || "Déconnexion";
     btnAuth.onclick = () => { signOut(auth); showToast('Déconnexion réussie', 'fa-check'); };
     const snap = await get(ref(db, `users/${user.uid}/profile`));
     if (snap.exists()) {
-      const p = snap.val();
-      currentProfileName = `${p.firstname} ${p.lastname}`.trim();
+      currentProfile = snap.val();
     }
+    // L'utilisateur peut choisir d'enlever l'anonymat
+    isAnon = true;
+    anonToggle.classList.add('on');
+    anonToggle.style.opacity = '1';
+    anonToggle.style.cursor = 'pointer';
   } else {
-    authLabel.textContent = tr('login');
+    authLabel.textContent = tr('login') || "Connexion";
     btnAuth.onclick = () => window.location.href = 'auth.html';
-    currentProfileName = tr("anonymous");
+    currentProfile = null;
+    // Forcé anonyme
+    isAnon = true;
+    anonToggle.classList.add('on');
+    anonToggle.style.opacity = '0.5';
+    anonToggle.style.cursor = 'not-allowed';
   }
-  renderGrid(); // Refresh grid to update heart icons
+  renderGrid();
 });
 
+anonToggle.onclick = () => {
+  if (!currentUser) {
+    showToast("Connectez-vous pour publier avec votre nom.", "fa-lock");
+    return;
+  }
+  isAnon = !isAnon;
+  anonToggle.classList.toggle('on', isAnon);
+};
+
+// ----------------- LECTURE DES DONNÉES & GRID -----------------
 onValue(ref(db, 'tomatoes'), (snapshot) => {
   tomatoesData = [];
-  snapshot.forEach(child => {
-    tomatoesData.push({ id: child.key, ...child.val() });
-  });
+  snapshot.forEach(child => { tomatoesData.push({ id: child.key, ...child.val() }); });
   renderGrid();
 });
 
@@ -520,20 +523,18 @@ function renderGrid() {
   const grid = document.getElementById('tomatoes-grid');
   const search = document.getElementById('search-input').value.toLowerCase();
 
+  // Filtrage
   let filtered = tomatoesData.filter(t => {
     const matchSearch = (t.name || '').toLowerCase().includes(search) || (t.country || '').toLowerCase().includes(search);
     const matchColor = currentColor === 'all' || t.color === currentColor;
     return matchSearch && matchColor;
   });
 
-  if (currentSort === 'alpha') filtered.sort((a,b) => (a.name||'').localeCompare(b.name));
-  else if (currentSort === 'likes') {
-    filtered.sort((a,b) => (Object.keys(b.likes || {}).length) - (Object.keys(a.likes || {}).length));
-  }
-  else filtered.sort((a,b) => (b.createdAt || 0) - (a.createdAt || 0));
+  // Tri via Algo
+  filtered = sortTomatoes(filtered, currentSort, currentProfile, currentUser ? currentUser.uid : null);
 
   if (filtered.length === 0) {
-    grid.innerHTML = `<div class="empty-state"><i class="fa-solid fa-leaf"></i><p>${tr('no_results')}</p></div>`;
+    grid.innerHTML = `<div class="empty-state"><i class="fa-solid fa-leaf"></i><p>Aucune variété trouvée.</p></div>`;
     return;
   }
 
@@ -541,24 +542,44 @@ function renderGrid() {
     const date = new Date(t.createdAt).toLocaleDateString(currentLang);
     const colorBg = colorMap[t.color] || '#ccc';
     
-    // Logique du bouton Like
     const likesCount = t.likes ? Object.keys(t.likes).length : 0;
     const isLiked = currentUser && t.likes && t.likes[currentUser.uid];
     
-    // Ajout du drapeau si le pays est défini
     let countryBadge = '';
     if (t.country) {
       const countryObj = countriesList.find(c => c.name === t.country);
       if (countryObj) {
         countryBadge = `<span class="badge"><img src="https://flagcdn.com/w20/${countryObj.code}.png" style="width:14px;border-radius:2px" alt=""> ${t.country}</span>`;
-      } else {
-        countryBadge = `<span class="badge"><i class="fa-solid fa-earth-europe"></i> ${t.country}</span>`;
       }
+    }
+
+    // Gestion de l'affichage des images (support legacy 1 image VS tableau multi-images)
+    let imagesHtml = '';
+    let imgCountBadge = '';
+    const imagesArray = t.imageURLs || (t.imageURL ? [t.imageURL] : []);
+    
+    if (imagesArray.length > 0) {
+      imagesHtml = imagesArray.map(url => `
+        <div class="card-img-wrapper">
+          <div class="card-img-blur" style="background-image: url('${url}')"></div>
+          <img src="${url}" class="card-img" alt="${t.name}" loading="lazy">
+        </div>
+      `).join('');
+      if (imagesArray.length > 1) {
+        imgCountBadge = `<div class="img-count"><i class="fa-regular fa-images"></i> 1/${imagesArray.length}</div>`;
+      }
+    } else {
+      imagesHtml = `<div class="card-img-wrapper" style="background:#eee"></div>`;
     }
 
     return `
       <div class="card">
-        <img src="${t.imageURL}" class="card-img" alt="${t.name}" loading="lazy">
+        <div style="position:relative">
+          <div class="card-carousel">
+            ${imagesHtml}
+          </div>
+          ${imgCountBadge}
+        </div>
         <div class="card-body">
           <h3 class="card-title">${t.name}</h3>
           <div class="card-meta">
@@ -570,9 +591,9 @@ function renderGrid() {
           
           <div class="card-footer">
             <div class="card-footer-left">
-              <i class="fa-solid fa-user" style="color:var(--text-muted)"></i> ${t.author || tr('anonymous')}
+              <i class="fa-solid fa-user" style="color:var(--text-muted)"></i> ${t.author || 'Anonyme'}
             </div>
-            <div class="card-footer-right">
+            <div class="card-footer-right" style="display:flex; gap:12px; align-items:center;">
               <span style="font-size: 12px">${date}</span>
               <button class="like-btn ${isLiked ? 'liked' : ''}" data-id="${t.id}">
                 <i class="${isLiked ? 'fa-solid' : 'fa-regular'} fa-heart"></i>
@@ -584,77 +605,101 @@ function renderGrid() {
       </div>
     `;
   }).join('');
+  
+  // Script minimal pour mettre à jour l'indicateur "1/3" au scroll du carrousel
+  document.querySelectorAll('.card-carousel').forEach(carousel => {
+    carousel.addEventListener('scroll', (e) => {
+      const parent = e.target.parentElement;
+      const indicator = parent.querySelector('.img-count');
+      if (indicator) {
+        const index = Math.round(e.target.scrollLeft / e.target.offsetWidth) + 1;
+        const total = e.target.children.length;
+        indicator.innerHTML = `<i class="fa-regular fa-images"></i> ${index}/${total}`;
+      }
+    });
+  });
 }
 
-// Recherche instantanée
 document.getElementById('search-input').addEventListener('input', renderGrid);
 
-// Gestionnaire pour les Likes
 document.getElementById('tomatoes-grid').addEventListener('click', async (e) => {
   const likeBtn = e.target.closest('.like-btn');
   if (likeBtn) {
-    if (!currentUser) {
-      showToast(tr('login_to_like') || 'Connectez-vous pour ajouter aux favoris', 'fa-lock');
-      return;
-    }
+    if (!currentUser) return showToast('Connectez-vous pour ajouter aux favoris', 'fa-lock');
     const tomatoId = likeBtn.getAttribute('data-id');
     const tomato = tomatoesData.find(t => t.id === tomatoId);
     if (!tomato) return;
     
     const isLiked = tomato.likes && tomato.likes[currentUser.uid];
-    
-    // Mise à jour simultanée (Tomate + Profil User)
     const updates = {};
     updates[`tomatoes/${tomatoId}/likes/${currentUser.uid}`] = isLiked ? null : true;
     updates[`users/${currentUser.uid}/likes/${tomatoId}`] = isLiked ? null : true;
     
-    try {
-      await update(ref(db), updates);
-    } catch(err) {
-      showToast("Erreur lors de l'ajout aux favoris.", 'fa-triangle-exclamation');
-    }
+    try { await update(ref(db), updates); } catch(err) { showToast("Erreur lors de l'action.", 'fa-triangle-exclamation'); }
   }
 });
 
 
-// ----------------- PUBLICATION (AVEC CORRECTION DU CORS) -----------------
-const imgPreview = document.getElementById('img-preview');
+// ----------------- PUBLICATION MULTI-IMAGES -----------------
 const fileInput = document.getElementById('file-input');
-imgPreview.onclick = () => fileInput.click();
+document.getElementById('btn-add-img').onclick = () => fileInput.click();
 
-fileInput.onchange = (e) => {
-  const file = e.target.files[0];
-  if (!file) return;
-  const reader = new FileReader();
-  reader.onload = (ev) => {
-    const img = new Image();
-    img.onload = () => {
-      const canvas = document.createElement('canvas');
-      let width = img.width; let height = img.height;
-      const MAX = 1600;
-      if (width > MAX || height > MAX) {
-        if (width > height) { height = Math.round((height * MAX)/width); width = MAX; }
-        else { width = Math.round((width * MAX)/height); height = MAX; }
-      }
-      canvas.width = width; canvas.height = height;
-      const ctx = canvas.getContext('2d');
-      ctx.drawImage(img, 0, 0, width, height);
-      
-      currentImageData = canvas.toDataURL('image/webp', 0.8);
-      imgPreview.style.backgroundImage = `url(${currentImageData})`;
-      imgPreview.innerHTML = '';
-      imgPreview.classList.add('has-img');
+fileInput.onchange = async (e) => {
+  const files = Array.from(e.target.files);
+  if (!files.length) return;
+  
+  const gallery = document.getElementById('upload-gallery');
+  const addBtn = document.getElementById('btn-add-img');
+  
+  for (const file of files) {
+    const base64 = await resizeImage(file);
+    currentImagesData.push(base64);
+    
+    const div = document.createElement('div');
+    div.className = 'upload-item';
+    div.innerHTML = `
+      <img src="${base64}" alt="">
+      <button class="del-btn"><i class="fa-solid fa-xmark"></i></button>
+    `;
+    div.querySelector('.del-btn').onclick = () => {
+      const idx = currentImagesData.indexOf(base64);
+      if (idx > -1) currentImagesData.splice(idx, 1);
+      div.remove();
     };
-    img.src = ev.target.result;
-  };
-  reader.readAsDataURL(file);
+    gallery.insertBefore(div, addBtn);
+  }
 };
+
+function resizeImage(file) {
+  return new Promise((resolve) => {
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        let width = img.width; let height = img.height;
+        const MAX = 1600;
+        if (width > MAX || height > MAX) {
+          if (width > height) { height = Math.round((height * MAX)/width); width = MAX; }
+          else { width = Math.round((width * MAX)/height); height = MAX; }
+        }
+        canvas.width = width; canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, width, height);
+        resolve(canvas.toDataURL('image/webp', 0.8));
+      };
+      img.src = ev.target.result;
+    };
+    reader.readAsDataURL(file);
+  });
+}
 
 document.getElementById('btn-submit').onclick = async () => {
   const name = document.getElementById('f-name').value.trim();
   const errBox = document.getElementById('form-error');
-  if (!name || !currentImageData) {
-    errBox.textContent = tr('err_required') || 'Champs requis manquants.';
+  
+  if (!name || currentImagesData.length === 0) {
+    errBox.textContent = 'Nom de la variété et au moins une photo requis.';
     errBox.style.display = 'block';
     return;
   }
@@ -666,48 +711,54 @@ document.getElementById('btn-submit').onclick = async () => {
   
   progress.style.display = 'block';
   btn.disabled = true;
-  
-  let p = 0;
-  const interval = setInterval(() => { p += 10; if(p>90) p=90; fill.style.width = p+'%'; }, 200);
+  fill.style.width = '20%';
 
   try {
-    // CORRECTION DU CORS : On force 'text/plain' pour éviter la vérification preflight OPTIONS de Google
-    const res = await fetch(GAS_URL, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'text/plain;charset=utf-8'
-      },
-      body: JSON.stringify({
-        name: name.replace(/\s+/g, '_') + '_' + Date.now() + '.webp',
-        image: currentImageData
-      })
-    });
-    const result = await res.json();
+    const urls = [];
+    let i = 1;
+    // Upload de chaque image séquentiellement vers GAS
+    for (const base64 of currentImagesData) {
+      const res = await fetch(GAS_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({
+          name: name.replace(/\s+/g, '_') + '_' + Date.now() + '_' + i + '.webp',
+          image: base64
+        })
+      });
+      const result = await res.json();
+      if (!result.success) throw new Error("Upload failed");
+      urls.push(result.url);
+      fill.style.width = (20 + (80 * i / currentImagesData.length)) + '%';
+      i++;
+    }
     
-    if (!result.success) throw new Error("Upload failed");
-    
+    // Détermination de l'auteur
+    let authorName = "Anonyme";
+    if (!isAnon && currentUser && currentProfile) {
+      authorName = `${currentProfile.firstname} ${currentProfile.lastname}`.trim();
+    }
+
     const tomatoData = {
       name: name,
       color: document.getElementById('f-color').value,
-      imageURL: result.url,
+      imageURLs: urls, // NOUVEAU: Tableau d'URLs
       weight: parseInt(document.getElementById('f-weight').value) || null,
       averageSize: document.getElementById('f-size').value || null,
       description: document.getElementById('f-desc').value || "",
       country: document.getElementById('f-country-value').value || "",
-      author: currentUser ? currentProfileName : (tr('anonymous') || 'Anonyme'),
+      author: authorName,
       uid: currentUser ? currentUser.uid : null,
       createdAt: Date.now()
     };
 
     await push(ref(db, 'tomatoes'), tomatoData);
     
-    clearInterval(interval);
     fill.style.width = '100%';
-    setTimeout(() => { modal.classList.remove('active'); resetForm(); showToast('Variété publiée avec succès !', 'fa-seedling'); }, 500);
+    setTimeout(() => { document.getElementById('add-modal').classList.remove('active'); resetForm(); showToast('Variété publiée avec succès !', 'fa-seedling'); }, 500);
 
   } catch(e) {
-    clearInterval(interval);
-    errBox.textContent = "Erreur (Avez-vous bien cliqué sur 'Nouvelle version' lors du déploiement du script ?)";
+    errBox.textContent = "Erreur de connexion. L'image est-elle trop lourde ?";
     errBox.style.display = 'block';
     progress.style.display = 'none';
     btn.disabled = false;
@@ -722,22 +773,31 @@ function resetForm() {
   document.getElementById('f-country-btn').innerHTML = `<span>Sélectionner un pays...</span> <i class="fa-solid fa-chevron-down" style="color:var(--text-muted)"></i>`;
   document.getElementById('f-country-search').value = '';
   renderCountryList();
-  currentImageData = null;
-  imgPreview.style.backgroundImage = 'none';
-  imgPreview.innerHTML = '<i class="fa-solid fa-camera"></i><span data-i18n="add_image">Cliquez pour ajouter une photo *</span>';
-  imgPreview.classList.remove('has-img');
+  
+  currentImagesData = [];
+  const gallery = document.getElementById('upload-gallery');
+  gallery.querySelectorAll('.upload-item').forEach(el => el.remove());
+  
   document.getElementById('progress-bar').style.display = 'none';
   document.getElementById('progress-fill').style.width = '0%';
   document.getElementById('btn-submit').disabled = false;
   document.getElementById('form-error').style.display = 'none';
-  applyI18n();
+  
+  // Réinitialiser le bouton anonyme en fonction de la connexion
+  if (!currentUser) {
+    isAnon = true;
+    anonToggle.classList.add('on');
+    anonToggle.style.opacity = '0.5';
+    anonToggle.style.cursor = 'not-allowed';
+  } else {
+    isAnon = true;
+    anonToggle.classList.add('on');
+  }
 }
 
-const modalEl = document.getElementById('add-modal');
-document.getElementById('btn-add-modal').onclick = () => { modalEl.classList.add('active'); };
-document.getElementById('close-modal').onclick = () => { modalEl.classList.remove('active'); resetForm(); };
+document.getElementById('btn-add-modal').onclick = () => { document.getElementById('add-modal').classList.add('active'); };
+document.getElementById('close-modal').onclick = () => { document.getElementById('add-modal').classList.remove('active'); resetForm(); };
 
-// Init
 loadTranslations();
 loadCountries();
 </script>
