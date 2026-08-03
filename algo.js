@@ -77,3 +77,23 @@ function computeScore(tomato, profile, implicitPrefs) {
 
   return score;
 }
+
+/**
+ * Renvoie les tomates les plus proches d'une tomate donnée (même couleur / même pays),
+ * utilisé pour le bloc "Tomates similaires" de la fiche détail.
+ */
+export function similarTomatoes(tomatoes, target, limit = 3) {
+  if (!target) return [];
+  return tomatoes
+    .filter(t => t.id !== target.id)
+    .map(t => {
+      let score = 0;
+      if (t.color && target.color && t.color === target.color) score += 2;
+      if (t.country && target.country && t.country === target.country) score += 1;
+      return { t, score };
+    })
+    .filter(x => x.score > 0)
+    .sort((a, b) => b.score - a.score || (b.t.createdAt || 0) - (a.t.createdAt || 0))
+    .slice(0, limit)
+    .map(x => x.t);
+}
