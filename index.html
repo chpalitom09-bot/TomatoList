@@ -38,6 +38,14 @@
   .btn-outline { background: transparent; border: 1px solid var(--border); color: var(--text-main); }
   .btn-outline:hover { background: var(--bg); }
 
+  /* Menu Langue Déroulant */
+  .lang-dropdown { position: relative; }
+  .lang-menu { position: absolute; top: calc(100% + 8px); right: 0; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); min-width: 130px; display: none; flex-direction: column; overflow: hidden; z-index: 200; }
+  .lang-menu.active { display: flex; animation: slideDown 0.2s cubic-bezier(0.16, 1, 0.3, 1); }
+  .lang-menu button { padding: 12px 16px; border: none; background: none; text-align: left; cursor: pointer; font-size: 14px; font-weight: 500; transition: background 0.2s; color: var(--text-main); }
+  .lang-menu button:hover { background: var(--bg); }
+  .lang-menu button.active { font-weight: 700; background: var(--bg); color: var(--primary); }
+
   /* Toolbar & Custom Filters */
   .toolbar-wrap { max-width: 1200px; margin: 32px auto 24px; }
   .toolbar { padding: 0 24px; display: flex; gap: 12px; margin-bottom: 16px; }
@@ -95,13 +103,26 @@
   .modal-close { background: var(--bg); border: 1px solid var(--border); width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 16px; cursor: pointer; color: var(--text-muted); transition: all 0.2s; }
   .modal-close:hover { background: var(--text-main); color: #fff; border-color: var(--text-main); }
   .modal-body { padding: 24px; }
+  
   .form-group { margin-bottom: 20px; }
   .form-group label { display: block; font-size: 13.5px; font-weight: 600; margin-bottom: 8px; color: var(--text-main); }
-  .form-control { width: 100%; padding: 12px 14px; border: 1px solid var(--border); border-radius: 10px; outline: none; font-size: 14px; background: var(--bg); transition: border-color 0.2s, background 0.2s; }
+  .form-control { width: 100%; padding: 12px 14px; border: 1px solid var(--border); border-radius: 10px; outline: none; font-size: 14px; background: var(--bg); transition: border-color 0.2s, background 0.2s; font-family: inherit; }
   .form-control:focus { border-color: var(--primary); background: #fff; }
   .form-row { display: flex; gap: 16px; }
   .form-row .form-group { flex: 1; }
   
+  /* Custom Country Select pour forcer l'affichage des drapeaux (FlagCDN) */
+  .custom-select-wrapper { position: relative; width: 100%; }
+  .custom-select-btn { width: 100%; padding: 12px 14px; background: var(--bg); border: 1px solid var(--border); border-radius: 10px; text-align: left; cursor: pointer; display: flex; align-items: center; justify-content: space-between; font-size: 14px; color: var(--text-main); transition: border-color 0.2s; }
+  .custom-select-btn:focus { border-color: var(--primary); background: #fff; outline: none; }
+  .custom-select-btn img { width: 22px; border-radius: 2px; margin-right: 10px; object-fit: cover; box-shadow: 0 0 2px rgba(0,0,0,0.1); }
+  .custom-select-menu { position: absolute; top: 100%; left: 0; right: 0; background: #fff; border: 1px solid var(--border); border-radius: 10px; margin-top: 4px; max-height: 220px; overflow-y: auto; z-index: 100; display: none; box-shadow: 0 10px 25px rgba(0,0,0,0.1); padding: 8px; }
+  .custom-select-menu.active { display: block; }
+  .custom-search-input { width: 100%; padding: 10px 12px; border: 1px solid var(--border); border-radius: 8px; outline: none; font-size: 14px; margin-bottom: 8px; }
+  .custom-option { padding: 10px 12px; cursor: pointer; display: flex; align-items: center; transition: background 0.2s; font-size: 14px; border-radius: 6px; }
+  .custom-option:hover { background: var(--bg); }
+  .custom-option img { width: 22px; border-radius: 2px; margin-right: 10px; box-shadow: 0 0 2px rgba(0,0,0,0.1); }
+
   .img-preview { width: 100%; height: 220px; border: 2px dashed var(--border); border-radius: 12px; margin-bottom: 20px; display: flex; align-items: center; justify-content: center; cursor: pointer; background-color: var(--bg); background-size: cover; background-position: center; color: var(--text-muted); flex-direction: column; gap: 12px; transition: border-color 0.2s; }
   .img-preview:hover { border-color: var(--text-muted); }
   .img-preview.has-img { border-style: solid; border-color: transparent; }
@@ -139,7 +160,21 @@
 <nav class="navbar">
   <a href="#" class="brand">TomatoList</a>
   <div class="nav-actions">
-    <button class="btn btn-outline" id="btn-lang"><i class="fa-solid fa-globe"></i> <span class="hide-mobile" id="lang-label">FR</span></button>
+    <div class="lang-dropdown">
+      <button class="btn btn-outline" id="btn-lang-dropdown">
+        <i class="fa-solid fa-globe"></i> 
+        <span class="hide-mobile" id="lang-label">FR</span>
+        <i class="fa-solid fa-chevron-down" style="font-size:10px; margin-left:2px"></i>
+      </button>
+      <div class="lang-menu" id="lang-menu">
+        <button data-lang="fr">Français</button>
+        <button data-lang="en">English</button>
+        <button data-lang="de">Deutsch</button>
+        <button data-lang="es">Español</button>
+        <button data-lang="it">Italiano</button>
+      </div>
+    </div>
+    
     <button class="btn btn-outline" id="btn-auth"><i class="fa-solid fa-user"></i> <span class="hide-mobile" id="auth-label" data-i18n="login">Connexion</span></button>
     <button class="btn btn-primary" id="btn-add-modal"><i class="fa-solid fa-plus"></i> <span class="hide-mobile" data-i18n="add">Ajouter</span></button>
   </div>
@@ -236,7 +271,18 @@
         </div>
         <div class="form-group">
           <label data-i18n="t_country">Pays d'origine</label>
-          <input type="text" class="form-control" id="f-country">
+          <div class="custom-select-wrapper">
+            <button class="custom-select-btn" id="f-country-btn" type="button">
+              <span>Sélectionner un pays...</span>
+              <i class="fa-solid fa-chevron-down" style="color:var(--text-muted)"></i>
+            </button>
+            <div class="custom-select-menu" id="f-country-menu">
+              <input type="text" class="custom-search-input" id="f-country-search" placeholder="Rechercher..." autocomplete="off">
+              <div id="f-country-list"></div>
+            </div>
+            <!-- Champ caché pour stocker la valeur -->
+            <input type="hidden" id="f-country-value" value="">
+          </div>
         </div>
       </div>
 
@@ -288,7 +334,7 @@ const firebaseConfig = {
   databaseURL: "https://tomatolist-efee0-default-rtdb.europe-west1.firebasedatabase.app"
 };
 
-// URL DU SCRIPT GOOGLE APPS SCRIPT MISE À JOUR :
+// L'URL du script de Google (App Script)
 const GAS_URL = "https://script.google.com/macros/s/AKfycbxVu24YbDkU7jbGKQt9kw2BdAo-Qj-_jympy35mMlMoS4guNFyxqqBhIxlts0_WZ1pgvg/exec";
 
 const app = initializeApp(firebaseConfig);
@@ -297,6 +343,7 @@ const auth = getAuth(app);
 const db = getDatabase(app);
 
 let tomatoesData = [];
+let countriesList = [];
 let currentUser = null;
 let currentProfileName = "Anonyme";
 let currentImageData = null;
@@ -325,6 +372,7 @@ function showToast(msg, icon = 'fa-circle-info') {
   setTimeout(() => { if (toast.parentNode) toast.remove(); }, 3500);
 }
 
+// ----------------- LANGUE (MENU DÉROULANT) -----------------
 async function loadTranslations() {
   try {
     const res = await fetch('lang.json');
@@ -345,15 +393,78 @@ function applyI18n() {
   });
   document.querySelectorAll('[data-i18n-ph]').forEach(el => el.placeholder = tr(el.getAttribute('data-i18n-ph')));
   document.getElementById('lang-label').textContent = currentLang.toUpperCase();
+  
+  // Highlight active lang in menu
+  document.querySelectorAll('#lang-menu button').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.lang === currentLang);
+  });
 }
 
-document.getElementById('btn-lang').onclick = () => {
-  const langs = ['fr','en','de','es','it','ru','zh','hi'];
-  currentLang = langs[(langs.indexOf(currentLang) + 1) % langs.length];
-  localStorage.setItem('tl_lang', currentLang);
-  applyI18n();
-  renderGrid();
+document.getElementById('btn-lang-dropdown').onclick = (e) => {
+  e.stopPropagation();
+  document.getElementById('lang-menu').classList.toggle('active');
 };
+document.querySelectorAll('#lang-menu button').forEach(btn => {
+  btn.onclick = (e) => {
+    currentLang = e.currentTarget.dataset.lang;
+    localStorage.setItem('tl_lang', currentLang);
+    applyI18n();
+    renderGrid();
+    document.getElementById('lang-menu').classList.remove('active');
+  };
+});
+document.addEventListener('click', (e) => {
+  if (!e.target.closest('.lang-dropdown')) {
+    document.getElementById('lang-menu').classList.remove('active');
+  }
+  // Fermer le sélecteur de pays s'il est ouvert et qu'on clique ailleurs
+  if (!e.target.closest('.custom-select-wrapper')) {
+    document.getElementById('f-country-menu').classList.remove('active');
+  }
+});
+
+// ----------------- PAYS (SÉLECTEUR DÉROULANT PERSONNALISÉ) -----------------
+async function loadCountries() {
+  try {
+    const res = await fetch('pays.json');
+    countriesList = await res.json();
+    renderCountryList();
+  } catch (e) {
+    console.warn("Fichier pays.json non trouvé.");
+  }
+}
+function renderCountryList(filterText = '') {
+  const container = document.getElementById('f-country-list');
+  const lowerFilter = filterText.toLowerCase();
+  
+  const filtered = countriesList.filter(c => c.name.toLowerCase().includes(lowerFilter));
+  
+  container.innerHTML = filtered.map(c => `
+    <div class="custom-option" data-name="${c.name}" data-code="${c.code}">
+      <img src="https://flagcdn.com/w20/${c.code}.png" alt="${c.name}">
+      <span>${c.name}</span>
+    </div>
+  `).join('');
+
+  container.querySelectorAll('.custom-option').forEach(opt => {
+    opt.onclick = () => {
+      const name = opt.getAttribute('data-name');
+      const code = opt.getAttribute('data-code');
+      // On met l'image et le texte dans le bouton
+      document.getElementById('f-country-btn').innerHTML = `<div style="display:flex;align-items:center"><img src="https://flagcdn.com/w20/${code}.png" alt=""> <span>${name}</span></div> <i class="fa-solid fa-chevron-down" style="color:var(--text-muted)"></i>`;
+      document.getElementById('f-country-value').value = name;
+      document.getElementById('f-country-menu').classList.remove('active');
+    };
+  });
+}
+document.getElementById('f-country-btn').onclick = (e) => {
+  document.getElementById('f-country-menu').classList.toggle('active');
+  document.getElementById('f-country-search').focus();
+};
+document.getElementById('f-country-search').oninput = (e) => {
+  renderCountryList(e.target.value);
+};
+
 
 document.getElementById('btn-toggle-filters').onclick = () => {
   document.getElementById('filters-panel').classList.toggle('active');
@@ -434,6 +545,17 @@ function renderGrid() {
     const likesCount = t.likes ? Object.keys(t.likes).length : 0;
     const isLiked = currentUser && t.likes && t.likes[currentUser.uid];
     
+    // Ajout du drapeau si le pays est défini
+    let countryBadge = '';
+    if (t.country) {
+      const countryObj = countriesList.find(c => c.name === t.country);
+      if (countryObj) {
+        countryBadge = `<span class="badge"><img src="https://flagcdn.com/w20/${countryObj.code}.png" style="width:14px;border-radius:2px" alt=""> ${t.country}</span>`;
+      } else {
+        countryBadge = `<span class="badge"><i class="fa-solid fa-earth-europe"></i> ${t.country}</span>`;
+      }
+    }
+
     return `
       <div class="card">
         <img src="${t.imageURL}" class="card-img" alt="${t.name}" loading="lazy">
@@ -442,7 +564,7 @@ function renderGrid() {
           <div class="card-meta">
             <span class="badge"><i class="color-dot" style="background:${colorBg}"></i> ${tr('color_'+(t.color||'Rouge').toLowerCase()) || t.color}</span>
             ${t.weight ? `<span class="badge"><i class="fa-solid fa-scale-balanced"></i> ${t.weight}g</span>` : ''}
-            ${t.country ? `<span class="badge"><i class="fa-solid fa-earth-europe"></i> ${t.country}</span>` : ''}
+            ${countryBadge}
           </div>
           <div class="card-desc">${t.description || '-'}</div>
           
@@ -464,9 +586,10 @@ function renderGrid() {
   }).join('');
 }
 
+// Recherche instantanée
 document.getElementById('search-input').addEventListener('input', renderGrid);
 
-// Gestionnaire global pour les Likes
+// Gestionnaire pour les Likes
 document.getElementById('tomatoes-grid').addEventListener('click', async (e) => {
   const likeBtn = e.target.closest('.like-btn');
   if (likeBtn) {
@@ -480,24 +603,21 @@ document.getElementById('tomatoes-grid').addEventListener('click', async (e) => 
     
     const isLiked = tomato.likes && tomato.likes[currentUser.uid];
     
-    // Multi-path update : met à jour le compteur sur la tomate ET dans le noeud profil du user
+    // Mise à jour simultanée (Tomate + Profil User)
     const updates = {};
     updates[`tomatoes/${tomatoId}/likes/${currentUser.uid}`] = isLiked ? null : true;
     updates[`users/${currentUser.uid}/likes/${tomatoId}`] = isLiked ? null : true;
     
     try {
       await update(ref(db), updates);
-      // L'UI se mettra à jour toute seule grâce au listener onValue
     } catch(err) {
-      showToast("Une erreur est survenue.", 'fa-triangle-exclamation');
+      showToast("Erreur lors de l'ajout aux favoris.", 'fa-triangle-exclamation');
     }
   }
 });
 
-const modal = document.getElementById('add-modal');
-document.getElementById('btn-add-modal').onclick = () => { modal.classList.add('active'); };
-document.getElementById('close-modal').onclick = () => { modal.classList.remove('active'); resetForm(); };
 
+// ----------------- PUBLICATION (AVEC CORRECTION DU CORS) -----------------
 const imgPreview = document.getElementById('img-preview');
 const fileInput = document.getElementById('file-input');
 imgPreview.onclick = () => fileInput.click();
@@ -551,8 +671,12 @@ document.getElementById('btn-submit').onclick = async () => {
   const interval = setInterval(() => { p += 10; if(p>90) p=90; fill.style.width = p+'%'; }, 200);
 
   try {
+    // CORRECTION DU CORS : On force 'text/plain' pour éviter la vérification preflight OPTIONS de Google
     const res = await fetch(GAS_URL, {
       method: 'POST',
+      headers: {
+        'Content-Type': 'text/plain;charset=utf-8'
+      },
       body: JSON.stringify({
         name: name.replace(/\s+/g, '_') + '_' + Date.now() + '.webp',
         image: currentImageData
@@ -562,7 +686,6 @@ document.getElementById('btn-submit').onclick = async () => {
     
     if (!result.success) throw new Error("Upload failed");
     
-    // Création de l'objet sans restriction de compte (Anonyme par défaut si non connecté)
     const tomatoData = {
       name: name,
       color: document.getElementById('f-color').value,
@@ -570,9 +693,9 @@ document.getElementById('btn-submit').onclick = async () => {
       weight: parseInt(document.getElementById('f-weight').value) || null,
       averageSize: document.getElementById('f-size').value || null,
       description: document.getElementById('f-desc').value || "",
-      country: document.getElementById('f-country').value || "",
-      author: currentUser ? currentProfileName : tr('anonymous') || 'Anonyme',
-      uid: currentUser ? currentUser.uid : null, // null si anonyme
+      country: document.getElementById('f-country-value').value || "",
+      author: currentUser ? currentProfileName : (tr('anonymous') || 'Anonyme'),
+      uid: currentUser ? currentUser.uid : null,
       createdAt: Date.now()
     };
 
@@ -584,7 +707,7 @@ document.getElementById('btn-submit').onclick = async () => {
 
   } catch(e) {
     clearInterval(interval);
-    errBox.textContent = "Erreur lors de l'envoi de l'image. Avez-vous configuré l'URL Apps Script ?";
+    errBox.textContent = "Erreur (Avez-vous bien cliqué sur 'Nouvelle version' lors du déploiement du script ?)";
     errBox.style.display = 'block';
     progress.style.display = 'none';
     btn.disabled = false;
@@ -595,7 +718,10 @@ function resetForm() {
   document.getElementById('f-name').value = '';
   document.getElementById('f-desc').value = '';
   document.getElementById('f-weight').value = '';
-  document.getElementById('f-country').value = '';
+  document.getElementById('f-country-value').value = '';
+  document.getElementById('f-country-btn').innerHTML = `<span>Sélectionner un pays...</span> <i class="fa-solid fa-chevron-down" style="color:var(--text-muted)"></i>`;
+  document.getElementById('f-country-search').value = '';
+  renderCountryList();
   currentImageData = null;
   imgPreview.style.backgroundImage = 'none';
   imgPreview.innerHTML = '<i class="fa-solid fa-camera"></i><span data-i18n="add_image">Cliquez pour ajouter une photo *</span>';
@@ -607,7 +733,13 @@ function resetForm() {
   applyI18n();
 }
 
+const modalEl = document.getElementById('add-modal');
+document.getElementById('btn-add-modal').onclick = () => { modalEl.classList.add('active'); };
+document.getElementById('close-modal').onclick = () => { modalEl.classList.remove('active'); resetForm(); };
+
+// Init
 loadTranslations();
+loadCountries();
 </script>
 </body>
 </html>
