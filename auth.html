@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="fr" id="html-root">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TomatoList — Compte</title>
+<link rel="icon" type="image/png" href="tomatolist.png">
+<meta name="theme-color" content="#b91c1c">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<style>
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  :root{
+    --bg:#ffffff; --panel:#fafafa; --line:#e9e9ea; --line-h:#d7d7d9;
+    --t1:#111827; --t2:#4b5563; --t3:#9ca3af;
+    --primary: #b91c1c; --primary-h: #991b1b;
+    --grey:#f3f4f6; --grey-h:#e5e7eb;
+    --sans:'Inter',sans-serif; --display:'Space Grotesk',sans-serif;
+  }
+  html,body{height:100%}
+  body{background:var(--bg);color:var(--t1);font-family:var(--sans);-webkit-font-smoothing:antialiased;overflow-x:hidden}
+  a{color:inherit}
+
+  .wrap{min-height:100vh;display:grid;grid-template-columns:1fr 1fr}
+  @media (max-width:900px){.wrap{grid-template-columns:1fr}}
+
+  /* ── LEFT VISUAL PANEL ── */
+  .side{
+    position:relative;background:#450a0a;color:#fff;
+    display:flex;flex-direction:column;justify-content:space-between;padding:48px;
+    overflow:hidden;
+  }
+  @media (max-width:900px){.side{display:none}}
+  .side-video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.6;z-index:0}
+  .side::before{
+    content:'';position:absolute;inset:0;z-index:1;
+    background: linear-gradient(180deg, rgba(69,10,10,0.3) 0%, rgba(69,10,10,0.85) 100%);
+    pointer-events:none;
+  }
+  .side-logo{display:flex;align-items:center;gap:10px;position:relative;z-index:2; text-decoration: none;}
+  .side-logo-text{font-family:var(--display);font-weight:700;font-size:24px;letter-spacing:-.02em; color:#fff;}
+  .side-quote{position:relative;z-index:2;max-width:420px}
+  .side-quote-mark{font-family:var(--display);font-size:52px;font-weight:700;line-height:.6;color:rgba(255,255,255,0.2);margin-bottom:10px}
+  .side-quote-text{font-family:var(--display);font-size:26px;font-weight:600;letter-spacing:-.02em;line-height:1.35;margin-bottom:18px}
+  .side-quote-sub{font-size:14px;color:rgba(255,255,255,0.7);line-height:1.6}
+  .side-foot{position:relative;z-index:2;font-size:12px;color:rgba(255,255,255,0.5)}
+
+  /* ── RIGHT FORM PANEL ── */
+  .main{display:flex;flex-direction:column;min-height:100vh}
+  .topbar{display:flex;align-items:center;justify-content:space-between;padding:24px 32px}
+  .back-link{display:flex;align-items:center;gap:8px;font-size:14px;font-weight:500;color:var(--t2);text-decoration:none;transition:color .15s}
+  .back-link:hover{color:var(--primary)}
+  .lang-switch{position:relative}
+  .lang-btn{display:flex;align-items:center;gap:7px;font-size:13px;font-weight:600;color:var(--t1);background:var(--grey);border:1px solid var(--line);padding:7px 12px;border-radius:9px;cursor:pointer}
+  
+  .center{flex:1;display:flex;align-items:center;justify-content:center;padding:24px}
+  .card{width:100%;max-width:380px}
+
+  .step-progress{display:flex;gap:6px;margin-bottom:28px}
+  .step-progress-bar{flex:1;height:3px;border-radius:3px;background:var(--line)}
+  .step-progress-bar.done{background:var(--primary)}
+
+  .brand-mini{display:none}
+  @media (max-width:900px){
+    .brand-mini{display:flex;align-items:center;gap:8px;justify-content:center;margin-bottom:22px; text-decoration: none;}
+    .brand-mini span{font-family:var(--display);font-weight:700;font-size:20px; color:var(--primary)}
+  }
+
+  .title{font-family:var(--display);font-size:26px;font-weight:700;letter-spacing:-.03em;margin-bottom:6px}
+  .subtitle{font-size:14px;color:var(--t2);margin-bottom:26px;line-height:1.5}
+
+  .tabs{display:flex;gap:3px;background:var(--grey);border-radius:11px;padding:3px;margin-bottom:22px;border:1px solid var(--line)}
+  .tab{flex:1;padding:10px;font-size:13px;font-weight:600;background:none;border:none;cursor:pointer;border-radius:8px;color:var(--t2);transition:all .16s;}
+  .tab.active{background:#fff;color:var(--primary);box-shadow:0 1px 3px rgba(0,0,0,0.08)}
+
+  .btn-google{width:100%;display:flex;align-items:center;justify-content:center;gap:10px;padding:12px;background:#fff;border:1px solid var(--line-h);border-radius:11px;font-size:14px;font-weight:600;cursor:pointer;transition:background .15s;margin-bottom:18px}
+  .btn-google:hover{background:var(--grey)}
+  .btn-google img{width:18px;height:18px}
+
+  .divider{display:flex;align-items:center;gap:12px;margin-bottom:18px}
+  .divider-line{flex:1;height:1px;background:var(--line)}
+  .divider-text{font-size:11px;font-weight:700;color:var(--t3);text-transform:uppercase}
+
+  .field{margin-bottom:14px}
+  .field-label{display:block;font-size:13px;font-weight:600;color:var(--t1);margin-bottom:6px}
+  .field-input-wrap{position:relative}
+  .field-input{width:100%;padding:12px 14px;background:var(--panel);border:1px solid var(--line);border-radius:10px;font-size:14px;color:var(--t1);outline:none;transition:border-color .15s,background .15s}
+  .field-input:focus{border-color:var(--primary);background:#fff}
+  .field-row{display:flex;gap:10px}
+  .field-row .field{flex:1}
+
+  .row-between{display:flex;align-items:center;justify-content:flex-end;margin-bottom:16px;margin-top:-4px}
+  .link-btn{font-size:13px;font-weight:600;color:var(--t2);background:none;border:none;cursor:pointer;text-decoration:underline;text-underline-offset:2px}
+  .link-btn:hover{color:var(--primary)}
+
+  .btn-primary{width:100%;padding:14px;background:var(--primary);color:#fff;border:none;border-radius:11px;font-size:14px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:background .15s}
+  .btn-primary:hover{background:var(--primary-h)}
+  .btn-secondary{width:100%;padding:14px;background:var(--grey);color:var(--t1);border:1px solid var(--line);border-radius:11px;font-size:14px;font-weight:600;cursor:pointer;}
+  .btn-row{display:flex;gap:10px}
+  .btn-row .btn-secondary{width:auto;padding:14px 20px}
+  .btn-row .btn-primary{flex:1}
+
+  .error-box{font-size:13px;color:#d92d20;background:#fef2f2;border:1px solid #fecaca;padding:10px 12px;border-radius:9px;margin-bottom:14px;display:none;}
+  .error-box.show{display:block}
+
+  .foot-note{font-size:12px;color:var(--t3);text-align:center;margin-top:20px;}
+
+  .usage-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:18px}
+  .usage-card{border:1px solid var(--line);border-radius:12px;padding:16px 12px;cursor:pointer;text-align:center;transition:border-color .15s}
+  .usage-card:hover{border-color:var(--t3)}
+  .usage-card.selected{border-color:var(--primary);background:#fef2f2;color:var(--primary)}
+  .usage-card i{font-size:20px;margin-bottom:8px;display:block}
+  .usage-card span{font-size:13px;font-weight:600}
+
+  .step{display:none}
+  .step.active{display:block;animation:fadeIn .3s ease}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <div class="side">
+    <video class="side-video" autoplay muted loop playsinline>
+      <source src="vid.mp4" type="video/mp4">
+    </video>
+    <div></div>
+    <a class="side-logo" href="index.html">
+      <span class="side-logo-text">TomatoList</span>
+    </a>
+    <div class="side-quote">
+      <div class="side-quote-mark">"</div>
+      <div class="side-quote-text" data-i18n="side_quote">La diversité au cœur du potager.</div>
+      <div class="side-quote-sub" data-i18n="side_quote_sub">Rejoignez la plus grande communauté de passionnés de tomates.</div>
+    </div>
+    <div class="side-foot">© TomatoList — <span id="year"></span></div>
+  </div>
+
+  <div class="main">
+    <div class="topbar">
+      <a class="back-link" href="index.html"><i class="fa-solid fa-arrow-left"></i> <span data-i18n="back_home">Retour au site</span></a>
+      <div class="lang-switch">
+        <button class="lang-btn" id="btn-lang"><i class="fa-solid fa-globe"></i> <span id="lang-label">FR</span></button>
+      </div>
+    </div>
+
+    <div class="center">
+      <div class="card">
+
+        <a href="index.html" class="brand-mini"><span>TomatoList</span></a>
+
+        <!-- AUTH -->
+        <div class="step active" id="step-auth">
+          <div class="title" id="auth-title" data-i18n="welcome_back">Connexion</div>
+          <div class="subtitle" id="auth-subtitle" data-i18n="welcome_back_sub">Gérez vos publications de tomates</div>
+
+          <button class="btn-google" id="btn-google">
+            <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="">
+            <span data-i18n="continue_google">Continuer avec Google</span>
+          </button>
+
+          <div class="divider"><div class="divider-line"></div><span class="divider-text" data-i18n="or">ou</span><div class="divider-line"></div></div>
+
+          <div class="tabs">
+            <button class="tab active" id="tab-login" data-i18n="tab_login">Connexion</button>
+            <button class="tab" id="tab-signup" data-i18n="tab_signup">Inscription</button>
+          </div>
+
+          <div class="error-box" id="auth-error"></div>
+
+          <!-- LOGIN -->
+          <div id="form-login">
+            <div class="field">
+              <label class="field-label" data-i18n="email">Email</label>
+              <input class="field-input" type="email" id="login-email">
+            </div>
+            <div class="field">
+              <label class="field-label" data-i18n="password">Mot de passe</label>
+              <input class="field-input" type="password" id="login-password">
+            </div>
+            <div class="row-between">
+              <button class="link-btn" id="btn-forgot" data-i18n="forgot_password">Mot de passe oublié ?</button>
+            </div>
+            <button class="btn-primary" id="btn-login"><span data-i18n="login">Se connecter</span></button>
+          </div>
+
+          <!-- SIGNUP -->
+          <div id="form-signup" style="display:none">
+            <div class="field">
+              <label class="field-label" data-i18n="email">Email</label>
+              <input class="field-input" type="email" id="signup-email">
+            </div>
+            <div class="field">
+              <label class="field-label" data-i18n="password">Mot de passe</label>
+              <input class="field-input" type="password" id="signup-password">
+            </div>
+            <button class="btn-primary" id="btn-signup" style="margin-top:16px"><span data-i18n="signup_btn">Créer le compte</span></button>
+          </div>
+          
+          <p class="foot-note" data-i18n="terms_note">Un compte n'est requis que pour publier avec votre nom. La consultation est libre.</p>
+        </div>
+
+        <!-- IDENTITY -->
+        <div class="step" id="step-identity">
+          <div class="step-progress"><div class="step-progress-bar done"></div><div class="step-progress-bar"></div></div>
+          <div class="title" data-i18n="step_identity_title">Votre profil</div>
+          <div class="subtitle" data-i18n="step_identity_sub">Comment souhaitez-vous signer vos publications ?</div>
+          <div class="field-row">
+            <div class="field">
+              <label class="field-label" data-i18n="firstname">Prénom</label>
+              <input class="field-input" type="text" id="q-firstname">
+            </div>
+            <div class="field">
+              <label class="field-label" data-i18n="lastname">Nom</label>
+              <input class="field-input" type="text" id="q-lastname">
+            </div>
+          </div>
+          <div class="field" style="margin-top:16px">
+            <label class="field-label" data-i18n="usage_title">Vous êtes principalement :</label>
+            <div class="usage-grid" id="usage-grid">
+              <div class="usage-card" data-val="grower"><i class="fa-solid fa-leaf"></i><span data-i18n="usage_grower">Producteur</span></div>
+              <div class="usage-card" data-val="gardener"><i class="fa-solid fa-seedling"></i><span data-i18n="usage_gardener">Jardinier amateur</span></div>
+              <div class="usage-card" data-val="chef"><i class="fa-solid fa-utensils"></i><span data-i18n="usage_chef">Cuisinier</span></div>
+              <div class="usage-card" data-val="curious"><i class="fa-solid fa-magnifying-glass"></i><span data-i18n="usage_curious">Curieux</span></div>
+            </div>
+          </div>
+          <div class="error-box" id="identity-error"></div>
+          <button class="btn-primary" id="btn-finish" style="margin-top:20px"><span data-i18n="finish">Terminer</span></button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.17.0/firebase-app.js";
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup, sendPasswordResetEmail, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.17.0/firebase-auth.js";
+import { getDatabase, ref, set, get } from "https://www.gstatic.com/firebasejs/12.17.0/firebase-database.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyAaz9s2jxsNqYd9FBsVG4u48-BwE8LAXCE",
+  authDomain: "tomatolist-efee0.firebaseapp.com",
+  projectId: "tomatolist-efee0",
+  storageBucket: "tomatolist-efee0.firebasestorage.app",
+  messagingSenderId: "451109980779",
+  appId: "1:451109980779:web:87ae55fc2b4370dfa43f2e",
+  measurementId: "G-Q8KHD0WW38"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getDatabase(app);
+const googleProvider = new GoogleAuthProvider();
+
+let currentLang = localStorage.getItem('tl_lang') || (navigator.language || 'fr').slice(0,2);
+let TRANSLATIONS = {};
+
+const state = { mode: 'login', pendingUser: null, usage: '' };
+
+async function loadTranslations() {
+  try {
+    const res = await fetch('lang.json');
+    TRANSLATIONS = await res.json();
+    applyI18n();
+  } catch(e) { console.error("Erreur lang.json"); }
+}
+
+function tr(key) { return (TRANSLATIONS[currentLang] && TRANSLATIONS[currentLang][key]) || (TRANSLATIONS.fr && TRANSLATIONS.fr[key]) || key; }
+
+function applyI18n() {
+  document.querySelectorAll('[data-i18n]').forEach(el => el.textContent = tr(el.getAttribute('data-i18n')));
+  document.getElementById('lang-label').textContent = currentLang.toUpperCase();
+}
+
+document.getElementById('btn-lang').onclick = () => {
+  const langs = ['fr','en','de','es','it','ru','zh','hi'];
+  currentLang = langs[(langs.indexOf(currentLang) + 1) % langs.length];
+  localStorage.setItem('tl_lang', currentLang);
+  applyI18n();
+};
+
+document.getElementById('year').textContent = new Date().getFullYear();
+
+function switchMode(mode) {
+  state.mode = mode;
+  document.getElementById('tab-login').classList.toggle('active', mode==='login');
+  document.getElementById('tab-signup').classList.toggle('active', mode==='signup');
+  document.getElementById('form-login').style.display = mode==='login' ? 'block' : 'none';
+  document.getElementById('form-signup').style.display = mode==='signup' ? 'block' : 'none';
+  document.getElementById('auth-error').classList.remove('show');
+}
+document.getElementById('tab-login').onclick = () => switchMode('login');
+document.getElementById('tab-signup').onclick = () => switchMode('signup');
+
+function setError(id, msg) {
+  const el = document.getElementById(id);
+  if (!msg) { el.classList.remove('show'); return; }
+  el.textContent = msg; el.classList.add('show');
+}
+
+// Cards select
+document.querySelectorAll('.usage-card').forEach(c => {
+  c.onclick = () => {
+    document.querySelectorAll('.usage-card').forEach(x => x.classList.remove('selected'));
+    c.classList.add('selected');
+    state.usage = c.getAttribute('data-val');
+  }
+});
+
+document.getElementById('btn-login').onclick = async () => {
+  const email = document.getElementById('login-email').value;
+  const pw = document.getElementById('login-password').value;
+  if(!email || !pw) return setError('auth-error', tr('err_required'));
+  try {
+    await signInWithEmailAndPassword(auth, email, pw);
+    window.location.href = 'index.html';
+  } catch(e) { setError('auth-error', "Identifiants incorrects"); }
+};
+
+document.getElementById('btn-signup').onclick = async () => {
+  const email = document.getElementById('signup-email').value;
+  const pw = document.getElementById('signup-password').value;
+  if(!email || pw.length < 6) return setError('auth-error', "Email invalide ou mot de passe trop court (6 min)");
+  try {
+    const cred = await createUserWithEmailAndPassword(auth, email, pw);
+    state.pendingUser = cred.user;
+    document.getElementById('step-auth').classList.remove('active');
+    document.getElementById('step-identity').classList.add('active');
+  } catch(e) { setError('auth-error', "Erreur à l'inscription. Email déjà utilisé ?"); }
+};
+
+document.getElementById('btn-google').onclick = async () => {
+  try {
+    const result = await signInWithPopup(auth, googleProvider);
+    const snap = await get(ref(db, `users/${result.user.uid}/profile`));
+    if(!snap.exists()) {
+      state.pendingUser = result.user;
+      document.getElementById('q-firstname').value = (result.user.displayName || '').split(' ')[0];
+      document.getElementById('q-lastname').value = (result.user.displayName || '').split(' ').slice(1).join(' ');
+      document.getElementById('step-auth').classList.remove('active');
+      document.getElementById('step-identity').classList.add('active');
+    } else {
+      window.location.href = 'index.html';
+    }
+  } catch(e) { setError('auth-error', "Erreur Google Auth"); }
+};
+
+document.getElementById('btn-finish').onclick = async () => {
+  const fn = document.getElementById('q-firstname').value.trim();
+  const ln = document.getElementById('q-lastname').value.trim();
+  if(!fn) return setError('identity-error', tr('err_required'));
+  
+  await set(ref(db, `users/${state.pendingUser.uid}/profile`), {
+    firstname: fn, lastname: ln, usage: state.usage, createdAt: Date.now()
+  });
+  window.location.href = 'index.html';
+};
+
+document.getElementById('btn-forgot').onclick = async () => {
+  const email = prompt("Votre email :");
+  if(email) {
+    try { await sendPasswordResetEmail(auth, email); alert("Email envoyé !"); }
+    catch(e) { alert("Erreur."); }
+  }
+};
+
+loadTranslations();
+</script>
+</body>
+</html>
