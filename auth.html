@@ -71,10 +71,6 @@
   .title{font-family:var(--display);font-size:26px;font-weight:700;letter-spacing:-.03em;margin-bottom:6px}
   .subtitle{font-size:14px;color:var(--t2);margin-bottom:26px;line-height:1.5}
 
-  .tabs{display:flex;gap:3px;background:var(--grey);border-radius:11px;padding:3px;margin-bottom:22px;border:1px solid var(--line)}
-  .tab{flex:1;padding:10px;font-size:13px;font-weight:600;background:none;border:none;cursor:pointer;border-radius:8px;color:var(--t2);transition:all .16s;}
-  .tab.active{background:#fff;color:var(--primary);box-shadow:0 1px 3px rgba(0,0,0,0.08)}
-
   .btn-google{width:100%;display:flex;align-items:center;justify-content:center;gap:10px;padding:12px;background:#fff;border:1px solid var(--line-h);border-radius:11px;font-size:14px;font-weight:600;cursor:pointer;transition:background .15s;margin-bottom:18px}
   .btn-google:hover{background:var(--grey)}
   .btn-google img{width:18px;height:18px}
@@ -97,6 +93,7 @@
 
   .btn-primary{width:100%;padding:14px;background:var(--primary);color:#fff;border:none;border-radius:11px;font-size:14px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:background .15s}
   .btn-primary:hover{background:var(--primary-h)}
+  .btn-primary:disabled{opacity: 0.6; cursor: not-allowed;}
   .btn-secondary{width:100%;padding:14px;background:var(--grey);color:var(--t1);border:1px solid var(--line);border-radius:11px;font-size:14px;font-weight:600;cursor:pointer;}
   .btn-row{display:flex;gap:10px}
   .btn-row .btn-secondary{width:auto;padding:14px 20px}
@@ -105,7 +102,7 @@
   .error-box{font-size:13px;color:#d92d20;background:#fef2f2;border:1px solid #fecaca;padding:10px 12px;border-radius:9px;margin-bottom:14px;display:none;}
   .error-box.show{display:block}
 
-  .foot-note{font-size:12px;color:var(--t3);text-align:center;margin-top:20px;}
+  .foot-note{font-size:12px;color:var(--t3);text-align:center;margin-top:20px; line-height:1.5;}
 
   .usage-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:18px}
   .usage-card{border:1px solid var(--line);border-radius:12px;padding:16px 12px;cursor:pointer;text-align:center;transition:border-color .15s}
@@ -117,6 +114,11 @@
   .step{display:none}
   .step.active{display:block;animation:fadeIn .3s ease}
   @keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+  
+  .loader { display: none; width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.4); border-top-color: #fff; border-radius: 50%; animation: spin 0.8s linear infinite; }
+  .btn-loading .loader { display: block; }
+  .btn-loading .btn-text { display: none; }
+  @keyframes spin { to { transform: rotate(360deg); } }
 </style>
 </head>
 <body>
@@ -151,10 +153,10 @@
 
         <a href="index.html" class="brand-mini"><span>TomatoList</span></a>
 
-        <!-- AUTH -->
+        <!-- AUTH (Connexion & Inscription Unifiées) -->
         <div class="step active" id="step-auth">
-          <div class="title" id="auth-title" data-i18n="welcome_back">Connexion</div>
-          <div class="subtitle" id="auth-subtitle" data-i18n="welcome_back_sub">Gérez vos publications de tomates</div>
+          <div class="title" data-i18n="auth_title">Bienvenue</div>
+          <div class="subtitle" data-i18n="auth_sub">Connectez-vous ou créez votre compte</div>
 
           <button class="btn-google" id="btn-google">
             <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="">
@@ -163,46 +165,30 @@
 
           <div class="divider"><div class="divider-line"></div><span class="divider-text" data-i18n="or">ou</span><div class="divider-line"></div></div>
 
-          <div class="tabs">
-            <button class="tab active" id="tab-login" data-i18n="tab_login">Connexion</button>
-            <button class="tab" id="tab-signup" data-i18n="tab_signup">Inscription</button>
-          </div>
-
           <div class="error-box" id="auth-error"></div>
 
-          <!-- LOGIN -->
-          <div id="form-login">
+          <div id="form-auth">
             <div class="field">
               <label class="field-label" data-i18n="email">Email</label>
-              <input class="field-input" type="email" id="login-email">
+              <input class="field-input" type="email" id="auth-email">
             </div>
             <div class="field">
               <label class="field-label" data-i18n="password">Mot de passe</label>
-              <input class="field-input" type="password" id="login-password">
+              <input class="field-input" type="password" id="auth-password">
             </div>
             <div class="row-between">
               <button class="link-btn" id="btn-forgot" data-i18n="forgot_password">Mot de passe oublié ?</button>
             </div>
-            <button class="btn-primary" id="btn-login"><span data-i18n="login">Se connecter</span></button>
-          </div>
-
-          <!-- SIGNUP -->
-          <div id="form-signup" style="display:none">
-            <div class="field">
-              <label class="field-label" data-i18n="email">Email</label>
-              <input class="field-input" type="email" id="signup-email">
-            </div>
-            <div class="field">
-              <label class="field-label" data-i18n="password">Mot de passe</label>
-              <input class="field-input" type="password" id="signup-password">
-            </div>
-            <button class="btn-primary" id="btn-signup" style="margin-top:16px"><span data-i18n="signup_btn">Créer le compte</span></button>
+            <button class="btn-primary" id="btn-magic-auth">
+              <div class="loader"></div>
+              <span class="btn-text" data-i18n="continue_btn">Continuer</span>
+            </button>
           </div>
           
-          <p class="foot-note" data-i18n="terms_note">Un compte n'est requis que pour publier avec votre nom. La consultation est libre.</p>
+          <p class="foot-note" data-i18n="terms_note">Si vous n'avez pas de compte, il sera créé automatiquement.<br>Un compte n'est requis que pour publier avec votre nom ou utiliser les favoris.</p>
         </div>
 
-        <!-- IDENTITY -->
+        <!-- IDENTITY (Pour les nouveaux comptes) -->
         <div class="step" id="step-identity">
           <div class="step-progress"><div class="step-progress-bar done"></div><div class="step-progress-bar"></div></div>
           <div class="title" data-i18n="step_identity_title">Votre profil</div>
@@ -221,7 +207,7 @@
             <label class="field-label" data-i18n="usage_title">Vous êtes principalement :</label>
             <div class="usage-grid" id="usage-grid">
               <div class="usage-card" data-val="grower"><i class="fa-solid fa-leaf"></i><span data-i18n="usage_grower">Producteur</span></div>
-              <div class="usage-card" data-val="gardener"><i class="fa-solid fa-seedling"></i><span data-i18n="usage_gardener">Jardinier amateur</span></div>
+              <div class="usage-card" data-val="gardener"><i class="fa-solid fa-seedling"></i><span data-i18n="usage_gardener">Jardinier</span></div>
               <div class="usage-card" data-val="chef"><i class="fa-solid fa-utensils"></i><span data-i18n="usage_chef">Cuisinier</span></div>
               <div class="usage-card" data-val="curious"><i class="fa-solid fa-magnifying-glass"></i><span data-i18n="usage_curious">Curieux</span></div>
             </div>
@@ -237,7 +223,7 @@
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.17.0/firebase-app.js";
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup, sendPasswordResetEmail, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.17.0/firebase-auth.js";
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, GoogleAuthProvider, signInWithRedirect, getRedirectResult, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/12.17.0/firebase-auth.js";
 import { getDatabase, ref, set, get } from "https://www.gstatic.com/firebasejs/12.17.0/firebase-database.js";
 
 const firebaseConfig = {
@@ -248,7 +234,7 @@ const firebaseConfig = {
   messagingSenderId: "451109980779",
   appId: "1:451109980779:web:87ae55fc2b4370dfa43f2e",
   measurementId: "G-Q8KHD0WW38",
- databaseURL: "https://tomatolist-efee0-default-rtdb.europe-west1.firebasedatabase.app"
+  databaseURL: "https://tomatolist-efee0-default-rtdb.europe-west1.firebasedatabase.app"
 };
 
 const app = initializeApp(firebaseConfig);
@@ -259,23 +245,25 @@ const googleProvider = new GoogleAuthProvider();
 let currentLang = localStorage.getItem('tl_lang') || (navigator.language || 'fr').slice(0,2);
 let TRANSLATIONS = {};
 
-const state = { mode: 'login', pendingUser: null, usage: '' };
+const state = { pendingUser: null, usage: '' };
+
+// ----------------- LANGUE -----------------
+const FALLBACK = {
+  'auth_title': 'Bienvenue', 'auth_sub': 'Connectez-vous ou créez votre compte', 'continue_btn': 'Continuer'
+};
 
 async function loadTranslations() {
   try {
     const res = await fetch('lang.json');
     TRANSLATIONS = await res.json();
-    applyI18n();
-  } catch(e) { console.error("Erreur lang.json"); }
+  } catch(e) {}
+  applyI18n();
 }
-
-function tr(key) { return (TRANSLATIONS[currentLang] && TRANSLATIONS[currentLang][key]) || (TRANSLATIONS.fr && TRANSLATIONS.fr[key]) || key; }
-
+function tr(key) { return (TRANSLATIONS[currentLang] && TRANSLATIONS[currentLang][key]) || (TRANSLATIONS.fr && TRANSLATIONS.fr[key]) || FALLBACK[key] || key; }
 function applyI18n() {
   document.querySelectorAll('[data-i18n]').forEach(el => el.textContent = tr(el.getAttribute('data-i18n')));
   document.getElementById('lang-label').textContent = currentLang.toUpperCase();
 }
-
 document.getElementById('btn-lang').onclick = () => {
   const langs = ['fr','en','de','es','it','ru','zh','hi'];
   currentLang = langs[(langs.indexOf(currentLang) + 1) % langs.length];
@@ -285,24 +273,87 @@ document.getElementById('btn-lang').onclick = () => {
 
 document.getElementById('year').textContent = new Date().getFullYear();
 
-function switchMode(mode) {
-  state.mode = mode;
-  document.getElementById('tab-login').classList.toggle('active', mode==='login');
-  document.getElementById('tab-signup').classList.toggle('active', mode==='signup');
-  document.getElementById('form-login').style.display = mode==='login' ? 'block' : 'none';
-  document.getElementById('form-signup').style.display = mode==='signup' ? 'block' : 'none';
-  document.getElementById('auth-error').classList.remove('show');
-}
-document.getElementById('tab-login').onclick = () => switchMode('login');
-document.getElementById('tab-signup').onclick = () => switchMode('signup');
-
 function setError(id, msg) {
   const el = document.getElementById(id);
   if (!msg) { el.classList.remove('show'); return; }
   el.textContent = msg; el.classList.add('show');
 }
 
-// Cards select
+// ----------------- REDIRECT GOOGLE RESULT -----------------
+// Capture le retour de Google après la redirection (corrige l'erreur CORS Github Pages)
+getRedirectResult(auth).then(async (result) => {
+  if (result) {
+    const user = result.user;
+    const snap = await get(ref(db, `users/${user.uid}/profile`));
+    if (snap.exists()) {
+      window.location.href = 'index.html';
+    } else {
+      state.pendingUser = user;
+      document.getElementById('q-firstname').value = (user.displayName || '').split(' ')[0];
+      document.getElementById('q-lastname').value = (user.displayName || '').split(' ').slice(1).join(' ');
+      document.getElementById('step-auth').classList.remove('active');
+      document.getElementById('step-identity').classList.add('active');
+    }
+  }
+}).catch(error => {
+  setError('auth-error', "Erreur lors de la connexion avec Google.");
+});
+
+
+// ----------------- MAGIC AUTH EMAIL/PASSWORD -----------------
+document.getElementById('btn-magic-auth').onclick = async (e) => {
+  const email = document.getElementById('auth-email').value.trim();
+  const pw = document.getElementById('auth-password').value;
+  const btn = e.currentTarget;
+  
+  if(!email || !pw) return setError('auth-error', tr('err_required') || "Veuillez remplir tous les champs.");
+  
+  setError('auth-error', '');
+  btn.classList.add('btn-loading');
+  btn.disabled = true;
+
+  try {
+    // 1. On tente d'abord de connecter l'utilisateur
+    await signInWithEmailAndPassword(auth, email, pw);
+    // Succès de connexion !
+    window.location.href = 'index.html';
+  } catch(error) {
+    // 2. Échec de connexion. Était-ce un mauvais mot de passe ou l'utilisateur n'existe pas ?
+    if (error.code === 'auth/invalid-credential' || error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password') {
+      try {
+        // On tente de créer le compte
+        const cred = await createUserWithEmailAndPassword(auth, email, pw);
+        // Succès de création !
+        state.pendingUser = cred.user;
+        document.getElementById('step-auth').classList.remove('active');
+        document.getElementById('step-identity').classList.add('active');
+      } catch (errCreate) {
+        // La création a échoué car l'email existe déjà -> C'était donc juste un mauvais mot de passe au départ !
+        if (errCreate.code === 'auth/email-already-in-use') {
+          setError('auth-error', "Mot de passe incorrect.");
+        } else if (errCreate.code === 'auth/weak-password') {
+          setError('auth-error', "Le mot de passe doit contenir au moins 6 caractères.");
+        } else {
+          setError('auth-error', "Erreur d'authentification.");
+        }
+      }
+    } else {
+      setError('auth-error', "Erreur : " + error.message);
+    }
+  } finally {
+    btn.classList.remove('btn-loading');
+    btn.disabled = false;
+  }
+};
+
+
+// ----------------- GOOGLE AUTH -----------------
+document.getElementById('btn-google').onclick = () => {
+  // Utilisation de Redirect au lieu de Popup pour éviter les blocages CORS sur Github Pages
+  signInWithRedirect(auth, googleProvider);
+};
+
+// ----------------- PROFIL (NOUVEAU COMPTE) -----------------
 document.querySelectorAll('.usage-card').forEach(c => {
   c.onclick = () => {
     document.querySelectorAll('.usage-card').forEach(x => x.classList.remove('selected'));
@@ -311,48 +362,10 @@ document.querySelectorAll('.usage-card').forEach(c => {
   }
 });
 
-document.getElementById('btn-login').onclick = async () => {
-  const email = document.getElementById('login-email').value;
-  const pw = document.getElementById('login-password').value;
-  if(!email || !pw) return setError('auth-error', tr('err_required'));
-  try {
-    await signInWithEmailAndPassword(auth, email, pw);
-    window.location.href = 'index.html';
-  } catch(e) { setError('auth-error', "Identifiants incorrects"); }
-};
-
-document.getElementById('btn-signup').onclick = async () => {
-  const email = document.getElementById('signup-email').value;
-  const pw = document.getElementById('signup-password').value;
-  if(!email || pw.length < 6) return setError('auth-error', "Email invalide ou mot de passe trop court (6 min)");
-  try {
-    const cred = await createUserWithEmailAndPassword(auth, email, pw);
-    state.pendingUser = cred.user;
-    document.getElementById('step-auth').classList.remove('active');
-    document.getElementById('step-identity').classList.add('active');
-  } catch(e) { setError('auth-error', "Erreur à l'inscription. Email déjà utilisé ?"); }
-};
-
-document.getElementById('btn-google').onclick = async () => {
-  try {
-    const result = await signInWithPopup(auth, googleProvider);
-    const snap = await get(ref(db, `users/${result.user.uid}/profile`));
-    if(!snap.exists()) {
-      state.pendingUser = result.user;
-      document.getElementById('q-firstname').value = (result.user.displayName || '').split(' ')[0];
-      document.getElementById('q-lastname').value = (result.user.displayName || '').split(' ').slice(1).join(' ');
-      document.getElementById('step-auth').classList.remove('active');
-      document.getElementById('step-identity').classList.add('active');
-    } else {
-      window.location.href = 'index.html';
-    }
-  } catch(e) { setError('auth-error', "Erreur Google Auth"); }
-};
-
 document.getElementById('btn-finish').onclick = async () => {
   const fn = document.getElementById('q-firstname').value.trim();
   const ln = document.getElementById('q-lastname').value.trim();
-  if(!fn) return setError('identity-error', tr('err_required'));
+  if(!fn) return setError('identity-error', tr('err_required') || "Le prénom est requis.");
   
   await set(ref(db, `users/${state.pendingUser.uid}/profile`), {
     firstname: fn, lastname: ln, usage: state.usage, createdAt: Date.now()
@@ -360,11 +373,12 @@ document.getElementById('btn-finish').onclick = async () => {
   window.location.href = 'index.html';
 };
 
+// ----------------- MOT DE PASSE OUBLIÉ -----------------
 document.getElementById('btn-forgot').onclick = async () => {
-  const email = prompt("Votre email :");
+  const email = prompt("Veuillez entrer votre adresse email pour réinitialiser votre mot de passe :");
   if(email) {
-    try { await sendPasswordResetEmail(auth, email); alert("Email envoyé !"); }
-    catch(e) { alert("Erreur."); }
+    try { await sendPasswordResetEmail(auth, email); alert("Email de réinitialisation envoyé !"); }
+    catch(e) { alert("Erreur ou email introuvable."); }
   }
 };
 
