@@ -603,20 +603,21 @@ function renderGrid() {
       }
     }
 
-    // Gestion de l'affichage des images (support legacy 1 image VS tableau multi-images)
+    // Gestion de l'affichage des images : UNE SEULE image sur la carte (le carrousel complet est dans la fiche détail)
     let imagesHtml = '';
     let imgCountBadge = '';
     const imagesArray = t.imageURLs || (t.imageURL ? [t.imageURL] : []);
     
     if (imagesArray.length > 0) {
-      imagesHtml = imagesArray.map(url => `
+      const firstUrl = imagesArray[0];
+      imagesHtml = `
         <div class="card-img-wrapper">
-          <div class="card-img-blur" style="background-image: url('${url}')"></div>
-          <img src="${url}" class="card-img" alt="${t.name}" loading="lazy">
+          <div class="card-img-blur" style="background-image: url('${firstUrl}')"></div>
+          <img src="${firstUrl}" class="card-img" alt="${t.name}" loading="lazy">
         </div>
-      `).join('');
+      `;
       if (imagesArray.length > 1) {
-        imgCountBadge = `<div class="img-count"><i class="fa-regular fa-images"></i> 1/${imagesArray.length}</div>`;
+        imgCountBadge = `<div class="img-count"><i class="fa-regular fa-images"></i> ${imagesArray.length}</div>`;
       }
     } else {
       imagesHtml = `<div class="card-img-wrapper" style="background:#eee"></div>`;
@@ -625,9 +626,7 @@ function renderGrid() {
     return `
       <div class="card" data-id="${t.id}">
         <div style="position:relative">
-          <div class="card-carousel">
-            ${imagesHtml}
-          </div>
+          ${imagesHtml}
           ${imgCountBadge}
         </div>
         <div class="card-body">
@@ -655,19 +654,6 @@ function renderGrid() {
       </div>
     `;
   }).join('');
-  
-  // Script minimal pour mettre à jour l'indicateur "1/3" au scroll du carrousel
-  document.querySelectorAll('.card-carousel').forEach(carousel => {
-    carousel.addEventListener('scroll', (e) => {
-      const parent = e.target.parentElement;
-      const indicator = parent.querySelector('.img-count');
-      if (indicator) {
-        const index = Math.round(e.target.scrollLeft / e.target.offsetWidth) + 1;
-        const total = e.target.children.length;
-        indicator.innerHTML = `<i class="fa-regular fa-images"></i> ${index}/${total}`;
-      }
-    });
-  });
 }
 
 document.getElementById('search-input').addEventListener('input', renderGrid);
