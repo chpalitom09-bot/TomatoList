@@ -82,8 +82,8 @@
   .field{margin-bottom:14px}
   .field-label{display:block;font-size:13px;font-weight:600;color:var(--t1);margin-bottom:6px}
   .field-input-wrap{position:relative}
-  .field-input{width:100%;padding:12px 14px;background:var(--panel);border:1px solid var(--line);border-radius:10px;font-size:14px;color:var(--t1);outline:none;transition:border-color .15s,background .15s}
-  .field-input:focus{border-color:var(--primary);background:#fff}
+  .field-input, .field-select{width:100%;padding:12px 14px;background:var(--panel);border:1px solid var(--line);border-radius:10px;font-size:14px;color:var(--t1);outline:none;transition:border-color .15s,background .15s; font-family: inherit;}
+  .field-input:focus, .field-select:focus{border-color:var(--primary);background:#fff}
   .field-row{display:flex;gap:10px}
   .field-row .field{flex:1}
 
@@ -104,12 +104,20 @@
 
   .foot-note{font-size:12px;color:var(--t3);text-align:center;margin-top:20px; line-height:1.5;}
 
+  /* Choix d'usage */
   .usage-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:18px}
   .usage-card{border:1px solid var(--line);border-radius:12px;padding:16px 12px;cursor:pointer;text-align:center;transition:border-color .15s}
   .usage-card:hover{border-color:var(--t3)}
   .usage-card.selected{border-color:var(--primary);background:#fef2f2;color:var(--primary)}
   .usage-card i{font-size:20px;margin-bottom:8px;display:block}
   .usage-card span{font-size:13px;font-weight:600}
+
+  /* Choix de couleurs (Préférences) */
+  .pill-group { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
+  .pref-pill { padding: 8px 14px; border: 1px solid var(--line); border-radius: 20px; background: var(--panel); color: var(--t2); cursor: pointer; font-size: 13px; font-weight: 500; transition: all 0.2s; display: flex; align-items: center; gap: 6px; user-select: none; }
+  .pref-pill:hover { border-color: var(--t3); }
+  .pref-pill.active { background: var(--primary); color: #fff; border-color: var(--primary); }
+  .pref-pill .color-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; box-shadow: inset 0 1px 2px rgba(0,0,0,0.2); }
 
   .step{display:none}
   .step.active{display:block;animation:fadeIn .3s ease}
@@ -153,7 +161,7 @@
 
         <a href="index.html" class="brand-mini"><span>TomatoList</span></a>
 
-        <!-- AUTH (Connexion & Inscription Unifiées) -->
+        <!-- ================= STEP 0: AUTH (Magique) ================= -->
         <div class="step active" id="step-auth">
           <div class="title" data-i18n="auth_title">Bienvenue</div>
           <div class="subtitle" data-i18n="auth_sub">Connectez-vous ou créez votre compte</div>
@@ -188,11 +196,12 @@
           <p class="foot-note" data-i18n="terms_note">Si vous n'avez pas de compte, il sera créé automatiquement.<br>Un compte n'est requis que pour publier avec votre nom ou utiliser les favoris.</p>
         </div>
 
-        <!-- IDENTITY (Pour les nouveaux comptes) -->
+        <!-- ================= STEP 1: PROFIL ================= -->
         <div class="step" id="step-identity">
-          <div class="step-progress"><div class="step-progress-bar done"></div><div class="step-progress-bar"></div></div>
+          <div class="step-progress"><div class="step-progress-bar done"></div><div class="step-progress-bar done"></div><div class="step-progress-bar"></div></div>
           <div class="title" data-i18n="step_identity_title">Votre profil</div>
           <div class="subtitle" data-i18n="step_identity_sub">Comment souhaitez-vous signer vos publications ?</div>
+          
           <div class="field-row">
             <div class="field">
               <label class="field-label" data-i18n="firstname">Prénom</label>
@@ -203,6 +212,7 @@
               <input class="field-input" type="text" id="q-lastname">
             </div>
           </div>
+
           <div class="field" style="margin-top:16px">
             <label class="field-label" data-i18n="usage_title">Vous êtes principalement :</label>
             <div class="usage-grid" id="usage-grid">
@@ -212,8 +222,56 @@
               <div class="usage-card" data-val="curious"><i class="fa-solid fa-magnifying-glass"></i><span data-i18n="usage_curious">Curieux</span></div>
             </div>
           </div>
+          
           <div class="error-box" id="identity-error"></div>
-          <button class="btn-primary" id="btn-finish" style="margin-top:20px"><span data-i18n="finish">Terminer</span></button>
+          <button class="btn-primary" id="btn-next-prefs" style="margin-top:10px">Suivant <i class="fa-solid fa-arrow-right"></i></button>
+        </div>
+
+        <!-- ================= STEP 2: PRÉFÉRENCES ================= -->
+        <div class="step" id="step-prefs">
+          <div class="step-progress"><div class="step-progress-bar done"></div><div class="step-progress-bar done"></div><div class="step-progress-bar done"></div></div>
+          <div class="title">Vos préférences</div>
+          <div class="subtitle">Aidez-nous à personnaliser votre expérience.</div>
+
+          <div class="field">
+            <label class="field-label">Votre pays</label>
+            <select class="field-select" id="q-country">
+              <option value="">Sélectionnez un pays...</option>
+              <!-- Rempli par le JS via pays.json -->
+            </select>
+          </div>
+
+          <div class="field" style="margin-top:20px">
+            <label class="field-label">Quelles couleurs de tomates préférez-vous ? (Choix multiples)</label>
+            <div class="pill-group" id="pref-colors">
+              <button class="pref-pill" data-color="Rouge"><i class="color-dot" style="background:#ef4444"></i> Rouge</button>
+              <button class="pref-pill" data-color="Jaune"><i class="color-dot" style="background:#eab308"></i> Jaune</button>
+              <button class="pref-pill" data-color="Noire"><i class="color-dot" style="background:#4b5563"></i> Noire</button>
+              <button class="pref-pill" data-color="Verte"><i class="color-dot" style="background:#22c55e"></i> Verte</button>
+              <button class="pref-pill" data-color="Orange"><i class="color-dot" style="background:#f97316"></i> Orange</button>
+              <button class="pref-pill" data-color="Rose"><i class="color-dot" style="background:#ec4899"></i> Rose</button>
+              <button class="pref-pill" data-color="Blanche"><i class="color-dot" style="background:#f3f4f6; border:1px solid #ccc"></i> Blanche</button>
+              <button class="pref-pill" data-color="Bicolore"><i class="color-dot" style="background:linear-gradient(135deg, #ef4444 50%, #eab308 50%)"></i> Bicolore</button>
+            </div>
+          </div>
+
+          <div class="field">
+            <label class="field-label">Quelle est votre taille de tomate préférée ?</label>
+            <select class="field-select" id="q-size">
+              <option value="">Peu importe</option>
+              <option value="Cerise">Cerise (Apéritif)</option>
+              <option value="Petite">Petite (Salade)</option>
+              <option value="Moyenne">Moyenne (Polyvalente)</option>
+              <option value="Grosse">Grosse (Chair à farcir/Cœur de bœuf)</option>
+            </select>
+          </div>
+          
+          <div class="error-box" id="prefs-error"></div>
+          
+          <div class="btn-row" style="margin-top:20px">
+            <button class="btn-secondary" id="btn-back-identity"><i class="fa-solid fa-arrow-left"></i></button>
+            <button class="btn-primary" id="btn-finish"><span data-i18n="finish">Terminer</span></button>
+          </div>
         </div>
 
       </div>
@@ -223,7 +281,7 @@
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.17.0/firebase-app.js";
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, GoogleAuthProvider, signInWithRedirect, getRedirectResult, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/12.17.0/firebase-auth.js";
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/12.17.0/firebase-auth.js";
 import { getDatabase, ref, set, get } from "https://www.gstatic.com/firebasejs/12.17.0/firebase-database.js";
 
 const firebaseConfig = {
@@ -245,7 +303,32 @@ const googleProvider = new GoogleAuthProvider();
 let currentLang = localStorage.getItem('tl_lang') || (navigator.language || 'fr').slice(0,2);
 let TRANSLATIONS = {};
 
-const state = { pendingUser: null, usage: '' };
+// ----------------- ETAT DE L'INSCRIPTION -----------------
+const state = { 
+  pendingUser: null, 
+  usage: '',
+  firstname: '',
+  lastname: '',
+  favColors: []
+};
+
+// ----------------- CHARGEMENT DES PAYS -----------------
+async function loadCountries() {
+  try {
+    const res = await fetch('pays.json');
+    const countries = await res.json();
+    const select = document.getElementById('q-country');
+    countries.forEach(c => {
+      const option = document.createElement('option');
+      option.value = c.name;
+      option.textContent = `${c.emoji || ''} ${c.name}`;
+      select.appendChild(option);
+    });
+  } catch(e) {
+    console.warn("Fichier pays.json introuvable.");
+  }
+}
+loadCountries();
 
 // ----------------- LANGUE -----------------
 const FALLBACK = {
@@ -279,25 +362,10 @@ function setError(id, msg) {
   el.textContent = msg; el.classList.add('show');
 }
 
-// ----------------- REDIRECT GOOGLE RESULT -----------------
-// Capture le retour de Google après la redirection (corrige l'erreur CORS Github Pages)
-getRedirectResult(auth).then(async (result) => {
-  if (result) {
-    const user = result.user;
-    const snap = await get(ref(db, `users/${user.uid}/profile`));
-    if (snap.exists()) {
-      window.location.href = 'index.html';
-    } else {
-      state.pendingUser = user;
-      document.getElementById('q-firstname').value = (user.displayName || '').split(' ')[0];
-      document.getElementById('q-lastname').value = (user.displayName || '').split(' ').slice(1).join(' ');
-      document.getElementById('step-auth').classList.remove('active');
-      document.getElementById('step-identity').classList.add('active');
-    }
-  }
-}).catch(error => {
-  setError('auth-error', "Erreur lors de la connexion avec Google.");
-});
+function showStep(id) {
+  document.querySelectorAll('.step').forEach(el => el.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
 
 
 // ----------------- MAGIC AUTH EMAIL/PASSWORD -----------------
@@ -313,22 +381,19 @@ document.getElementById('btn-magic-auth').onclick = async (e) => {
   btn.disabled = true;
 
   try {
-    // 1. On tente d'abord de connecter l'utilisateur
+    // 1. On tente de connecter
     await signInWithEmailAndPassword(auth, email, pw);
-    // Succès de connexion !
     window.location.href = 'index.html';
   } catch(error) {
-    // 2. Échec de connexion. Était-ce un mauvais mot de passe ou l'utilisateur n'existe pas ?
+    // 2. Échec de connexion : Erreur de mot de passe ou compte inexistant ?
     if (error.code === 'auth/invalid-credential' || error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password') {
       try {
         // On tente de créer le compte
         const cred = await createUserWithEmailAndPassword(auth, email, pw);
-        // Succès de création !
         state.pendingUser = cred.user;
-        document.getElementById('step-auth').classList.remove('active');
-        document.getElementById('step-identity').classList.add('active');
+        showStep('step-identity'); // Redirection vers le profil
       } catch (errCreate) {
-        // La création a échoué car l'email existe déjà -> C'était donc juste un mauvais mot de passe au départ !
+        // Échec de création car l'email existe : c'était donc un mauvais mot de passe
         if (errCreate.code === 'auth/email-already-in-use') {
           setError('auth-error', "Mot de passe incorrect.");
         } else if (errCreate.code === 'auth/weak-password') {
@@ -347,13 +412,34 @@ document.getElementById('btn-magic-auth').onclick = async (e) => {
 };
 
 
-// ----------------- GOOGLE AUTH -----------------
-document.getElementById('btn-google').onclick = () => {
-  // Utilisation de Redirect au lieu de Popup pour éviter les blocages CORS sur Github Pages
-  signInWithRedirect(auth, googleProvider);
+// ----------------- GOOGLE AUTH (RETOUR AU POPUP) -----------------
+document.getElementById('btn-google').onclick = async () => {
+  setError('auth-error', '');
+  try {
+    const result = await signInWithPopup(auth, googleProvider);
+    const user = result.user;
+    
+    // On vérifie si l'utilisateur a déjà un profil rempli
+    const snap = await get(ref(db, `users/${user.uid}/profile`));
+    
+    if (snap.exists()) {
+      window.location.href = 'index.html';
+    } else {
+      state.pendingUser = user;
+      document.getElementById('q-firstname').value = (user.displayName || '').split(' ')[0];
+      document.getElementById('q-lastname').value = (user.displayName || '').split(' ').slice(1).join(' ');
+      showStep('step-identity');
+    }
+  } catch (error) {
+    // Ignore l'erreur si l'utilisateur ferme simplement le popup
+    if (error.code !== 'auth/popup-closed-by-user' && error.code !== 'auth/cancelled-popup-request') {
+      setError('auth-error', "Erreur lors de la connexion avec Google.");
+    }
+  }
 };
 
-// ----------------- PROFIL (NOUVEAU COMPTE) -----------------
+
+// ----------------- ETAPE 1 : PROFIL -----------------
 document.querySelectorAll('.usage-card').forEach(c => {
   c.onclick = () => {
     document.querySelectorAll('.usage-card').forEach(x => x.classList.remove('selected'));
@@ -362,16 +448,52 @@ document.querySelectorAll('.usage-card').forEach(c => {
   }
 });
 
-document.getElementById('btn-finish').onclick = async () => {
-  const fn = document.getElementById('q-firstname').value.trim();
-  const ln = document.getElementById('q-lastname').value.trim();
-  if(!fn) return setError('identity-error', tr('err_required') || "Le prénom est requis.");
+document.getElementById('btn-next-prefs').onclick = () => {
+  state.firstname = document.getElementById('q-firstname').value.trim();
+  state.lastname = document.getElementById('q-lastname').value.trim();
   
+  if(!state.firstname) {
+    return setError('identity-error', tr('err_required') || "Le prénom est requis.");
+  }
+  setError('identity-error', '');
+  showStep('step-prefs');
+};
+
+
+// ----------------- ETAPE 2 : PRÉFÉRENCES -----------------
+// Gestion des boutons couleurs multiples
+document.querySelectorAll('.pref-pill').forEach(btn => {
+  btn.onclick = () => {
+    btn.classList.toggle('active');
+    const color = btn.getAttribute('data-color');
+    if (btn.classList.contains('active')) {
+      state.favColors.push(color);
+    } else {
+      state.favColors = state.favColors.filter(c => c !== color);
+    }
+  };
+});
+
+document.getElementById('btn-back-identity').onclick = () => showStep('step-identity');
+
+document.getElementById('btn-finish').onclick = async () => {
+  const country = document.getElementById('q-country').value;
+  const favSize = document.getElementById('q-size').value;
+  
+  // Sauvegarde dans Firebase (Profil complet)
   await set(ref(db, `users/${state.pendingUser.uid}/profile`), {
-    firstname: fn, lastname: ln, usage: state.usage, createdAt: Date.now()
+    firstname: state.firstname,
+    lastname: state.lastname,
+    usage: state.usage,
+    country: country,
+    favoriteColors: state.favColors,
+    favoriteSize: favSize,
+    createdAt: Date.now()
   });
+  
   window.location.href = 'index.html';
 };
+
 
 // ----------------- MOT DE PASSE OUBLIÉ -----------------
 document.getElementById('btn-forgot').onclick = async () => {
