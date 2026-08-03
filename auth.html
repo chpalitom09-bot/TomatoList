@@ -104,7 +104,7 @@
 
   .foot-note{font-size:12px;color:var(--t3);text-align:center;margin-top:20px; line-height:1.5;}
 
-  /* Choix d'usage */
+  /* ── CHOIX D'USAGE ── */
   .usage-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:18px}
   .usage-card{border:1px solid var(--line);border-radius:12px;padding:16px 12px;cursor:pointer;text-align:center;transition:border-color .15s}
   .usage-card:hover{border-color:var(--t3)}
@@ -112,12 +112,24 @@
   .usage-card i{font-size:20px;margin-bottom:8px;display:block}
   .usage-card span{font-size:13px;font-weight:600}
 
-  /* Choix de couleurs (Préférences) */
-  .pill-group { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
-  .pref-pill { padding: 8px 14px; border: 1px solid var(--line); border-radius: 20px; background: var(--panel); color: var(--t2); cursor: pointer; font-size: 13px; font-weight: 500; transition: all 0.2s; display: flex; align-items: center; gap: 6px; user-select: none; }
-  .pref-pill:hover { border-color: var(--t3); }
-  .pref-pill.active { background: var(--primary); color: #fff; border-color: var(--primary); }
-  .pref-pill .color-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; box-shadow: inset 0 1px 2px rgba(0,0,0,0.2); }
+  /* ── CHOIX COULEURS PREMIUM ── */
+  .pill-group { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 16px; }
+  .pref-pill { padding: 10px 16px; border: 1px solid var(--line); border-radius: 30px; background: var(--bg); color: var(--t2); cursor: pointer; font-size: 14px; font-weight: 500; transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1); display: flex; align-items: center; gap: 10px; user-select: none; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
+  .pref-pill:hover { border-color: var(--t3); transform: translateY(-1px); box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+  .pref-pill.active { background: #fff; color: var(--t1); font-weight: 600; box-shadow: 0 0 0 1.5px var(--t1); border-color: transparent; }
+  .pref-pill .color-dot { width: 16px; height: 16px; border-radius: 50%; display: inline-block; box-shadow: inset 0 2px 4px rgba(0,0,0,0.2), 0 0 0 1px rgba(0,0,0,0.05); }
+
+  /* ── SÉLECTEUR DE PAYS CUSTOM (AVEC DRAPEAUX) ── */
+  .custom-select-wrapper { position: relative; width: 100%; }
+  .custom-select-btn { width: 100%; padding: 12px 14px; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; text-align: left; cursor: pointer; display: flex; align-items: center; justify-content: space-between; font-size: 14px; color: var(--t1); transition: border-color 0.2s, background 0.2s; font-family: inherit; }
+  .custom-select-btn:focus { border-color: var(--primary); background: #fff; outline: none; }
+  .custom-select-btn img { width: 22px; border-radius: 2px; margin-right: 10px; object-fit: cover; box-shadow: 0 0 2px rgba(0,0,0,0.1); }
+  .custom-select-menu { position: absolute; top: 100%; left: 0; right: 0; background: #fff; border: 1px solid var(--line); border-radius: 10px; margin-top: 4px; max-height: 220px; overflow-y: auto; z-index: 100; display: none; box-shadow: 0 10px 25px rgba(0,0,0,0.1); padding: 8px; }
+  .custom-select-menu.active { display: block; animation: fadeIn 0.15s ease; }
+  .custom-search-input { width: 100%; padding: 10px 12px; border: 1px solid var(--line); border-radius: 8px; outline: none; font-size: 14px; margin-bottom: 8px; font-family: inherit; }
+  .custom-option { padding: 10px 12px; cursor: pointer; display: flex; align-items: center; transition: background 0.2s; font-size: 14px; border-radius: 6px; }
+  .custom-option:hover { background: var(--grey); }
+  .custom-option img { width: 22px; border-radius: 2px; margin-right: 10px; box-shadow: 0 0 2px rgba(0,0,0,0.1); }
 
   .step{display:none}
   .step.active{display:block;animation:fadeIn .3s ease}
@@ -235,10 +247,17 @@
 
           <div class="field">
             <label class="field-label">Votre pays</label>
-            <select class="field-select" id="q-country">
-              <option value="">Sélectionnez un pays...</option>
-              <!-- Rempli par le JS via pays.json -->
-            </select>
+            <div class="custom-select-wrapper">
+              <button class="custom-select-btn" id="q-country-btn" type="button">
+                <span style="color:var(--t3)">Sélectionner un pays...</span>
+                <i class="fa-solid fa-chevron-down" style="color:var(--t3)"></i>
+              </button>
+              <div class="custom-select-menu" id="q-country-menu">
+                <input type="text" class="custom-search-input" id="q-country-search" placeholder="Rechercher..." autocomplete="off">
+                <div id="q-country-list"></div>
+              </div>
+              <input type="hidden" id="q-country-value" value="">
+            </div>
           </div>
 
           <div class="field" style="margin-top:20px">
@@ -250,7 +269,7 @@
               <button class="pref-pill" data-color="Verte"><i class="color-dot" style="background:#22c55e"></i> Verte</button>
               <button class="pref-pill" data-color="Orange"><i class="color-dot" style="background:#f97316"></i> Orange</button>
               <button class="pref-pill" data-color="Rose"><i class="color-dot" style="background:#ec4899"></i> Rose</button>
-              <button class="pref-pill" data-color="Blanche"><i class="color-dot" style="background:#f3f4f6; border:1px solid #ccc"></i> Blanche</button>
+              <button class="pref-pill" data-color="Blanche"><i class="color-dot" style="background:#f9fafb; border: 1px solid #d1d5db;"></i> Blanche</button>
               <button class="pref-pill" data-color="Bicolore"><i class="color-dot" style="background:linear-gradient(135deg, #ef4444 50%, #eab308 50%)"></i> Bicolore</button>
             </div>
           </div>
@@ -312,22 +331,53 @@ const state = {
   favColors: []
 };
 
-// ----------------- CHARGEMENT DES PAYS -----------------
+// ----------------- SÉLECTEUR DE PAYS CUSTOM (AVEC DRAPEAUX) -----------------
+let countriesList = [];
 async function loadCountries() {
   try {
     const res = await fetch('pays.json');
-    const countries = await res.json();
-    const select = document.getElementById('q-country');
-    countries.forEach(c => {
-      const option = document.createElement('option');
-      option.value = c.name;
-      option.textContent = `${c.emoji || ''} ${c.name}`;
-      select.appendChild(option);
-    });
-  } catch(e) {
-    console.warn("Fichier pays.json introuvable.");
+    countriesList = await res.json();
+    renderCountryList();
+  } catch (e) {
+    console.warn("Fichier pays.json non trouvé.");
   }
 }
+function renderCountryList(filterText = '') {
+  const container = document.getElementById('q-country-list');
+  const lowerFilter = filterText.toLowerCase();
+  const filtered = countriesList.filter(c => c.name.toLowerCase().includes(lowerFilter));
+  
+  container.innerHTML = filtered.map(c => `
+    <div class="custom-option" data-name="${c.name}" data-code="${c.code}">
+      <img src="https://flagcdn.com/w20/${c.code}.png" alt="${c.name}">
+      <span>${c.name}</span>
+    </div>
+  `).join('');
+
+  container.querySelectorAll('.custom-option').forEach(opt => {
+    opt.onclick = () => {
+      const name = opt.getAttribute('data-name');
+      const code = opt.getAttribute('data-code');
+      document.getElementById('q-country-btn').innerHTML = `<div style="display:flex;align-items:center"><img src="https://flagcdn.com/w20/${code}.png" alt=""> <span>${name}</span></div> <i class="fa-solid fa-chevron-down" style="color:var(--t3)"></i>`;
+      document.getElementById('q-country-value').value = name;
+      document.getElementById('q-country-menu').classList.remove('active');
+    };
+  });
+}
+document.getElementById('q-country-btn').onclick = (e) => {
+  e.stopPropagation();
+  document.getElementById('q-country-menu').classList.toggle('active');
+  document.getElementById('q-country-search').focus();
+};
+document.getElementById('q-country-search').oninput = (e) => {
+  renderCountryList(e.target.value);
+};
+document.addEventListener('click', (e) => {
+  if (!e.target.closest('.custom-select-wrapper')) {
+    const menu = document.getElementById('q-country-menu');
+    if (menu) menu.classList.remove('active');
+  }
+});
 loadCountries();
 
 // ----------------- LANGUE -----------------
@@ -412,7 +462,7 @@ document.getElementById('btn-magic-auth').onclick = async (e) => {
 };
 
 
-// ----------------- GOOGLE AUTH (RETOUR AU POPUP) -----------------
+// ----------------- GOOGLE AUTH (POPUP) -----------------
 document.getElementById('btn-google').onclick = async () => {
   setError('auth-error', '');
   try {
@@ -477,7 +527,7 @@ document.querySelectorAll('.pref-pill').forEach(btn => {
 document.getElementById('btn-back-identity').onclick = () => showStep('step-identity');
 
 document.getElementById('btn-finish').onclick = async () => {
-  const country = document.getElementById('q-country').value;
+  const country = document.getElementById('q-country-value').value;
   const favSize = document.getElementById('q-size').value;
   
   // Sauvegarde dans Firebase (Profil complet)
