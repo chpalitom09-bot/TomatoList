@@ -27,10 +27,6 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
-<script>
-  // Script Google Analytics
-</script>
-
 <style>
   :root {
     --primary: #b91c1c; --primary-hover: #991b1b;
@@ -89,7 +85,7 @@
   .foryou-pill { background: linear-gradient(135deg, #fef2f2, #fff); border-color: #fca5a5 !important; color: var(--primary) !important; }
 
   /* CARDS & IMAGES CADRÉES */
-  .grid { max-width: 1200px; margin: 0 auto 64px; padding: 0 24px; display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 24px; }
+  .grid { max-width: 1200px; margin: 0 auto 32px; padding: 0 24px; display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 24px; }
   .card { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; overflow: hidden; transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s; display: flex; flex-direction: column; }
   .card:hover { transform: translateY(-6px); box-shadow: 0 20px 40px rgba(0,0,0,0.08); }
   
@@ -115,7 +111,7 @@
   .card { cursor: pointer; }
 
   /* ──────────────────────────────────────────────────────────────────
-     BANDEAU DE PARTAGE (inséré dans la grille tous les 50 tomates)
+     BANDEAU DE PARTAGE (inséré dans la grille tous les 25 tomates)
   ────────────────────────────────────────────────────────────────── */
   .share-banner {
     grid-column: 1 / -1;
@@ -211,6 +207,14 @@
     backdrop-filter: blur(4px);
   }
   .share-banner-btn.secondary:hover { background: rgba(255,255,255,0.28); }
+
+  /* PAGINATION */
+  .pagination { display: flex; justify-content: center; align-items: center; gap: 8px; margin-bottom: 64px; padding: 0 24px; flex-wrap: wrap; }
+  .page-btn { padding: 8px 14px; border: 1px solid var(--line); background: var(--surface); color: var(--text-main); border-radius: 8px; cursor: pointer; font-size: 14px; font-weight: 600; transition: all 0.2s; min-width: 38px; text-align: center; display: flex; align-items: center; justify-content: center; }
+  .page-btn:hover:not(:disabled) { background: var(--bg); border-color: var(--line-h); }
+  .page-btn.active { background: var(--primary); color: #fff; border-color: var(--primary); }
+  .page-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+  .page-dots { font-size: 14px; color: var(--text-muted); font-weight: 600; padding: 0 4px; }
 
   /* Modal Détail */
   .detail-modal { max-width: 640px; }
@@ -496,6 +500,9 @@
   <!-- Rempli par JavaScript -->
 </div>
 
+<!-- Container pour la pagination -->
+<div id="pagination-container" class="pagination"></div>
+
 <!-- Bannière PWA -->
 <div class="install-banner" id="install-banner">
   <img src="icon.svg" alt="TomatoList" class="install-banner-icon">
@@ -560,6 +567,17 @@
         <div class="detail-section-title" data-i18n="similar_title">Tomates similaires</div>
         <div class="similar-grid" id="similar-grid"></div>
       </div>
+      
+      <!-- NOUVEAU: SECTION COMMENTAIRES -->
+      <div id="comments-block" style="margin-top:22px; border-top:1px solid var(--line); padding-top:14px;">
+        <div class="detail-section-title" data-i18n="comments_title">Commentaires</div>
+        <div id="comments-list" style="display:flex; flex-direction:column; gap:12px; margin-bottom:16px;"></div>
+        <div class="comment-form" style="display:flex; flex-direction:column; gap:8px;">
+          <textarea id="comment-input" class="form-control" rows="2" placeholder="Ajouter un commentaire..."></textarea>
+          <button class="btn btn-primary btn-sm" id="btn-submit-comment" style="align-self:flex-end;"><i class="fa-solid fa-paper-plane"></i> <span data-i18n="send">Envoyer</span></button>
+        </div>
+      </div>
+
     </div>
   </div>
 </div>
@@ -706,6 +724,7 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.17.0/firebase-app.js";
 import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.17.0/firebase-auth.js";
 import { getDatabase, ref, onValue, push, get, update, remove } from "https://www.gstatic.com/firebasejs/12.17.0/firebase-database.js";
+// Assurez-vous que le fichier algo.js est bien présent
 import { sortTomatoes, similarTomatoes, recordClick, getClickData } from "./algo.js";
 
 // Coordonnées approximatives (lat, lon) par code pays ISO
@@ -735,6 +754,10 @@ let countriesList = [];
 let currentUser = null;
 let currentProfile = null;
 let currentImagesData = [];
+
+// Pagination
+let currentPage = 1;
+const ITEMS_PER_PAGE = 51;
 
 let currentSort = 'date';
 let currentColor = 'all';
@@ -816,7 +839,7 @@ document.querySelectorAll('#lang-menu button').forEach(btn => {
   btn.onclick = (e) => {
     currentLang = e.currentTarget.dataset.lang;
     localStorage.setItem('tl_lang', currentLang);
-    applyI18n(); renderGrid();
+    applyI18n(); currentPage = 1; renderGrid();
     document.getElementById('lang-menu').classList.remove('active');
   };
 });
@@ -883,6 +906,7 @@ document.querySelectorAll('#sort-group .filter-pill').forEach(btn => {
     document.querySelectorAll('#sort-group .filter-pill').forEach(b => b.classList.remove('active'));
     e.currentTarget.classList.add('active');
     currentSort = e.currentTarget.getAttribute('data-val');
+    currentPage = 1;
     renderGrid();
   };
 });
@@ -891,11 +915,13 @@ document.querySelectorAll('#color-group .filter-pill').forEach(btn => {
     document.querySelectorAll('#color-group .filter-pill').forEach(b => b.classList.remove('active'));
     e.currentTarget.classList.add('active');
     currentColor = e.currentTarget.getAttribute('data-val');
+    currentPage = 1;
     renderGrid();
   };
 });
 document.getElementById('country-filter-select').onchange = (e) => {
   currentCountry = e.target.value;
+  currentPage = 1;
   renderGrid();
 };
 
@@ -963,12 +989,16 @@ onValue(ref(db, 'tomatoes'), (snapshot) => {
   hasFirstData = true;
   updateVarietyCounter(tomatoesData.length);
   renderGrid();
-  if (detailCurrentId) refreshDetailLikeBtn();
+  if (detailCurrentId) {
+    refreshDetailLikeBtn();
+    const t = tomatoesData.find(x => x.id === detailCurrentId);
+    if(t) renderComments(t); // Mise à jour en temps réel des commentaires
+  }
   maybeOpenSharedTomato();
 });
 
 // ─── BANDEAU DE PARTAGE ───────────────────────────────────────────────────────
-// Insère un bandeau dans la grille tous les 50 tomates
+// Insère un bandeau dans la grille tous les 25 tomates
 function buildShareBannerHTML(index) {
   return `
     <div class="share-banner" role="complementary" aria-label="Partager TomatoList">
@@ -991,7 +1021,39 @@ function buildShareBannerHTML(index) {
   `;
 }
 
-// ─── RENDU DE LA GRILLE ───────────────────────────────────────────────────────
+// ─── RENDU DE LA GRILLE & PAGINATION ──────────────────────────────────────────
+function renderPagination(totalPages) {
+  const container = document.getElementById('pagination-container');
+  if (totalPages <= 1) { container.innerHTML = ''; return; }
+  
+  let html = '';
+  html += `<button class="page-btn" ${currentPage === 1 ? 'disabled' : ''} onclick="window.changePage(${currentPage - 1})"><i class="fa-solid fa-chevron-left"></i></button>`;
+  
+  let startPage = Math.max(1, currentPage - 2);
+  let endPage = Math.min(totalPages, currentPage + 2);
+  
+  if (startPage > 1) {
+    html += `<button class="page-btn" onclick="window.changePage(1)">1</button>`;
+    if (startPage > 2) html += `<span class="page-dots">...</span>`;
+  }
+  for (let p = startPage; p <= endPage; p++) {
+    html += `<button class="page-btn ${p === currentPage ? 'active' : ''}" onclick="window.changePage(${p})">${p}</button>`;
+  }
+  if (endPage < totalPages) {
+    if (endPage < totalPages - 1) html += `<span class="page-dots">...</span>`;
+    html += `<button class="page-btn" onclick="window.changePage(${totalPages})">${totalPages}</button>`;
+  }
+  
+  html += `<button class="page-btn" ${currentPage === totalPages ? 'disabled' : ''} onclick="window.changePage(${currentPage + 1})"><i class="fa-solid fa-chevron-right"></i></button>`;
+  container.innerHTML = html;
+}
+
+window.changePage = (p) => { 
+  currentPage = p; 
+  renderGrid(); 
+  document.getElementById('tomatoes-grid').scrollIntoView({ behavior: 'smooth', block: 'start' });
+};
+
 function renderGrid() {
   const grid = document.getElementById('tomatoes-grid');
   const search = document.getElementById('search-input').value.toLowerCase();
@@ -1007,16 +1069,25 @@ function renderGrid() {
 
   if (filtered.length === 0) {
     grid.innerHTML = `<div class="empty-state"><i class="fa-solid fa-leaf"></i><p>Aucune variété trouvée.</p></div>`;
+    document.getElementById('pagination-container').innerHTML = '';
     return;
   }
 
-  const BANNER_INTERVAL = 50; // Bandeau tous les N tomates
+  // Logique de pagination
+  const totalPages = Math.ceil(filtered.length / ITEMS_PER_PAGE);
+  if (currentPage > totalPages) currentPage = totalPages || 1;
+  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+  const pageItems = filtered.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+
+  const BANNER_INTERVAL = 25; // Modifié à 25 comme demandé
   let htmlParts = [];
   let bannerIndex = 0;
 
-  filtered.forEach((t, i) => {
-    // Insérer le bandeau AVANT la tomate n°50, 100, 150... (index 49, 99...)
-    if (i > 0 && i % BANNER_INTERVAL === 0) {
+  pageItems.forEach((t, i) => {
+    // Calcul de l'index global pour placer le bandeau indépendamment de la page
+    const globalIndex = startIndex + i;
+    // On ajoute un bandeau tous les BANNER_INTERVAL éléments
+    if (globalIndex > 0 && globalIndex % BANNER_INTERVAL === 0) {
       htmlParts.push(buildShareBannerHTML(bannerIndex++));
     }
 
@@ -1075,6 +1146,7 @@ function renderGrid() {
   });
 
   grid.innerHTML = htmlParts.join('');
+  renderPagination(totalPages);
 
   // Attacher les événements sur les boutons des bandeaux de partage
   grid.querySelectorAll('[data-share-copy]').forEach(btn => {
@@ -1109,7 +1181,10 @@ function renderGrid() {
   });
 }
 
-document.getElementById('search-input').addEventListener('input', renderGrid);
+document.getElementById('search-input').addEventListener('input', () => {
+  currentPage = 1;
+  renderGrid();
+});
 
 // ─── LIKES ────────────────────────────────────────────────────────────────────
 async function toggleLike(tomatoId) {
@@ -1137,8 +1212,62 @@ document.getElementById('tomatoes-grid').addEventListener('click', async (e) => 
   if (card) { openDetailModal(card.getAttribute('data-id')); }
 });
 
-// ─── MODAL DÉTAIL ─────────────────────────────────────────────────────────────
+// ─── MODAL DÉTAIL & COMMENTAIRES ──────────────────────────────────────────────
 let detailCurrentId = null;
+
+function renderComments(t) {
+  const list = document.getElementById('comments-list');
+  const commentsObj = t.comments || {};
+  const comments = Object.keys(commentsObj).map(k => ({id: k, ...commentsObj[k]})).sort((a,b) => a.at - b.at);
+  
+  if (comments.length === 0) {
+    list.innerHTML = `<div style="color:var(--text-muted); font-size:13px; text-align:center;">Aucun commentaire pour l'instant. Soyez le premier !</div>`;
+  } else {
+    list.innerHTML = comments.map(c => {
+      const dateStr = new Date(c.at).toLocaleDateString(currentLang, {day: 'numeric', month: 'short', year: 'numeric'});
+      return `
+      <div style="background:var(--bg); padding:12px 16px; border-radius:12px; font-size:13.5px; border:1px solid var(--line);">
+        <div style="font-weight:600; margin-bottom:6px; display:flex; justify-content:space-between; align-items:center;">
+          <span style="color:var(--primary);"><i class="fa-solid fa-user-circle"></i> ${c.author || 'Anonyme'}</span>
+          <span style="font-size:11px; color:var(--text-muted); font-weight:500;">${dateStr}</span>
+        </div>
+        <div style="color:var(--text-main); line-height:1.5;">${c.text.replace(/\n/g, '<br>')}</div>
+      </div>
+    `}).join('');
+  }
+}
+
+document.getElementById('btn-submit-comment').onclick = async () => {
+  if (!detailCurrentId) return;
+  const input = document.getElementById('comment-input');
+  const text = input.value.trim();
+  if (!text) return;
+  
+  const btn = document.getElementById('btn-submit-comment');
+  btn.disabled = true;
+  btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
+  
+  let authorName = "Anonyme";
+  if (currentUser && currentProfile) {
+    authorName = `${currentProfile.firstname || ''} ${currentProfile.lastname || ''}`.trim() || "Utilisateur";
+  }
+  
+  try {
+    await push(ref(db, `tomatoes/${detailCurrentId}/comments`), {
+      author: authorName,
+      uid: currentUser ? currentUser.uid : null,
+      text: text,
+      at: Date.now()
+    });
+    input.value = '';
+    showToast('Commentaire ajouté !', 'fa-check');
+  } catch(e) {
+    showToast('Erreur lors de l\'envoi du commentaire.', 'fa-triangle-exclamation');
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> <span>Envoyer</span>';
+  }
+};
 
 function openDetailModal(tomatoId) {
   const t = tomatoesData.find(x => x.id === tomatoId);
@@ -1146,7 +1275,7 @@ function openDetailModal(tomatoId) {
   detailCurrentId = tomatoId;
 
   // ── Enregistrement du clic pour l'algorithme ──────────────────────────────
-  recordClick(t);
+  if (typeof recordClick === 'function') recordClick(t);
 
   const imagesArray = t.imageURLs || (t.imageURL ? [t.imageURL] : []);
   const carousel = document.getElementById('detail-carousel');
@@ -1218,7 +1347,7 @@ function openDetailModal(tomatoId) {
 
   renderContributors(t);
 
-  const similar = similarTomatoes(tomatoesData, t, 3);
+  const similar = typeof similarTomatoes === 'function' ? similarTomatoes(tomatoesData, t, 3) : [];
   const similarBlock = document.getElementById('similar-block');
   if (similar.length > 0) {
     similarBlock.style.display = 'block';
@@ -1240,6 +1369,8 @@ function openDetailModal(tomatoId) {
   }
 
   refreshDetailLikeBtn();
+  renderComments(t);
+  
   document.getElementById('detail-modal').classList.add('active');
   history.replaceState(null, '', `?tomato=${tomatoId}`);
 }
@@ -1474,6 +1605,7 @@ function renderMap() {
       currentCountry = countryName;
       document.getElementById('country-filter-select').value = countryName;
       document.getElementById('map-modal').classList.remove('active');
+      currentPage = 1;
       renderGrid();
       document.getElementById('tomatoes-grid').scrollIntoView({ behavior: 'smooth' });
     });
@@ -1619,7 +1751,7 @@ function isFormDirty() {
   return !!document.getElementById('f-name').value.trim() || !!document.getElementById('f-desc').value.trim() || currentImagesData.length > 0;
 }
 function closeAddModalWithConfirm() {
-  if (isFormDirty() && !confirm(tr('leave_confirm'))) return;
+  if (isFormDirty() && !confirm(tr('leave_confirm') || 'Voulez-vous vraiment annuler ? Vos modifications seront perdues.')) return;
   document.getElementById('add-modal').classList.remove('active');
   resetForm();
 }
@@ -1628,9 +1760,9 @@ function openEditModal(t) {
   editingTomatoId = t.id; editOwnerUid = t.uid || null;
   const isOwner = currentUser && editOwnerUid && currentUser.uid === editOwnerUid;
   document.getElementById('add-modal-title').removeAttribute('data-i18n');
-  document.getElementById('add-modal-title').textContent = tr('edit_title');
+  document.getElementById('add-modal-title').textContent = tr('edit_title') || 'Modifier';
   document.getElementById('btn-submit-label').removeAttribute('data-i18n');
-  document.getElementById('btn-submit-label').textContent = tr('save');
+  document.getElementById('btn-submit-label').textContent = tr('save') || 'Sauvegarder';
   document.getElementById('f-name').value = t.name || '';
   document.getElementById('f-color').value = t.color || 'Rouge';
   document.getElementById('f-weight').value = t.weight || '';
