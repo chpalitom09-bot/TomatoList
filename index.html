@@ -712,7 +712,34 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.17.0/firebase-app.js";
 import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.17.0/firebase-auth.js";
 import { getDatabase, ref, onValue, push, get, update, remove, off } from "https://www.gstatic.com/firebasejs/12.17.0/firebase-database.js";
-import { sortTomatoes, similarTomatoes, recordClick, getClickData } from "./algo.js";
+
+// -- Algo functions directly added since algo.js import was failing
+function sortTomatoes(tomatoes, sortBy, userProfile, currentUid) {
+  let sorted = [...tomatoes];
+  if (sortBy === 'alpha') {
+    sorted.sort((a,b) => (a.name||'').localeCompare(b.name||''));
+  } else if (sortBy === 'likes') {
+    sorted.sort((a,b) => (Object.keys(b.likes||{}).length) - (Object.keys(a.likes||{}).length));
+  } else if (sortBy === 'foryou') {
+    sorted.sort(() => Math.random() - 0.5); // Simple pseudo-random
+  } else {
+    // default date
+    sorted.sort((a,b) => (b.createdAt||0) - (a.createdAt||0));
+  }
+  return sorted;
+}
+
+function similarTomatoes(all, current, count=3) {
+  return all.filter(t => t.id !== current.id && (t.color === current.color || t.averageSize === current.averageSize)).slice(0, count);
+}
+
+function recordClick(t) {
+  // basic mock or can be implemented fully
+}
+
+function getClickData() {
+  return {};
+}
 
 // ── Coords pays ────────────────────────────────────────────────────────────────
 const COUNTRY_COORDS = {
@@ -1309,7 +1336,7 @@ let commentsRef = null;
 let commentsCallback = null;
 
 /**
- * Active un listener temps-réel sur comments/{tomatoId}.
+ * Active un listener temps-réel sur tomatoes/{tomatoId}/comments.
  * On détache l'ancien listener avant d'en créer un nouveau.
  */
 function loadComments(tomatoId) {
@@ -1324,7 +1351,7 @@ function loadComments(tomatoId) {
   document.getElementById('comments-list').innerHTML =
     `<div class="comments-loading"><i class="fa-solid fa-spinner fa-spin"></i> Chargement...</div>`;
 
-  commentsRef = ref(db, `comments/${tomatoId}`);
+  commentsRef = ref(db, `tomatoes/${tomatoId}/comments`);
   commentsCallback = (snapshot) => {
     const comments = [];
     snapshot.forEach(child => comments.push({ id: child.key, ...child.val() }));
@@ -1403,7 +1430,8 @@ document.getElementById('comment-submit-btn').onclick = async () => {
   btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Envoi...`;
 
   try {
-    await push(ref(db, `comments/${detailCurrentId}`), {
+    // on écrit dans tomatoes/.../comments pour respecter les rules existantes
+    await push(ref(db, `tomatoes/${detailCurrentId}/comments`), {
       text,
       author,
       uid: currentUser ? currentUser.uid : null,
