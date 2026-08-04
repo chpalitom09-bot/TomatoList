@@ -1,0 +1,796 @@
+<!DOCTYPE html>
+<html lang="fr" id="html-root">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TomatoList — Compte</title>
+<link rel="icon" type="image/png" href="tomatolist.png">
+<meta name="theme-color" content="#b91c1c">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<style>
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  :root{
+    --bg:#ffffff; --panel:#fafafa; --line:#e9e9ea; --line-h:#d7d7d9;
+    --t1:#111827; --t2:#4b5563; --t3:#9ca3af;
+    --primary: #b91c1c; --primary-h: #991b1b;
+    --grey:#f3f4f6; --grey-h:#e5e7eb;
+    --sans:'Inter',sans-serif; --display:'Space Grotesk',sans-serif;
+  }
+  html,body{height:100%}
+  body{background:var(--bg);color:var(--t1);font-family:var(--sans);-webkit-font-smoothing:antialiased;overflow-x:hidden}
+  a{color:inherit}
+
+  .wrap{min-height:100vh;display:grid;grid-template-columns:1fr 1fr}
+  @media (max-width:900px){.wrap{grid-template-columns:1fr}}
+
+  /* ── LEFT VISUAL PANEL ── */
+  .side{
+    position:relative;background:#450a0a;color:#fff;
+    display:flex;flex-direction:column;justify-content:space-between;padding:48px;
+    overflow:hidden;
+  }
+  @media (max-width:900px){.side{display:none}}
+  .side-video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.6;z-index:0}
+  .side::before{
+    content:'';position:absolute;inset:0;z-index:1;
+    background: linear-gradient(180deg, rgba(69,10,10,0.3) 0%, rgba(69,10,10,0.85) 100%);
+    pointer-events:none;
+  }
+  .side-logo{display:flex;align-items:center;gap:10px;position:relative;z-index:2; text-decoration: none;}
+  .side-logo-text{font-family:var(--display);font-weight:700;font-size:24px;letter-spacing:-.02em; color:#fff;}
+  .side-quote{position:relative;z-index:2;max-width:420px}
+  .side-quote-mark{font-family:var(--display);font-size:52px;font-weight:700;line-height:.6;color:rgba(255,255,255,0.2);margin-bottom:10px}
+  .side-quote-text{font-family:var(--display);font-size:26px;font-weight:600;letter-spacing:-.02em;line-height:1.35;margin-bottom:18px}
+  .side-quote-sub{font-size:14px;color:rgba(255,255,255,0.7);line-height:1.6}
+  .side-foot{position:relative;z-index:2;font-size:12px;color:rgba(255,255,255,0.5)}
+
+  /* ── RIGHT FORM PANEL ── */
+  .main{display:flex;flex-direction:column;min-height:100vh}
+  .topbar{display:flex;align-items:center;justify-content:space-between;padding:24px 32px}
+  .back-link{display:flex;align-items:center;gap:8px;font-size:14px;font-weight:500;color:var(--t2);text-decoration:none;transition:color .15s}
+  .back-link:hover{color:var(--primary)}
+  .lang-switch{position:relative}
+  .lang-btn{display:flex;align-items:center;gap:7px;font-size:13px;font-weight:600;color:var(--t1);background:var(--grey);border:1px solid var(--line);padding:7px 12px;border-radius:9px;cursor:pointer}
+
+  .center{flex:1;display:flex;align-items:center;justify-content:center;padding:24px}
+  .card{width:100%;max-width:380px}
+
+  .step-progress{display:flex;gap:6px;margin-bottom:28px}
+  .step-progress-bar{flex:1;height:3px;border-radius:3px;background:var(--line)}
+  .step-progress-bar.done{background:var(--primary)}
+
+  .brand-mini{display:none}
+  @media (max-width:900px){
+    .brand-mini{display:flex;align-items:center;gap:8px;justify-content:center;margin-bottom:22px; text-decoration: none;}
+    .brand-mini span{font-family:var(--display);font-weight:700;font-size:20px; color:var(--primary)}
+  }
+
+  .title{font-family:var(--display);font-size:26px;font-weight:700;letter-spacing:-.03em;margin-bottom:6px}
+  .subtitle{font-size:14px;color:var(--t2);margin-bottom:26px;line-height:1.5}
+
+  .btn-google{width:100%;display:flex;align-items:center;justify-content:center;gap:10px;padding:12px;background:#fff;border:1px solid var(--line-h);border-radius:11px;font-size:14px;font-weight:600;cursor:pointer;transition:background .15s;margin-bottom:18px}
+  .btn-google:hover{background:var(--grey)}
+  .btn-google img{width:18px;height:18px}
+
+  .divider{display:flex;align-items:center;gap:12px;margin-bottom:18px}
+  .divider-line{flex:1;height:1px;background:var(--line)}
+  .divider-text{font-size:11px;font-weight:700;color:var(--t3);text-transform:uppercase}
+
+  /* ── ONGLETS CONNEXION / INSCRIPTION ── */
+  .tabs{display:flex;gap:3px;background:var(--grey);border-radius:11px;padding:3px;margin-bottom:20px;border:1px solid var(--line)}
+  .tab{flex:1;padding:9px;font-size:13px;font-weight:600;background:none;border:none;cursor:pointer;border-radius:8px;color:var(--t2);transition:all .16s;font-family:var(--sans)}
+  .tab.active{background:#fff;color:var(--t1);box-shadow:0 1px 3px rgba(0,0,0,0.08)}
+
+  .field{margin-bottom:14px}
+  .field-label{display:block;font-size:13px;font-weight:600;color:var(--t1);margin-bottom:6px}
+  .field-input-wrap{position:relative}
+  .field-input, .field-select{width:100%;padding:12px 14px;background:var(--panel);border:1px solid var(--line);border-radius:10px;font-size:14px;color:var(--t1);outline:none;transition:border-color .15s,background .15s; font-family: inherit;}
+  .field-input:focus, .field-select:focus{border-color:var(--primary);background:#fff}
+  .field-input.has-toggle{padding-right:42px}
+  .field-toggle{position:absolute;right:4px;top:4px;bottom:4px;width:36px;display:flex;align-items:center;justify-content:center;background:none;border:none;color:var(--t3);cursor:pointer;border-radius:7px}
+  .field-toggle:hover{color:var(--t1);background:var(--grey)}
+  .field-hint{font-size:11px;color:var(--t3);margin-top:5px;min-height:14px}
+  .field-hint.err{color:#d92d20}
+  .field-hint.ok{color:#16a34a}
+  .field-row{display:flex;gap:10px}
+  .field-row .field{flex:1}
+
+  .row-between{display:flex;align-items:center;justify-content:flex-end;margin-bottom:16px;margin-top:-4px}
+  .link-btn{font-size:13px;font-weight:600;color:var(--t2);background:none;border:none;cursor:pointer;text-decoration:underline;text-underline-offset:2px}
+  .link-btn:hover{color:var(--primary)}
+
+  .btn-primary{width:100%;padding:14px;background:var(--primary);color:#fff;border:none;border-radius:11px;font-size:14px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:background .15s}
+  .btn-primary:hover{background:var(--primary-h)}
+  .btn-primary:disabled{opacity: 0.6; cursor: not-allowed;}
+  .btn-secondary{width:100%;padding:14px;background:var(--grey);color:var(--t1);border:1px solid var(--line);border-radius:11px;font-size:14px;font-weight:600;cursor:pointer;}
+  .btn-row{display:flex;gap:10px}
+  .btn-row .btn-secondary{width:auto;padding:14px 20px}
+  .btn-row .btn-primary{flex:1}
+
+  .error-box{font-size:13px;color:#d92d20;background:#fef2f2;border:1px solid #fecaca;padding:10px 12px;border-radius:9px;margin-bottom:14px;display:none;}
+  .error-box.show{display:block}
+
+  .foot-note{font-size:12px;color:var(--t3);text-align:center;margin-top:20px; line-height:1.5;}
+  .switch-line{text-align:center;font-size:13px;color:var(--t2);margin-top:20px}
+  .switch-line button{background:none;border:none;color:var(--primary);font-weight:700;cursor:pointer;font-size:13px;text-decoration:underline;text-underline-offset:2px;font-family:var(--sans)}
+
+  /* ── CHOIX D'USAGE ── */
+  .usage-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:18px}
+  .usage-card{border:1px solid var(--line);border-radius:12px;padding:16px 12px;cursor:pointer;text-align:center;transition:border-color .15s}
+  .usage-card:hover{border-color:var(--t3)}
+  .usage-card.selected{border-color:var(--primary);background:#fef2f2;color:var(--primary)}
+  .usage-card i{font-size:20px;margin-bottom:8px;display:block}
+  .usage-card span{font-size:13px;font-weight:600}
+
+  /* ── CHOIX COULEURS PREMIUM ── */
+  .pill-group { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 16px; }
+  .pref-pill { padding: 10px 16px; border: 1px solid var(--line); border-radius: 30px; background: var(--bg); color: var(--t2); cursor: pointer; font-size: 14px; font-weight: 500; transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1); display: flex; align-items: center; gap: 10px; user-select: none; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
+  .pref-pill:hover { border-color: var(--t3); transform: translateY(-1px); box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+  .pref-pill.active { background: #fff; color: var(--t1); font-weight: 600; box-shadow: 0 0 0 1.5px var(--t1); border-color: transparent; }
+  .pref-pill .color-dot { width: 16px; height: 16px; border-radius: 50%; display: inline-block; box-shadow: inset 0 2px 4px rgba(0,0,0,0.2), 0 0 0 1px rgba(0,0,0,0.05); }
+
+  /* ── SÉLECTEUR DE PAYS CUSTOM (AVEC DRAPEAUX) ── */
+  .custom-select-wrapper { position: relative; width: 100%; }
+  .custom-select-btn { width: 100%; padding: 12px 14px; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; text-align: left; cursor: pointer; display: flex; align-items: center; justify-content: space-between; font-size: 14px; color: var(--t1); transition: border-color 0.2s, background 0.2s; font-family: inherit; }
+  .custom-select-btn:focus { border-color: var(--primary); background: #fff; outline: none; }
+  .custom-select-btn img { width: 22px; border-radius: 2px; margin-right: 10px; object-fit: cover; box-shadow: 0 0 2px rgba(0,0,0,0.1); }
+  .custom-select-menu { position: absolute; top: 100%; left: 0; right: 0; background: #fff; border: 1px solid var(--line); border-radius: 10px; margin-top: 4px; max-height: 220px; overflow-y: auto; z-index: 100; display: none; box-shadow: 0 10px 25px rgba(0,0,0,0.1); padding: 8px; }
+  .custom-select-menu.active { display: block; animation: fadeIn 0.15s ease; }
+  .custom-search-input { width: 100%; padding: 10px 12px; border: 1px solid var(--line); border-radius: 8px; outline: none; font-size: 14px; margin-bottom: 8px; font-family: inherit; }
+  .custom-option { padding: 10px 12px; cursor: pointer; display: flex; align-items: center; transition: background 0.2s; font-size: 14px; border-radius: 6px; }
+  .custom-option:hover { background: var(--grey); }
+  .custom-option img { width: 22px; border-radius: 2px; margin-right: 10px; box-shadow: 0 0 2px rgba(0,0,0,0.1); }
+
+  .step{display:none}
+  .step.active{display:block;animation:fadeIn .3s ease}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+
+  .loader { display: none; width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.4); border-top-color: #fff; border-radius: 50%; animation: spin 0.8s linear infinite; }
+  .btn-secondary .loader { border-color: rgba(0,0,0,0.2); border-top-color: var(--t1); }
+  .btn-loading .loader { display: block; }
+  .btn-loading .btn-text { display: none; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .toast-host{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);z-index:999;display:flex;flex-direction:column;gap:8px;align-items:center}
+  .toast{background:var(--t1);color:#fff;font-size:13px;font-weight:500;padding:11px 18px;border-radius:11px;box-shadow:0 8px 24px rgba(0,0,0,0.18);opacity:0;transform:translateY(8px);transition:opacity .25s,transform .25s}
+  .toast.show{opacity:1;transform:translateY(0)}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <div class="side">
+    <video class="side-video" autoplay muted loop playsinline>
+      <source src="vid.mp4" type="video/mp4">
+    </video>
+    <div></div>
+    <a class="side-logo" href="index.html">
+      <span class="side-logo-text">TomatoList</span>
+    </a>
+    <div class="side-quote">
+      <div class="side-quote-mark">"</div>
+      <div class="side-quote-text" data-i18n="side_quote">La diversité au cœur du potager.</div>
+      <div class="side-quote-sub" data-i18n="side_quote_sub">Rejoignez la plus grande communauté de passionnés de tomates.</div>
+    </div>
+    <div class="side-foot">© TomatoList — <span id="year"></span></div>
+  </div>
+
+  <div class="main">
+    <div class="topbar">
+      <a class="back-link" href="index.html"><i class="fa-solid fa-arrow-left"></i> <span data-i18n="back_home">Retour au site</span></a>
+      <div class="lang-switch">
+        <button class="lang-btn" id="btn-lang"><i class="fa-solid fa-globe"></i> <span id="lang-label">FR</span></button>
+      </div>
+    </div>
+
+    <div class="center">
+      <div class="card">
+
+        <a href="index.html" class="brand-mini"><span>TomatoList</span></a>
+
+        <!-- ================= STEP 0: CONNEXION / INSCRIPTION ================= -->
+        <div class="step active" id="step-auth">
+          <div class="title" id="auth-title" data-i18n="auth_title">Bienvenue</div>
+          <div class="subtitle" id="auth-subtitle" data-i18n="auth_sub">Connectez-vous ou créez votre compte</div>
+
+          <button class="btn-google" id="btn-google">
+            <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="">
+            <span data-i18n="continue_google">Continuer avec Google</span>
+          </button>
+
+          <div class="error-box" id="inapp-browser-warning" style="display:none; background:#fff7ed; color:#9a3412; border-color:#fdba74;">
+            <strong data-i18n="inapp_title">Navigateur intégré détecté</strong><br>
+            <span data-i18n="inapp_desc">Google bloque la connexion depuis l'app Facebook/Instagram/Messenger. Utilisez le bouton ci-dessous pour ouvrir la page dans votre navigateur, ou connectez-vous avec votre email juste en dessous.</span>
+            <div style="margin-top:10px; display:flex; gap:8px; flex-wrap:wrap;">
+              <button type="button" class="btn-google" id="btn-open-external" style="margin:0; flex:1; min-width:180px;">
+                <i class="fa-solid fa-arrow-up-right-from-square"></i>&nbsp;<span data-i18n="open_in_browser">Ouvrir dans le navigateur</span>
+              </button>
+              <button type="button" class="btn-google" id="btn-copy-link" style="margin:0; flex:1; min-width:180px;">
+                <i class="fa-solid fa-copy"></i>&nbsp;<span data-i18n="copy_link">Copier le lien</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="divider"><div class="divider-line"></div><span class="divider-text" data-i18n="or">ou</span><div class="divider-line"></div></div>
+
+          <div class="tabs">
+            <button class="tab active" id="tab-login" data-i18n="tab_login">Connexion</button>
+            <button class="tab" id="tab-signup" data-i18n="tab_signup">Inscription</button>
+          </div>
+
+          <div class="error-box" id="auth-error"></div>
+
+          <!-- FORMULAIRE CONNEXION -->
+          <div id="form-login">
+            <div class="field">
+              <label class="field-label" data-i18n="email">Email</label>
+              <input class="field-input" type="email" id="login-email" autocomplete="email">
+            </div>
+            <div class="field">
+              <label class="field-label" data-i18n="password">Mot de passe</label>
+              <div class="field-input-wrap">
+                <input class="field-input has-toggle" type="password" id="login-password" autocomplete="current-password">
+                <button type="button" class="field-toggle" data-target="login-password"><i class="fa-solid fa-eye"></i></button>
+              </div>
+            </div>
+            <div class="row-between">
+              <button class="link-btn" id="btn-forgot" data-i18n="forgot_password">Mot de passe oublié ?</button>
+            </div>
+            <button class="btn-primary" id="btn-login">
+              <div class="loader"></div>
+              <span class="btn-text" data-i18n="login_btn">Se connecter</span>
+            </button>
+          </div>
+
+          <!-- FORMULAIRE INSCRIPTION -->
+          <div id="form-signup" style="display:none">
+            <div class="field">
+              <label class="field-label" data-i18n="email">Email</label>
+              <input class="field-input" type="email" id="signup-email" autocomplete="email">
+              <p class="field-hint" id="signup-email-hint"></p>
+            </div>
+            <div class="field">
+              <label class="field-label" data-i18n="password">Mot de passe</label>
+              <div class="field-input-wrap">
+                <input class="field-input has-toggle" type="password" id="signup-password" autocomplete="new-password">
+                <button type="button" class="field-toggle" data-target="signup-password"><i class="fa-solid fa-eye"></i></button>
+              </div>
+              <p class="field-hint" data-i18n="password_hint">6 caractères minimum</p>
+            </div>
+            <div class="field">
+              <label class="field-label" data-i18n="password_confirm">Confirmer le mot de passe</label>
+              <div class="field-input-wrap">
+                <input class="field-input has-toggle" type="password" id="signup-password2" autocomplete="new-password">
+                <button type="button" class="field-toggle" data-target="signup-password2"><i class="fa-solid fa-eye"></i></button>
+              </div>
+            </div>
+            <button class="btn-primary" id="btn-signup">
+              <div class="loader"></div>
+              <span class="btn-text" data-i18n="signup_btn">Créer mon compte</span>
+            </button>
+          </div>
+
+          <p class="foot-note" data-i18n="terms_note">Un compte n'est requis que pour publier avec votre nom ou utiliser les favoris.</p>
+        </div>
+
+        <!-- ================= STEP RESET: MOT DE PASSE OUBLIÉ ================= -->
+        <div class="step" id="step-reset">
+          <div class="title" data-i18n="reset_title">Réinitialiser le mot de passe</div>
+          <div class="subtitle" data-i18n="reset_sub">Nous vous enverrons un lien par email</div>
+          <div class="field">
+            <label class="field-label" data-i18n="email">Email</label>
+            <input class="field-input" type="email" id="reset-email">
+          </div>
+          <div class="error-box" id="reset-error"></div>
+          <button class="btn-primary" id="btn-reset-send">
+            <div class="loader"></div>
+            <span class="btn-text" data-i18n="reset_send">Envoyer le lien</span>
+          </button>
+          <p class="switch-line"><button id="btn-reset-back" data-i18n="login_link">Retour à la connexion</button></p>
+        </div>
+
+        <!-- ================= STEP 1: PROFIL ================= -->
+        <div class="step" id="step-identity">
+          <div class="step-progress"><div class="step-progress-bar done"></div><div class="step-progress-bar done"></div><div class="step-progress-bar"></div></div>
+          <div class="title" data-i18n="step_identity_title">Votre profil</div>
+          <div class="subtitle" data-i18n="step_identity_sub">Comment souhaitez-vous signer vos publications ?</div>
+
+          <div class="field-row">
+            <div class="field">
+              <label class="field-label" data-i18n="firstname">Prénom</label>
+              <input class="field-input" type="text" id="q-firstname">
+            </div>
+            <div class="field">
+              <label class="field-label" data-i18n="lastname">Nom</label>
+              <input class="field-input" type="text" id="q-lastname">
+            </div>
+          </div>
+
+          <div class="field" style="margin-top:16px">
+            <label class="field-label" data-i18n="usage_title">Vous êtes principalement :</label>
+            <div class="usage-grid" id="usage-grid">
+              <div class="usage-card" data-val="grower"><i class="fa-solid fa-leaf"></i><span data-i18n="usage_grower">Producteur</span></div>
+              <div class="usage-card" data-val="gardener"><i class="fa-solid fa-seedling"></i><span data-i18n="usage_gardener">Jardinier</span></div>
+              <div class="usage-card" data-val="chef"><i class="fa-solid fa-utensils"></i><span data-i18n="usage_chef">Cuisinier</span></div>
+              <div class="usage-card" data-val="curious"><i class="fa-solid fa-magnifying-glass"></i><span data-i18n="usage_curious">Curieux</span></div>
+            </div>
+          </div>
+
+          <div class="error-box" id="identity-error"></div>
+          <button class="btn-primary" id="btn-next-prefs" style="margin-top:10px"><span data-i18n="next">Suivant</span> <i class="fa-solid fa-arrow-right"></i></button>
+        </div>
+
+        <!-- ================= STEP 2: PRÉFÉRENCES ================= -->
+        <div class="step" id="step-prefs">
+          <div class="step-progress"><div class="step-progress-bar done"></div><div class="step-progress-bar done"></div><div class="step-progress-bar done"></div></div>
+          <div class="title" data-i18n="step_prefs_title">Vos préférences</div>
+          <div class="subtitle" data-i18n="step_prefs_sub">Aidez-nous à personnaliser votre expérience.</div>
+
+          <div class="field">
+            <label class="field-label" data-i18n="country_label">Votre pays</label>
+            <div class="custom-select-wrapper">
+              <button class="custom-select-btn" id="q-country-btn" type="button">
+                <span style="color:var(--t3)" data-i18n="country_ph">Sélectionner un pays...</span>
+                <i class="fa-solid fa-chevron-down" style="color:var(--t3)"></i>
+              </button>
+              <div class="custom-select-menu" id="q-country-menu">
+                <input type="text" class="custom-search-input" id="q-country-search" data-i18n-ph="search_ph" placeholder="Rechercher..." autocomplete="off">
+                <div id="q-country-list"></div>
+              </div>
+              <input type="hidden" id="q-country-value" value="">
+            </div>
+          </div>
+
+          <div class="field" style="margin-top:20px">
+            <label class="field-label" data-i18n="colors_label">Quelles couleurs de tomates préférez-vous ? (Choix multiples)</label>
+            <div class="pill-group" id="pref-colors">
+              <button class="pref-pill" data-color="Rouge"><i class="color-dot" style="background:#ef4444"></i> Rouge</button>
+              <button class="pref-pill" data-color="Jaune"><i class="color-dot" style="background:#eab308"></i> Jaune</button>
+              <button class="pref-pill" data-color="Noire"><i class="color-dot" style="background:#4b5563"></i> Noire</button>
+              <button class="pref-pill" data-color="Verte"><i class="color-dot" style="background:#22c55e"></i> Verte</button>
+              <button class="pref-pill" data-color="Orange"><i class="color-dot" style="background:#f97316"></i> Orange</button>
+              <button class="pref-pill" data-color="Rose"><i class="color-dot" style="background:#ec4899"></i> Rose</button>
+              <button class="pref-pill" data-color="Blanche"><i class="color-dot" style="background:#f9fafb; border: 1px solid #d1d5db;"></i> Blanche</button>
+              <button class="pref-pill" data-color="Bicolore"><i class="color-dot" style="background:linear-gradient(135deg, #ef4444 50%, #eab308 50%)"></i> Bicolore</button>
+            </div>
+          </div>
+
+          <div class="field">
+            <label class="field-label" data-i18n="size_label">Quelle est votre taille de tomate préférée ?</label>
+            <select class="field-select" id="q-size">
+              <option value="" data-i18n="size_any">Peu importe</option>
+              <option value="Cerise" data-i18n="size_cherry">Cerise (Apéritif)</option>
+              <option value="Petite" data-i18n="size_small">Petite (Salade)</option>
+              <option value="Moyenne" data-i18n="size_medium">Moyenne (Polyvalente)</option>
+              <option value="Grosse" data-i18n="size_large">Grosse (Chair à farcir/Cœur de bœuf)</option>
+            </select>
+          </div>
+
+          <div class="error-box" id="prefs-error"></div>
+
+          <div class="btn-row" style="margin-top:20px">
+            <button class="btn-secondary" id="btn-back-identity"><i class="fa-solid fa-arrow-left"></i></button>
+            <button class="btn-primary" id="btn-finish">
+              <div class="loader"></div>
+              <span class="btn-text" data-i18n="finish">Terminer</span>
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast-host" id="toast-host"></div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.17.0/firebase-app.js";
+import {
+  getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword,
+  GoogleAuthProvider, signInWithPopup, sendPasswordResetEmail
+} from "https://www.gstatic.com/firebasejs/12.17.0/firebase-auth.js";
+import { getDatabase, ref, set, get } from "https://www.gstatic.com/firebasejs/12.17.0/firebase-database.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyAaz9s2jxsNqYd9FBsVG4u48-BwE8LAXCE",
+  authDomain: "tomatolist-efee0.firebaseapp.com",
+  projectId: "tomatolist-efee0",
+  storageBucket: "tomatolist-efee0.firebasestorage.app",
+  messagingSenderId: "451109980779",
+  appId: "1:451109980779:web:87ae55fc2b4370dfa43f2e",
+  measurementId: "G-Q8KHD0WW38",
+  databaseURL: "https://tomatolist-efee0-default-rtdb.europe-west1.firebasedatabase.app"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getDatabase(app);
+const googleProvider = new GoogleAuthProvider();
+
+let currentLang = localStorage.getItem('tl_lang') || (navigator.language || 'fr').slice(0,2);
+let TRANSLATIONS = {};
+
+// ----------------- ETAT DE L'INSCRIPTION -----------------
+const state = {
+  pendingUser: null,
+  usage: '',
+  firstname: '',
+  lastname: '',
+  favColors: []
+};
+
+// ----------------- SÉLECTEUR DE PAYS CUSTOM (AVEC DRAPEAUX) -----------------
+let countriesList = [];
+async function loadCountries() {
+  try {
+    const res = await fetch('pays.json');
+    countriesList = await res.json();
+    renderCountryList();
+  } catch (e) {
+    console.warn("Fichier pays.json non trouvé.");
+  }
+}
+function renderCountryList(filterText = '') {
+  const container = document.getElementById('q-country-list');
+  const lowerFilter = filterText.toLowerCase();
+  const filtered = countriesList.filter(c => c.name.toLowerCase().includes(lowerFilter));
+
+  container.innerHTML = filtered.map(c => `
+    <div class="custom-option" data-name="${c.name}" data-code="${c.code}">
+      <img src="https://flagcdn.com/w20/${c.code}.png" alt="${c.name}">
+      <span>${c.name}</span>
+    </div>
+  `).join('');
+
+  container.querySelectorAll('.custom-option').forEach(opt => {
+    opt.onclick = () => {
+      const name = opt.getAttribute('data-name');
+      const code = opt.getAttribute('data-code');
+      document.getElementById('q-country-btn').innerHTML = `<div style="display:flex;align-items:center"><img src="https://flagcdn.com/w20/${code}.png" alt=""> <span>${name}</span></div> <i class="fa-solid fa-chevron-down" style="color:var(--t3)"></i>`;
+      document.getElementById('q-country-value').value = name;
+      document.getElementById('q-country-menu').classList.remove('active');
+    };
+  });
+}
+document.getElementById('q-country-btn').onclick = (e) => {
+  e.stopPropagation();
+  document.getElementById('q-country-menu').classList.toggle('active');
+  document.getElementById('q-country-search').focus();
+};
+document.getElementById('q-country-search').oninput = (e) => {
+  renderCountryList(e.target.value);
+};
+document.addEventListener('click', (e) => {
+  if (!e.target.closest('.custom-select-wrapper')) {
+    const menu = document.getElementById('q-country-menu');
+    if (menu) menu.classList.remove('active');
+  }
+});
+loadCountries();
+
+// ----------------- LANGUE -----------------
+const FALLBACK = {
+  'auth_title': 'Bienvenue', 'auth_sub': 'Connectez-vous ou créez votre compte'
+};
+
+async function loadTranslations() {
+  try {
+    const res = await fetch('lang.json');
+    TRANSLATIONS = await res.json();
+  } catch(e) {}
+  applyI18n();
+}
+function tr(key) { return (TRANSLATIONS[currentLang] && TRANSLATIONS[currentLang][key]) || (TRANSLATIONS.fr && TRANSLATIONS.fr[key]) || FALLBACK[key] || key; }
+function applyI18n() {
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const key = el.getAttribute('data-i18n');
+    const val = tr(key);
+    // Sécurité : si la traduction est manquante, tr() renvoie la clé technique elle-même.
+    // On garde alors le texte déjà présent dans le HTML plutôt que d'afficher la clé brute.
+    if (val && val !== key) el.textContent = val;
+  });
+  document.querySelectorAll('[data-i18n-ph]').forEach(el => {
+    const key = el.getAttribute('data-i18n-ph');
+    const val = tr(key);
+    if (val && val !== key) el.placeholder = val;
+  });
+  document.getElementById('lang-label').textContent = currentLang.toUpperCase();
+  updateAuthTexts();
+}
+document.getElementById('btn-lang').onclick = () => {
+  const langs = ['fr','en','de','es','it','ru','zh','hi'];
+  currentLang = langs[(langs.indexOf(currentLang) + 1) % langs.length];
+  localStorage.setItem('tl_lang', currentLang);
+  applyI18n();
+};
+
+document.getElementById('year').textContent = new Date().getFullYear();
+
+function setError(id, msg) {
+  const el = document.getElementById(id);
+  if (!msg) { el.classList.remove('show'); el.textContent = ''; return; }
+  el.textContent = msg; el.classList.add('show');
+}
+
+function setLoading(btnId, on) {
+  const btn = document.getElementById(btnId);
+  btn.classList.toggle('btn-loading', on);
+  btn.disabled = on;
+}
+
+function toast(msg) {
+  const host = document.getElementById('toast-host');
+  const el = document.createElement('div');
+  el.className = 'toast'; el.textContent = msg;
+  host.appendChild(el);
+  requestAnimationFrame(() => el.classList.add('show'));
+  setTimeout(() => { el.classList.remove('show'); setTimeout(() => el.remove(), 300); }, 3200);
+}
+
+function showStep(id) {
+  document.querySelectorAll('.step').forEach(el => el.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+// Messages d'erreur toujours en français en dur : on évite de dépendre d'une clé de
+// traduction qui pourrait manquer dans lang.json et afficher un texte incompréhensible.
+function errMsg(code) {
+  return {
+    'auth/user-not-found': "Aucun compte ne correspond à cet email.",
+    'auth/wrong-password': "Mot de passe incorrect.",
+    'auth/invalid-credential': "Email ou mot de passe incorrect.",
+    'auth/email-already-in-use': "Un compte existe déjà avec cet email.",
+    'auth/invalid-email': "Adresse email invalide.",
+    'auth/weak-password': "Le mot de passe doit contenir au moins 6 caractères.",
+    'auth/too-many-requests': "Trop de tentatives. Réessayez dans quelques minutes.",
+    'auth/network-request-failed': "Problème de connexion réseau.",
+  }[code] || "Une erreur est survenue. Merci de réessayer.";
+}
+
+const emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+// ----------------- ONGLETS CONNEXION / INSCRIPTION -----------------
+let authMode = 'login';
+function updateAuthTexts() {
+  const isLogin = authMode === 'login';
+  document.getElementById('auth-title').textContent = tr(isLogin ? 'auth_title' : 'signup_title') || (isLogin ? 'Bienvenue' : 'Créer un compte');
+  document.getElementById('auth-subtitle').textContent = tr(isLogin ? 'auth_sub' : 'signup_sub') || (isLogin ? 'Connectez-vous ou créez votre compte' : 'Rejoignez la communauté TomatoList');
+}
+function switchMode(mode) {
+  authMode = mode;
+  document.getElementById('tab-login').classList.toggle('active', mode === 'login');
+  document.getElementById('tab-signup').classList.toggle('active', mode === 'signup');
+  document.getElementById('form-login').style.display = mode === 'login' ? '' : 'none';
+  document.getElementById('form-signup').style.display = mode === 'signup' ? '' : 'none';
+  setError('auth-error', '');
+  updateAuthTexts();
+}
+document.getElementById('tab-login').onclick = () => switchMode('login');
+document.getElementById('tab-signup').onclick = () => switchMode('signup');
+
+// ----------------- AFFICHAGE MOT DE PASSE ----------------
+document.querySelectorAll('.field-toggle').forEach(btn => {
+  btn.onclick = () => {
+    const inp = document.getElementById(btn.getAttribute('data-target'));
+    const icon = btn.querySelector('i');
+    if (inp.type === 'password') { inp.type = 'text'; icon.className = 'fa-solid fa-eye-slash'; }
+    else { inp.type = 'password'; icon.className = 'fa-solid fa-eye'; }
+  };
+});
+
+// ----------------- VALIDATION EMAIL EN DIRECT (INSCRIPTION) -----------------
+document.getElementById('signup-email').addEventListener('input', e => {
+  const v = e.target.value.trim();
+  const hint = document.getElementById('signup-email-hint');
+  if (!v) { hint.textContent = ''; hint.className = 'field-hint'; return; }
+  if (emailRe.test(v)) { hint.textContent = ''; hint.className = 'field-hint ok'; }
+  else { hint.textContent = "Adresse email invalide"; hint.className = 'field-hint err'; }
+});
+
+// ----------------- CONNEXION -----------------
+document.getElementById('btn-login').onclick = async () => {
+  const email = document.getElementById('login-email').value.trim();
+  const pw = document.getElementById('login-password').value;
+  setError('auth-error', '');
+  if (!email) return setError('auth-error', "Veuillez entrer votre adresse email.");
+  if (!emailRe.test(email)) return setError('auth-error', "Adresse email invalide.");
+  if (!pw) return setError('auth-error', "Veuillez entrer votre mot de passe.");
+  setLoading('btn-login', true);
+  try {
+    await signInWithEmailAndPassword(auth, email, pw);
+    window.location.href = 'index.html';
+  } catch (e) {
+    setError('auth-error', errMsg(e.code));
+  } finally {
+    setLoading('btn-login', false);
+  }
+};
+
+// ----------------- INSCRIPTION -----------------
+document.getElementById('btn-signup').onclick = async () => {
+  const email = document.getElementById('signup-email').value.trim();
+  const pw = document.getElementById('signup-password').value;
+  const pw2 = document.getElementById('signup-password2').value;
+  setError('auth-error', '');
+  if (!email) return setError('auth-error', "Veuillez entrer votre adresse email.");
+  if (!emailRe.test(email)) return setError('auth-error', "Adresse email invalide.");
+  if (pw.length < 6) return setError('auth-error', "Le mot de passe doit contenir au moins 6 caractères.");
+  if (pw !== pw2) return setError('auth-error', "Les mots de passe ne correspondent pas.");
+  setLoading('btn-signup', true);
+  try {
+    const cred = await createUserWithEmailAndPassword(auth, email, pw);
+    state.pendingUser = cred.user;
+    showStep('step-identity');
+  } catch (e) {
+    if (e.code === 'auth/email-already-in-use') {
+      switchMode('login');
+      document.getElementById('login-email').value = email;
+      setError('auth-error', errMsg(e.code));
+    } else {
+      setError('auth-error', errMsg(e.code));
+    }
+  } finally {
+    setLoading('btn-signup', false);
+  }
+};
+
+// ----------------- MOT DE PASSE OUBLIÉ (étape dédiée) -----------------
+document.getElementById('btn-forgot').onclick = () => {
+  document.getElementById('reset-email').value = document.getElementById('login-email').value;
+  setError('reset-error', '');
+  showStep('step-reset');
+};
+document.getElementById('btn-reset-back').onclick = () => showStep('step-auth');
+document.getElementById('btn-reset-send').onclick = async () => {
+  const email = document.getElementById('reset-email').value.trim();
+  setError('reset-error', '');
+  if (!emailRe.test(email)) return setError('reset-error', "Adresse email invalide.");
+  setLoading('btn-reset-send', true);
+  try {
+    await sendPasswordResetEmail(auth, email);
+    toast("Email de réinitialisation envoyé !");
+    setTimeout(() => showStep('step-auth'), 900);
+  } catch (e) {
+    setError('reset-error', errMsg(e.code));
+  } finally {
+    setLoading('btn-reset-send', false);
+  }
+};
+
+// ----------------- GOOGLE AUTH (popup simple, identique sur desktop et mobile) -----------------
+
+// Détection des navigateurs "in-app" (Facebook, Instagram, Messenger, TikTok, Line...) :
+// Google bloque volontairement sa connexion dans ces webviews, souvent SANS renvoyer
+// d'erreur exploitable, donc on prévient l'utilisateur avant même qu'il clique.
+function detectInAppBrowser() {
+  const ua = navigator.userAgent || '';
+  return /FBAN|FBAV|FB_IAB|Instagram|Line\/|MessengerForiOS|Messenger|Snapchat|TikTok|MicroMessenger|WhatsApp|Twitter|Pinterest\//i.test(ua);
+}
+const isInAppBrowser = detectInAppBrowser();
+
+if (isInAppBrowser) {
+  document.getElementById('inapp-browser-warning').style.display = 'block';
+  document.getElementById('btn-google').style.display = 'none';
+}
+
+document.getElementById('btn-open-external').onclick = () => {
+  const url = window.location.href;
+  if (/Android/i.test(navigator.userAgent)) {
+    const intentUrl = `intent://${url.replace(/^https?:\/\//, '')}#Intent;scheme=https;package=com.android.chrome;end`;
+    window.location.href = intentUrl;
+    setTimeout(() => { window.location.href = url; }, 800);
+  } else {
+    window.open(url, '_blank');
+  }
+};
+
+document.getElementById('btn-copy-link').onclick = async () => {
+  try {
+    await navigator.clipboard.writeText(window.location.href);
+    const btn = document.getElementById('btn-copy-link');
+    const label = btn.querySelector('span');
+    const original = label.textContent;
+    label.textContent = TRANSLATIONS[currentLang]?.link_copied || 'Lien copié !';
+    setTimeout(() => { label.textContent = original; }, 2000);
+  } catch (e) {
+    setError('auth-error', window.location.href);
+  }
+};
+
+document.getElementById('btn-google').onclick = async () => {
+  setError('auth-error', '');
+  try {
+    const result = await signInWithPopup(auth, googleProvider);
+    const user = result.user;
+    const snap = await get(ref(db, `users/${user.uid}/profile`));
+    if (snap.exists()) {
+      window.location.href = 'index.html';
+    } else {
+      state.pendingUser = user;
+      document.getElementById('q-firstname').value = (user.displayName || '').split(' ')[0] || '';
+      document.getElementById('q-lastname').value = (user.displayName || '').split(' ').slice(1).join(' ') || '';
+      showStep('step-identity');
+    }
+  } catch (error) {
+    if (error.code !== 'auth/popup-closed-by-user' && error.code !== 'auth/cancelled-popup-request') {
+      setError('auth-error', errMsg(error.code));
+    }
+  }
+};
+
+// ----------------- ETAPE 1 : PROFIL -----------------
+document.querySelectorAll('.usage-card').forEach(c => {
+  c.onclick = () => {
+    document.querySelectorAll('.usage-card').forEach(x => x.classList.remove('selected'));
+    c.classList.add('selected');
+    state.usage = c.getAttribute('data-val');
+  }
+});
+
+document.getElementById('btn-next-prefs').onclick = () => {
+  state.firstname = document.getElementById('q-firstname').value.trim();
+  state.lastname = document.getElementById('q-lastname').value.trim();
+
+  if (!state.firstname) {
+    return setError('identity-error', "Le prénom est requis.");
+  }
+  setError('identity-error', '');
+  showStep('step-prefs');
+};
+
+// ----------------- ETAPE 2 : PRÉFÉRENCES -----------------
+document.querySelectorAll('.pref-pill').forEach(btn => {
+  btn.onclick = () => {
+    btn.classList.toggle('active');
+    const color = btn.getAttribute('data-color');
+    if (btn.classList.contains('active')) {
+      state.favColors.push(color);
+    } else {
+      state.favColors = state.favColors.filter(c => c !== color);
+    }
+  };
+});
+
+document.getElementById('btn-back-identity').onclick = () => showStep('step-identity');
+
+document.getElementById('btn-finish').onclick = async () => {
+  if (!state.pendingUser) { setError('prefs-error', "Une erreur est survenue. Merci de réessayer depuis le début."); return; }
+  const country = document.getElementById('q-country-value').value;
+  const favSize = document.getElementById('q-size').value;
+
+  setLoading('btn-finish', true);
+  setError('prefs-error', '');
+  try {
+    await set(ref(db, `users/${state.pendingUser.uid}/profile`), {
+      firstname: state.firstname,
+      lastname: state.lastname,
+      usage: state.usage,
+      country: country,
+      favoriteColors: state.favColors,
+      favoriteSize: favSize,
+      createdAt: Date.now()
+    });
+    window.location.href = 'index.html';
+  } catch (e) {
+    setError('prefs-error', "Impossible d'enregistrer votre profil. Merci de réessayer.");
+  } finally {
+    setLoading('btn-finish', false);
+  }
+};
+
+/* enter-to-submit */
+document.getElementById('login-password').addEventListener('keydown', e => { if (e.key === 'Enter') document.getElementById('btn-login').click(); });
+document.getElementById('signup-password2').addEventListener('keydown', e => { if (e.key === 'Enter') document.getElementById('btn-signup').click(); });
+document.getElementById('reset-email').addEventListener('keydown', e => { if (e.key === 'Enter') document.getElementById('btn-reset-send').click(); });
+
+loadTranslations();
+
+const params = new URLSearchParams(window.location.search);
+if (params.get('mode') === 'signup') switchMode('signup');
+</script>
+</body>
+</html>
