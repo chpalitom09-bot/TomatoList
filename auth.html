@@ -139,9 +139,19 @@
   .btn-loading .loader { display: block; }
   .btn-loading .btn-text { display: none; }
   @keyframes spin { to { transform: rotate(360deg); } }
+
+  .redirect-loader{position:fixed;inset:0;background:#fff;z-index:999;display:none;align-items:center;justify-content:center;flex-direction:column;gap:14px}
+  .redirect-loader.show{display:flex}
+  .redirect-loader .big-loader{width:34px;height:34px;border:3px solid var(--line);border-top-color:var(--primary);border-radius:50%;animation:spin .8s linear infinite}
+  .redirect-loader span{font-size:14px;color:var(--t2);font-weight:500}
 </style>
 </head>
 <body>
+
+<div class="redirect-loader" id="redirect-loader">
+  <div class="big-loader"></div>
+  <span>Connexion avec Google…</span>
+</div>
 
 <div class="wrap">
   <div class="side">
@@ -313,7 +323,7 @@
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.17.0/firebase-app.js";
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/12.17.0/firebase-auth.js";
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/12.17.0/firebase-auth.js";
 import { getDatabase, ref, set, get } from "https://www.gstatic.com/firebasejs/12.17.0/firebase-database.js";
 
 const firebaseConfig = {
@@ -515,26 +525,81 @@ document.getElementById('btn-copy-link').onclick = async () => {
   }
 };
 
-document.getElementById('btn-google').onclick = async () => {
+// Sur mobile, le popup Google est très instable : les navigateurs (Safari iOS, Chrome
+// Android en mode "app partitionnée") coupent souvent la communication entre la popup et
+// l'onglet principal une fois le compte Google créé côté serveur. Résultat observé : le
+// compte est bien créé, mais la page d'origine reçoit une erreur et n'enchaîne jamais sur
+// le questionnaire de profil. On utilise donc la redirection complète sur mobile, qui est
+// fiable à 100%, et on garde le popup (plus confortable) sur desktop.
+function isMobileDevice() {
+  return /Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || window.innerWidth < 900;
+}
+
+// Traite un utilisateur Google fraîchement connecté : profil existant -> accueil,
+// sinon -> on lance le questionnaire d'inscription (étape identité puis préférences).
+async function handleGoogleUser(user) {
+  const snap = await get(ref(db, `users/${user.uid}/profile`));
+  if (snap.exists()) {
+    window.location.href = 'index.html';
+  } else {
+    state.pendingUser = user;
+    document.getElementById('q-firstname').value = (user.displayName || '').split(' ')[0] || '';
+    document.getElementById('q-lastname').value = (user.displayName || '').split(' ').slice(1).join(' ') || '';
+    showStep('step-identity');
+    document.getElementById('redirect-loader').classList.remove('show');
+  }
+}
+
+const btnGoogle = document.getElementById('btn-google');
+
+btnGoogle.onclick = async () => {
   setError('auth-error', '');
+  btnGoogle.disabled = true;
   try {
-    const result = await signInWithPopup(auth, googleProvider);
-    const user = result.user;
-    const snap = await get(ref(db, `users/${user.uid}/profile`));
-    if (snap.exists()) {
-      window.location.href = 'index.html';
+    if (isMobileDevice()) {
+      // On mémorise qu'une redirection Google est en cours (survit au rechargement de page)
+      sessionStorage.setItem('tl_google_redirect_pending', '1');
+      await signInWithRedirect(auth, googleProvider);
+      // La page se recharge ici : le code après cet appel ne s'exécute pas.
     } else {
-      state.pendingUser = user;
-      document.getElementById('q-firstname').value = (user.displayName || '').split(' ')[0];
-      document.getElementById('q-lastname').value = (user.displayName || '').split(' ').slice(1).join(' ');
-      showStep('step-identity');
+      const result = await signInWithPopup(auth, googleProvider);
+      await handleGoogleUser(result.user);
     }
   } catch (error) {
+    sessionStorage.removeItem('tl_google_redirect_pending');
     if (error.code !== 'auth/popup-closed-by-user' && error.code !== 'auth/cancelled-popup-request') {
       setError('auth-error', "Erreur lors de la connexion avec Google.");
     }
+  } finally {
+    btnGoogle.disabled = false;
   }
 };
+
+// Au chargement de la page, on vérifie systématiquement si on revient d'une redirection
+// Google (mobile). C'est ce qui manquait : sans cet appel, le retour de redirection n'était
+// jamais lu et l'inscription restait bloquée sans questionnaire.
+(async () => {
+  const wasPending = sessionStorage.getItem('tl_google_redirect_pending') === '1';
+  const loaderEl = document.getElementById('redirect-loader');
+  if (wasPending) loaderEl.classList.add('show');
+  try {
+    const result = await getRedirectResult(auth);
+    if (result && result.user) {
+      sessionStorage.removeItem('tl_google_redirect_pending');
+      await handleGoogleUser(result.user);
+      return; // on quitte la page (redirection ou étape suivante), pas besoin de cacher le loader
+    } else if (wasPending) {
+      // On était censé revenir d'une redirection mais Firebase n'a rien retourné
+      // (session perdue, cookies bloqués, etc.)
+      sessionStorage.removeItem('tl_google_redirect_pending');
+      setError('auth-error', "La connexion avec Google a été interrompue. Merci de réessayer.");
+    }
+  } catch (error) {
+    sessionStorage.removeItem('tl_google_redirect_pending');
+    setError('auth-error', "Erreur lors de la connexion avec Google.");
+  }
+  loaderEl.classList.remove('show');
+})();
 
 
 // ----------------- ETAPE 1 : PROFIL -----------------
