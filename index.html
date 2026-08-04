@@ -618,7 +618,6 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/12.17.0/fireba
 import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.17.0/firebase-auth.js";
 import { getDatabase, ref, onValue, push, get, update, remove } from "https://www.gstatic.com/firebasejs/12.17.0/firebase-database.js";
 import { sortTomatoes, similarTomatoes } from "./algo.js";
-import { DATA as LEGACY_TOMATO_DATA } from "./data.js";
 
 // Coordonnées approximatives (lat, lon) des pays disponibles dans pays.json — pour la carte du monde
 const COUNTRY_COORDS = {
@@ -1798,183 +1797,102 @@ if ('serviceWorker' in navigator) {
 })();
 
 // =====================================================================
-// ----------------- MIGRATION : import des données data.js -----------
+// ----------------- NETTOYAGE : fusion des doublons par nom -----------
 // =====================================================================
-// Ce bloc importe une seule fois les anciennes tomates de data.js dans
-// Firebase. Un verrou localStorage + un verrou côté base évitent les
-// doublons si la page est rechargée ou ouverte sur plusieurs appareils.
+// L'import depuis data.js est désormais désactivé (plus aucun appel à
+// data.js dans ce fichier). Ce bloc corrige les doublons déjà présents
+// dans Firebase : toutes les fiches qui ont le même nom de tomate sont
+// fusionnées en une seule fiche. Les images (liens) de toutes les
+// fiches sont réunies et dédupliquées, les autres champs (description,
+// pays, poids, couleur, taille...) sont complétés à partir de la
+// première fiche non vide trouvée dans le groupe, et les contributeurs
+// sont fusionnés. Les fiches en trop sont ensuite supprimées.
+// Verrouillé (local + base) pour ne s'exécuter qu'une seule fois et ne
+// jamais retoucher des fiches ajoutées après coup.
 
-const MIGRATION_LOCAL_KEY = 'tl_legacy_migration_v1_done';
-const MIGRATION_DB_FLAG = 'meta/migrationV1Done';
+const MERGE_LOCAL_KEY = 'tl_merge_by_name_v1_done';
+const MERGE_DB_FLAG = 'meta/mergeByNameV1Done';
 
-// --- Nettoyage du pays : retire les drapeaux emoji (indicateurs régionaux) ---
-function stripFlagEmoji(str) {
-  if (!str) return '';
-  return str
-    .replace(/[\u{1F1E6}-\u{1F1FF}]/gu, '') // drapeaux (paires d'indicateurs régionaux)
-    .replace(/[\u{FE0F}\u{200D}]/gu, '')    // variantes/joiners résiduels
-    .trim();
+function normalizeNameKey(name) {
+  return (name || '')
+    .trim()
+    .toLowerCase()
+    .normalize('NFD').replace(/[\u0300-\u036f]/g, '') // retire les accents
+    .replace(/\s+/g, ' ');
 }
 
-// --- Mapping couleur (ancien libellé libre -> valeur du <select id="f-color">) ---
-function mapLegacyColor(couleur) {
-  const s = (couleur || '').toLowerCase();
+// Fusionne un tableau de fiches "doublons" (même nom) en une seule fiche.
+function mergeTomatoGroup(group) {
+  // La plus ancienne fiche sert de base pour l'id conservé.
+  const sorted = [...group].sort((a, b) => (a.createdAt ?? 0) - (b.createdAt ?? 0));
+  const base = sorted[0];
 
-  // Toute couleur composée / rayée / bigarrée / à deux tons => Bicolore
-  const bicolorHints = ['strié', 'strie', 'zébré', 'zebre', 'rayé', 'raye', 'bigarr', 'marbré', 'marbre', ' et ', '/', 'multicolore'];
-  if (bicolorHints.some(h => s.includes(h))) return 'Bicolore';
+  // Fusion des images/liens : union de toutes les fiches, sans doublons, ordre conservé.
+  const seenImages = new Set();
+  const mergedImages = [];
+  for (const t of sorted) {
+    const imgs = Array.isArray(t.imageURLs) ? t.imageURLs : [];
+    for (const url of imgs) {
+      if (url && !seenImages.has(url)) {
+        seenImages.add(url);
+        mergedImages.push(url);
+      }
+    }
+  }
 
-  // Teintes sombres (noir, pourpre, violet, indigo, bleu, chocolat, brun, marron, bronze, ocre, cuivré)
-  const darkHints = ['noir', 'pourpre', 'violet', 'indigo', 'bleu', 'chocolat', 'brun', 'marron', 'bronze', 'ocre', 'cuivr'];
-  if (darkHints.some(h => s.includes(h))) return 'Noire';
+  // Pour les champs simples : on garde la première valeur non vide rencontrée
+  // (en partant de la fiche la plus ancienne).
+  function firstNonEmpty(field) {
+    for (const t of sorted) {
+      const v = t[field];
+      if (v !== undefined && v !== null && String(v).trim() !== '') return v;
+    }
+    return base[field];
+  }
 
-  if (s.includes('rouge') || s.includes('cardinal') || s.includes('terre cuite')) return 'Rouge';
-  if (s.includes('jaune')) return 'Jaune';
-  if (s.includes('vert')) return 'Verte';
-  if (s.includes('orange')) return 'Orange';
-  if (s.includes('rose')) return 'Rose';
-  if (s.includes('blanc') || s.includes('crème') || s.includes('creme') || s.includes('ivoire')) return 'Blanche';
+  // Fusion des contributeurs de toutes les fiches.
+  const mergedContributors = {};
+  for (const t of sorted) {
+    if (t.contributors && typeof t.contributors === 'object') {
+      Object.assign(mergedContributors, t.contributors);
+    }
+  }
 
-  // Valeur par défaut si rien ne correspond (teinte non reconnue / mélangée)
-  return 'Bicolore';
+  const merged = {
+    ...base,
+    name: firstNonEmpty('name'),
+    color: firstNonEmpty('color'),
+    weight: firstNonEmpty('weight'),
+    averageSize: firstNonEmpty('averageSize'),
+    description: firstNonEmpty('description'),
+    country: firstNonEmpty('country'),
+    author: firstNonEmpty('author'),
+    imageURLs: mergedImages,
+    createdAt: base.createdAt ?? Date.now()
+  };
+  if (Object.keys(mergedContributors).length > 0) merged.contributors = mergedContributors;
+
+  return { keepId: base.id, merged, removeIds: sorted.slice(1).map(t => t.id) };
 }
 
-// --- Extraction d'un poids moyen (en g) depuis "100-180g", "80g", etc. ---
-function parseLegacyWeight(poids) {
-  if (!poids) return null;
-  const nums = String(poids).match(/\d+/g);
-  if (!nums || nums.length === 0) return null;
-  const values = nums.map(Number);
-  const avg = values.reduce((a, b) => a + b, 0) / values.length;
-  return Math.round(avg);
-}
-
-// --- Mapping poids moyen -> catégorie du <select id="f-size"> ---
-function mapLegacySize(avgWeight) {
-  if (avgWeight == null) return '';
-  if (avgWeight <= 30) return 'Cerise';
-  if (avgWeight <= 100) return 'Petite';
-  if (avgWeight <= 200) return 'Moyenne';
-  if (avgWeight <= 400) return 'Grosse';
-  return 'Très grosse';
-}
-
-async function migrateLegacyTomatoes() {
-  // Verrou local : ne pas relancer sur ce même navigateur
-  if (localStorage.getItem(MIGRATION_LOCAL_KEY) === 'true') {
-    console.log('[Migration] Déjà exécutée sur cet appareil, migration ignorée.');
+async function mergeDuplicateTomatoesByName() {
+  if (localStorage.getItem(MERGE_LOCAL_KEY) === 'true') {
+    console.log('[Merge] Déjà exécuté sur cet appareil, fusion ignorée.');
     return;
   }
 
   try {
-    // Verrou base : ne pas relancer si déjà fait depuis un autre appareil
-    const flagSnap = await get(ref(db, MIGRATION_DB_FLAG));
+    const flagSnap = await get(ref(db, MERGE_DB_FLAG));
     if (flagSnap.exists() && flagSnap.val() === true) {
-      console.log('[Migration] Déjà exécutée côté base de données, migration ignorée.');
-      localStorage.setItem(MIGRATION_LOCAL_KEY, 'true');
+      console.log('[Merge] Déjà exécuté côté base de données, fusion ignorée.');
+      localStorage.setItem(MERGE_LOCAL_KEY, 'true');
       return;
     }
   } catch (e) {
-    console.warn('[Migration] Impossible de vérifier le verrou distant, on continue prudemment.', e);
+    console.warn('[Merge] Impossible de vérifier le verrou distant, on continue prudemment.', e);
   }
 
-  if (!Array.isArray(LEGACY_TOMATO_DATA) || LEGACY_TOMATO_DATA.length === 0) {
-    console.log('[Migration] Aucune donnée trouvée dans data.js.');
-    return;
-  }
-
-  console.log(`[Migration] Démarrage de l'import de ${LEGACY_TOMATO_DATA.length} tomate(s) depuis data.js...`);
-
-  let successCount = 0;
-  let errorCount = 0;
-
-  for (const legacy of LEGACY_TOMATO_DATA) {
-    try {
-      const avgWeight = parseLegacyWeight(legacy.poids);
-      const tomatoData = {
-        name: (legacy.nom || '').trim(),
-        color: mapLegacyColor(legacy.couleur),
-        imageURLs: Array.isArray(legacy.images) ? legacy.images : [],
-        weight: avgWeight,
-        averageSize: mapLegacySize(avgWeight),
-        description: (legacy.descriptionLongue || legacy.descriptionCourte || '').trim(),
-        country: stripFlagEmoji(legacy.origine),
-        author: "Christophe Duval",
-        uid: null,
-        createdAt: Date.now(),
-        contributors: {
-          migrated_contributor: {
-            name: "Tom Duval",
-            uid: null,
-            at: Date.now()
-          }
-        }
-      };
-
-      await push(ref(db, 'tomatoes'), tomatoData);
-      successCount++;
-    } catch (e) {
-      errorCount++;
-      console.error('[Migration] Erreur sur la tomate :', legacy && legacy.nom, e);
-    }
-  }
-
-  try {
-    await update(ref(db, 'meta'), { migrationV1Done: true });
-  } catch (e) {
-    console.warn('[Migration] Impossible d\'écrire le verrou distant.', e);
-  }
-
-  localStorage.setItem(MIGRATION_LOCAL_KEY, 'true');
-  console.log(`[Migration] Terminée : ${successCount} tomate(s) importée(s) avec succès, ${errorCount} erreur(s).`);
-}
-
-migrateLegacyTomatoes();
-
-// =====================================================================
-// ----------------- NETTOYAGE : suppression des doublons --------------
-// =====================================================================
-// Corrige les doublons créés par un bug d'import (mêmes tomates
-// enregistrées 2 ou 3 fois). On ne considère comme "doublon" que les
-// fiches strictement identiques : même nom, même description, même
-// pays, même couleur, même poids et exactement les mêmes images.
-// On garde la plus ancienne (createdAt le plus petit) et on supprime
-// les autres. Verrouillé pour toujours (local + base) pour ne jamais
-// re-scanner ni resupprimer par erreur des fiches ajoutées plus tard.
-
-const DEDUP_LOCAL_KEY = 'tl_dedup_v1_done';
-const DEDUP_DB_FLAG = 'meta/dedupV1Done';
-
-function buildDedupSignature(t) {
-  const images = Array.isArray(t.imageURLs) ? [...t.imageURLs].sort().join('|') : '';
-  return [
-    (t.name || '').trim().toLowerCase(),
-    (t.description || '').trim().toLowerCase(),
-    (t.country || '').trim().toLowerCase(),
-    (t.color || '').trim().toLowerCase(),
-    t.weight == null ? '' : String(t.weight),
-    images
-  ].join('###');
-}
-
-async function dedupeTomatoes() {
-  if (localStorage.getItem(DEDUP_LOCAL_KEY) === 'true') {
-    console.log('[Dedup] Déjà exécuté sur cet appareil, nettoyage ignoré.');
-    return;
-  }
-
-  try {
-    const flagSnap = await get(ref(db, DEDUP_DB_FLAG));
-    if (flagSnap.exists() && flagSnap.val() === true) {
-      console.log('[Dedup] Déjà exécuté côté base de données, nettoyage ignoré.');
-      localStorage.setItem(DEDUP_LOCAL_KEY, 'true');
-      return;
-    }
-  } catch (e) {
-    console.warn('[Dedup] Impossible de vérifier le verrou distant, on continue prudemment.', e);
-  }
-
-  console.log('[Dedup] Analyse des tomates à la recherche de doublons stricts...');
+  console.log('[Merge] Analyse des tomates à la recherche de doublons (même nom)...');
 
   let allTomatoes = [];
   try {
@@ -1983,56 +1901,64 @@ async function dedupeTomatoes() {
       snap.forEach(child => { allTomatoes.push({ id: child.key, ...child.val() }); });
     }
   } catch (e) {
-    console.error('[Dedup] Impossible de lire les tomates.', e);
+    console.error('[Merge] Impossible de lire les tomates.', e);
     return;
   }
 
   if (allTomatoes.length === 0) {
-    console.log('[Dedup] Aucune tomate trouvée.');
+    console.log('[Merge] Aucune tomate trouvée.');
     return;
   }
 
-  // Regroupement par signature stricte
+  // Regroupement par nom normalisé (accents/casse/espaces ignorés)
   const groups = new Map();
   for (const t of allTomatoes) {
-    const sig = buildDedupSignature(t);
-    if (!groups.has(sig)) groups.set(sig, []);
-    groups.get(sig).push(t);
+    const key = normalizeNameKey(t.name);
+    if (!key) continue; // fiches sans nom : on n'y touche pas
+    if (!groups.has(key)) groups.set(key, []);
+    groups.get(key).push(t);
   }
 
+  let mergedGroupsCount = 0;
   let removedCount = 0;
-  let groupsWithDuplicates = 0;
 
   for (const [, group] of groups) {
     if (group.length <= 1) continue;
-    groupsWithDuplicates++;
 
-    // On garde la plus ancienne fiche (createdAt le plus petit ; si absent, on garde la première rencontrée)
-    group.sort((a, b) => (a.createdAt ?? 0) - (b.createdAt ?? 0));
-    const [keep, ...duplicates] = group;
+    const { keepId, merged, removeIds } = mergeTomatoGroup(group);
+    const { id, ...mergedWithoutId } = merged;
 
-    for (const dup of duplicates) {
+    try {
+      await update(ref(db, `tomatoes/${keepId}`), mergedWithoutId);
+    } catch (e) {
+      console.error('[Merge] Erreur en mettant à jour la fiche fusionnée :', keepId, merged.name, e);
+      continue; // on ne supprime pas les autres si la fusion a échoué
+    }
+
+    for (const dupId of removeIds) {
       try {
-        await remove(ref(db, `tomatoes/${dup.id}`));
+        await remove(ref(db, `tomatoes/${dupId}`));
         removedCount++;
       } catch (e) {
-        console.error('[Dedup] Erreur en supprimant le doublon :', dup.id, dup.name, e);
+        console.error('[Merge] Erreur en supprimant le doublon fusionné :', dupId, merged.name, e);
       }
     }
-    console.log(`[Dedup] "${keep.name}" : ${duplicates.length} doublon(s) supprimé(s), fiche conservée = ${keep.id}`);
+
+    mergedGroupsCount++;
+    console.log(`[Merge] "${merged.name}" : ${removeIds.length} fiche(s) fusionnée(s) dans ${keepId} (${merged.imageURLs.length} image(s) au total).`);
   }
 
   try {
-    await update(ref(db, 'meta'), { dedupV1Done: true });
+    await update(ref(db, 'meta'), { mergeByNameV1Done: true });
   } catch (e) {
-    console.warn('[Dedup] Impossible d\'écrire le verrou distant.', e);
+    console.warn('[Merge] Impossible d\'écrire le verrou distant.', e);
   }
 
-  localStorage.setItem(DEDUP_LOCAL_KEY, 'true');
-  console.log(`[Dedup] Terminé : ${removedCount} doublon(s) supprimé(s) sur ${groupsWithDuplicates} variété(s) concernée(s). Verrou posé définitivement.`);
+  localStorage.setItem(MERGE_LOCAL_KEY, 'true');
+  console.log(`[Merge] Terminé : ${mergedGroupsCount} variété(s) fusionnée(s), ${removedCount} fiche(s) en double supprimée(s). Verrou posé définitivement.`);
 }
 
-dedupeTomatoes();
+mergeDuplicateTomatoesByName();
 </script>
 </body>
 </html>
