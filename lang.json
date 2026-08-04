@@ -86,7 +86,13 @@
     "not_owner": "Vous ne pouvez modifier que vos propres variétés.",
     "select_country_ph": "Sélectionner un pays...",
     "search_country_ph": "Rechercher...",
-    "publish_success": "Variété publiée avec succès !"
+    "publish_success": "Variété publiée avec succès !",
+    "map_hint": "Glissez, molette ou pincez pour zoomer",
+    "inapp_title": "Navigateur intégré détecté",
+    "inapp_desc": "Google bloque la connexion depuis l'app Facebook/Instagram/Messenger. Utilisez le bouton ci-dessous pour ouvrir la page dans votre navigateur, ou connectez-vous avec votre email juste en dessous.",
+    "open_in_browser": "Ouvrir dans le navigateur",
+    "copy_link": "Copier le lien",
+    "link_copied": "Lien copié !"
   },
   "en": {
     "login": "Login",
@@ -175,6 +181,12 @@
     "not_owner": "You can only edit your own varieties.",
     "select_country_ph": "Select a country...",
     "search_country_ph": "Search...",
-    "publish_success": "Variety published successfully!"
+    "publish_success": "Variety published successfully!",
+    "map_hint": "Drag, scroll or pinch to zoom",
+    "inapp_title": "In-app browser detected",
+    "inapp_desc": "Google blocks sign-in from the Facebook/Instagram/Messenger app browser. Use the button below to open the page in your browser, or sign in with email just below.",
+    "open_in_browser": "Open in browser",
+    "copy_link": "Copy link",
+    "link_copied": "Link copied!"
   }
 }
