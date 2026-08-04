@@ -610,6 +610,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/12.17.0/fireba
 import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.17.0/firebase-auth.js";
 import { getDatabase, ref, onValue, push, get, update, remove } from "https://www.gstatic.com/firebasejs/12.17.0/firebase-database.js";
 import { sortTomatoes, similarTomatoes } from "./algo.js";
+import { DATA as LEGACY_TOMATO_DATA } from "./data.js";
 
 // Coordonnées approximatives (lat, lon) des pays disponibles dans pays.json — pour la carte du monde
 const COUNTRY_COORDS = {
@@ -1755,6 +1756,140 @@ if ('serviceWorker' in navigator) {
     showToast(tr('install_success') || 'TomatoList est installé !', 'fa-circle-check');
   });
 })();
+
+// =====================================================================
+// ----------------- MIGRATION : import des données data.js -----------
+// =====================================================================
+// Ce bloc importe une seule fois les anciennes tomates de data.js dans
+// Firebase. Un verrou localStorage + un verrou côté base évitent les
+// doublons si la page est rechargée ou ouverte sur plusieurs appareils.
+
+const MIGRATION_LOCAL_KEY = 'tl_legacy_migration_v1_done';
+const MIGRATION_DB_FLAG = 'meta/migrationV1Done';
+
+// --- Nettoyage du pays : retire les drapeaux emoji (indicateurs régionaux) ---
+function stripFlagEmoji(str) {
+  if (!str) return '';
+  return str
+    .replace(/[\u{1F1E6}-\u{1F1FF}]/gu, '') // drapeaux (paires d'indicateurs régionaux)
+    .replace(/[\u{FE0F}\u{200D}]/gu, '')    // variantes/joiners résiduels
+    .trim();
+}
+
+// --- Mapping couleur (ancien libellé libre -> valeur du <select id="f-color">) ---
+function mapLegacyColor(couleur) {
+  const s = (couleur || '').toLowerCase();
+
+  // Toute couleur composée / rayée / bigarrée / à deux tons => Bicolore
+  const bicolorHints = ['strié', 'strie', 'zébré', 'zebre', 'rayé', 'raye', 'bigarr', 'marbré', 'marbre', ' et ', '/', 'multicolore'];
+  if (bicolorHints.some(h => s.includes(h))) return 'Bicolore';
+
+  // Teintes sombres (noir, pourpre, violet, indigo, bleu, chocolat, brun, marron, bronze, ocre, cuivré)
+  const darkHints = ['noir', 'pourpre', 'violet', 'indigo', 'bleu', 'chocolat', 'brun', 'marron', 'bronze', 'ocre', 'cuivr'];
+  if (darkHints.some(h => s.includes(h))) return 'Noire';
+
+  if (s.includes('rouge') || s.includes('cardinal') || s.includes('terre cuite')) return 'Rouge';
+  if (s.includes('jaune')) return 'Jaune';
+  if (s.includes('vert')) return 'Verte';
+  if (s.includes('orange')) return 'Orange';
+  if (s.includes('rose')) return 'Rose';
+  if (s.includes('blanc') || s.includes('crème') || s.includes('creme') || s.includes('ivoire')) return 'Blanche';
+
+  // Valeur par défaut si rien ne correspond (teinte non reconnue / mélangée)
+  return 'Bicolore';
+}
+
+// --- Extraction d'un poids moyen (en g) depuis "100-180g", "80g", etc. ---
+function parseLegacyWeight(poids) {
+  if (!poids) return null;
+  const nums = String(poids).match(/\d+/g);
+  if (!nums || nums.length === 0) return null;
+  const values = nums.map(Number);
+  const avg = values.reduce((a, b) => a + b, 0) / values.length;
+  return Math.round(avg);
+}
+
+// --- Mapping poids moyen -> catégorie du <select id="f-size"> ---
+function mapLegacySize(avgWeight) {
+  if (avgWeight == null) return '';
+  if (avgWeight <= 30) return 'Cerise';
+  if (avgWeight <= 100) return 'Petite';
+  if (avgWeight <= 200) return 'Moyenne';
+  if (avgWeight <= 400) return 'Grosse';
+  return 'Très grosse';
+}
+
+async function migrateLegacyTomatoes() {
+  // Verrou local : ne pas relancer sur ce même navigateur
+  if (localStorage.getItem(MIGRATION_LOCAL_KEY) === 'true') {
+    console.log('[Migration] Déjà exécutée sur cet appareil, migration ignorée.');
+    return;
+  }
+
+  try {
+    // Verrou base : ne pas relancer si déjà fait depuis un autre appareil
+    const flagSnap = await get(ref(db, MIGRATION_DB_FLAG));
+    if (flagSnap.exists() && flagSnap.val() === true) {
+      console.log('[Migration] Déjà exécutée côté base de données, migration ignorée.');
+      localStorage.setItem(MIGRATION_LOCAL_KEY, 'true');
+      return;
+    }
+  } catch (e) {
+    console.warn('[Migration] Impossible de vérifier le verrou distant, on continue prudemment.', e);
+  }
+
+  if (!Array.isArray(LEGACY_TOMATO_DATA) || LEGACY_TOMATO_DATA.length === 0) {
+    console.log('[Migration] Aucune donnée trouvée dans data.js.');
+    return;
+  }
+
+  console.log(`[Migration] Démarrage de l'import de ${LEGACY_TOMATO_DATA.length} tomate(s) depuis data.js...`);
+
+  let successCount = 0;
+  let errorCount = 0;
+
+  for (const legacy of LEGACY_TOMATO_DATA) {
+    try {
+      const avgWeight = parseLegacyWeight(legacy.poids);
+      const tomatoData = {
+        name: (legacy.nom || '').trim(),
+        color: mapLegacyColor(legacy.couleur),
+        imageURLs: Array.isArray(legacy.images) ? legacy.images : [],
+        weight: avgWeight,
+        averageSize: mapLegacySize(avgWeight),
+        description: (legacy.descriptionLongue || legacy.descriptionCourte || '').trim(),
+        country: stripFlagEmoji(legacy.origine),
+        author: "Christophe Duval",
+        uid: null,
+        createdAt: Date.now(),
+        contributors: {
+          migrated_contributor: {
+            name: "Tom Duval",
+            uid: null,
+            at: Date.now()
+          }
+        }
+      };
+
+      await push(ref(db, 'tomatoes'), tomatoData);
+      successCount++;
+    } catch (e) {
+      errorCount++;
+      console.error('[Migration] Erreur sur la tomate :', legacy && legacy.nom, e);
+    }
+  }
+
+  try {
+    await update(ref(db, 'meta'), { migrationV1Done: true });
+  } catch (e) {
+    console.warn('[Migration] Impossible d\'écrire le verrou distant.', e);
+  }
+
+  localStorage.setItem(MIGRATION_LOCAL_KEY, 'true');
+  console.log(`[Migration] Terminée : ${successCount} tomate(s) importée(s) avec succès, ${errorCount} erreur(s).`);
+}
+
+migrateLegacyTomatoes();
 </script>
 </body>
 </html>
