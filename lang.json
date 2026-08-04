@@ -92,7 +92,14 @@
     "inapp_desc": "Google bloque la connexion depuis l'app Facebook/Instagram/Messenger. Utilisez le bouton ci-dessous pour ouvrir la page dans votre navigateur, ou connectez-vous avec votre email juste en dessous.",
     "open_in_browser": "Ouvrir dans le navigateur",
     "copy_link": "Copier le lien",
-    "link_copied": "Lien copié !"
+    "link_copied": "Lien copié !",
+    "install_title": "Installer TomatoList",
+    "install_sub": "Accédez-y en un tap, même hors connexion.",
+    "install_sub_ios": "Appuyez sur <i class=\"fa-solid fa-arrow-up-from-bracket\"></i> puis « Sur l'écran d'accueil ».",
+    "install_btn": "Installer",
+    "install_ios_hint": "Comment faire",
+    "install_later": "Plus tard",
+    "install_success": "TomatoList est installé !"
   },
   "en": {
     "login": "Login",
@@ -187,6 +194,13 @@
     "inapp_desc": "Google blocks sign-in from the Facebook/Instagram/Messenger app browser. Use the button below to open the page in your browser, or sign in with email just below.",
     "open_in_browser": "Open in browser",
     "copy_link": "Copy link",
-    "link_copied": "Link copied!"
+    "link_copied": "Link copied!",
+    "install_title": "Install TomatoList",
+    "install_sub": "Get one-tap access, even offline.",
+    "install_sub_ios": "Tap <i class=\"fa-solid fa-arrow-up-from-bracket\"></i> then \"Add to Home Screen\".",
+    "install_btn": "Install",
+    "install_ios_hint": "How to",
+    "install_later": "Later",
+    "install_success": "TomatoList is installed!"
   }
 }
