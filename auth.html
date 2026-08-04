@@ -475,17 +475,20 @@ document.getElementById('btn-magic-auth').onclick = async (e) => {
 };
 
 
-// ----------------- GOOGLE AUTH (POPUP sur desktop, REDIRECT sur mobile) -----------------
+// ----------------- GOOGLE AUTH (POPUP partout, y compris mobile) -----------------
+// La popup garde le contexte de la page (variable `state`, étape d'inscription en cours...),
+// contrairement à une redirection qui recharge complètement la page et peut perdre ce contexte
+// sur certains navigateurs mobiles. On garde donc la popup comme méthode principale partout,
+// avec une redirection uniquement proposée en solution de secours si la popup est bloquée.
 
 // 1) Détection des navigateurs "in-app" (Facebook, Instagram, Messenger, TikTok, Line...)
 //    Google bloque volontairement sa connexion dans ces webviews, souvent SANS renvoyer
 //    d'erreur exploitable : d'où l'effet "je clique et il ne se passe rien".
 function detectInAppBrowser() {
   const ua = navigator.userAgent || '';
-  return /FBAN|FBAV|FB_IAB|Instagram|Line\/|MessengerForiOS|Messenger|Snapchat|TikTok|MicroMessenger|WhatsApp|Twitter|Pinterest\/|GSA\//i.test(ua);
+  return /FBAN|FBAV|FB_IAB|Instagram|Line\/|MessengerForiOS|Messenger|Snapchat|TikTok|MicroMessenger|WhatsApp|Twitter|Pinterest\//i.test(ua);
 }
 const isInAppBrowser = detectInAppBrowser();
-const isMobileDevice = /Android|iPhone|iPad|iPod|Mobile|Opera Mini/i.test(navigator.userAgent) || (window.innerWidth <= 768);
 
 if (isInAppBrowser) {
   document.getElementById('inapp-browser-warning').style.display = 'block';
@@ -538,6 +541,32 @@ function setGoogleLoading(loading) {
   btn.style.opacity = loading ? '0.6' : '1';
 }
 
+function showRedirectFallback() {
+  let box = document.getElementById('google-redirect-fallback');
+  if (box) { box.style.display = 'block'; return; }
+  box = document.createElement('div');
+  box.id = 'google-redirect-fallback';
+  box.style.marginTop = '10px';
+  box.style.fontSize = '13px';
+  box.style.textAlign = 'center';
+  box.innerHTML = `<a href="#" id="google-redirect-link" style="color:var(--primary,#b91c1c); text-decoration:underline;">La fenêtre ne s'ouvre pas ? Cliquez ici pour continuer autrement</a>`;
+  document.getElementById('auth-error').insertAdjacentElement('afterend', box);
+  document.getElementById('google-redirect-link').onclick = async (e) => {
+    e.preventDefault();
+    setError('auth-error', '');
+    setGoogleLoading(true);
+    try {
+      sessionStorage.setItem('tl_google_redirect_pending', '1');
+      await signInWithRedirect(auth, googleProvider);
+    } catch (error) {
+      console.error('Erreur signInWithRedirect :', error);
+      sessionStorage.removeItem('tl_google_redirect_pending');
+      setGoogleLoading(false);
+      setError('auth-error', "Erreur lors de la connexion avec Google (" + (error.code || error.message) + ").");
+    }
+  };
+}
+
 document.getElementById('btn-google').onclick = async () => {
   setError('auth-error', '');
 
@@ -550,35 +579,31 @@ document.getElementById('btn-google').onclick = async () => {
   setGoogleLoading(true);
 
   try {
-    if (isMobileDevice) {
-      // On mémorise qu'une redirection Google est en cours : utile pour le filet de
-      // sécurité au rechargement (onAuthStateChanged) plus bas.
-      sessionStorage.setItem('tl_google_redirect_pending', '1');
-      await signInWithRedirect(auth, googleProvider);
-      return; // la page va se recharger vers Google, rien d'autre à faire ici
-    }
     const result = await signInWithPopup(auth, googleProvider);
+    setGoogleLoading(false);
     await processGoogleUser(result.user);
   } catch (error) {
     console.error('Erreur connexion Google :', error);
-    sessionStorage.removeItem('tl_google_redirect_pending');
     setGoogleLoading(false);
     if (error.code === 'auth/popup-closed-by-user' || error.code === 'auth/cancelled-popup-request') {
       // L'utilisateur a juste fermé la popup, rien à afficher
     } else if (error.code === 'auth/popup-blocked' || error.code === 'auth/operation-not-supported-in-this-environment') {
-      setError('auth-error', "Votre navigateur bloque les fenêtres de connexion. Réessayez ou utilisez la connexion par email.");
+      setError('auth-error', "Votre navigateur a bloqué la fenêtre de connexion.");
+      showRedirectFallback();
     } else if (error.code === 'auth/unauthorized-domain') {
       setError('auth-error', "Ce site n'est pas encore autorisé pour la connexion Google (configuration en cours). Utilisez la connexion par email en attendant.");
     } else {
       setError('auth-error', "Erreur lors de la connexion avec Google (" + (error.code || error.message) + ").");
+      showRedirectFallback();
     }
   }
 };
 
-// 2) Filet de sécurité n°1 : résultat direct de la redirection
+// Filet de sécurité : si l'utilisateur a utilisé le lien de secours ci-dessus (redirection),
+// on récupère le résultat au retour sur la page.
 (async () => {
   const wasPending = sessionStorage.getItem('tl_google_redirect_pending') === '1';
-  if (!wasPending) return; // on ne bloque pas le chargement normal de la page si aucune redirection n'était en cours
+  if (!wasPending) return;
 
   setGoogleLoading(true);
   try {
@@ -592,26 +617,20 @@ document.getElementById('btn-google').onclick = async () => {
     console.error('Erreur getRedirectResult :', error);
     sessionStorage.removeItem('tl_google_redirect_pending');
     setGoogleLoading(false);
-    if (error.code === 'auth/unauthorized-domain') {
-      setError('auth-error', "Ce site n'est pas encore autorisé pour la connexion Google (configuration en cours). Utilisez la connexion par email en attendant.");
-    } else {
-      setError('auth-error', "La connexion Google a échoué (" + (error.code || error.message) + "). Réessayez ou utilisez la connexion par email.");
-    }
+    setError('auth-error', "La connexion Google a échoué (" + (error.code || error.message) + "). Utilisez la connexion par email.");
     return;
   }
-  // getRedirectResult n'a rien renvoyé : on laisse le filet n°2 (onAuthStateChanged) faire le travail,
-  // mais si rien ne se passe après quelques secondes, on prévient l'utilisateur plutôt que de rester bloqué en silence.
   setTimeout(() => {
     if (sessionStorage.getItem('tl_google_redirect_pending') === '1') {
       sessionStorage.removeItem('tl_google_redirect_pending');
       setGoogleLoading(false);
-      setError('auth-error', "La connexion Google n'a pas pu être finalisée. Réessayez ou utilisez la connexion par email.");
+      setError('auth-error', "La connexion Google n'a pas pu être finalisée. Utilisez la connexion par email.");
     }
   }, 6000);
 })();
 
-// 3) Filet de sécurité n°2 : certains navigateurs mobiles restaurent la session via
-// onAuthStateChanged plus fiablement que getRedirectResult() (partitionnement du stockage).
+// Certains navigateurs restaurent la session via onAuthStateChanged plus fiablement
+// que getRedirectResult() après une redirection (partitionnement du stockage).
 onAuthStateChanged(auth, async (user) => {
   const wasPending = sessionStorage.getItem('tl_google_redirect_pending') === '1';
   if (wasPending && user) {
