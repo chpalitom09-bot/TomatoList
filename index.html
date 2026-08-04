@@ -205,6 +205,10 @@
   .author-link { cursor: pointer; }
   .author-link:hover { text-decoration: underline; color: var(--primary); }
 
+  .contributor-chip { display: flex; align-items: center; gap: 6px; background: var(--bg); border: 1px solid var(--line); padding: 5px 10px 5px 5px; border-radius: 20px; font-size: 12.5px; font-weight: 500; cursor: pointer; transition: all 0.2s; }
+  .contributor-chip:hover { border-color: var(--primary); color: var(--primary); }
+  .contributor-chip .contributor-avatar { width: 22px; height: 22px; border-radius: 50%; background: var(--primary); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; text-transform: uppercase; flex-shrink: 0; }
+
   /* Boutons action détail */
   .detail-actions { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
   .btn-sm { padding: 8px 14px; font-size: 13px; border-radius: 8px; }
@@ -437,6 +441,11 @@
         </div>
       </div>
 
+      <div id="detail-contributors" style="display:none; margin-top:14px; padding-top:14px; border-top:1px solid var(--line);">
+        <div class="detail-section-title" style="margin-bottom:10px;">Contributeurs</div>
+        <div id="detail-contributors-list" style="display:flex; flex-wrap:wrap; gap:8px;"></div>
+      </div>
+
       <div id="similar-block" style="margin-top:22px; display:none;">
         <div class="detail-section-title" data-i18n="similar_title">Tomates similaires</div>
         <div class="similar-grid" id="similar-grid"></div>
@@ -496,6 +505,12 @@
     </div>
     <div class="modal-body">
       <div class="error-msg" id="form-error"></div>
+      <div id="edit-contributor-note" style="display:none; background:#fef2f2; border:1px solid #fca5a5; border-radius:10px; padding:14px; margin-bottom:16px;">
+        <div style="color:var(--primary); font-size:13px; font-weight:600; margin-bottom:8px;">
+          <i class="fa-solid fa-circle-info"></i> Vous modifiez la variété d'un autre contributeur. Indiquez votre nom pour qu'il apparaisse sur la fiche.
+        </div>
+        <input type="text" class="form-control" id="f-contributor-name" placeholder="Votre prénom et nom">
+      </div>
       
       <input type="file" id="file-input" accept="image/*" multiple style="display:none">
       
@@ -620,6 +635,7 @@ let currentColor = 'all';
 let currentCountry = 'all';
 let isAnon = true; // Toggle Anonyme activé par défaut
 let editingTomatoId = null; // null = création, sinon id de la tomate en cours d'édition
+let editOwnerUid = null; // uid de l'auteur initial de la tomate en cours d'édition (null si inconnu/anonyme)
 let hasFirstData = false; // pour savoir si on doit encore afficher le squelette
 
 let currentLang = localStorage.getItem('tl_lang') || (navigator.language || 'fr').slice(0,2);
@@ -1028,10 +1044,13 @@ function openDetailModal(tomatoId) {
 
   document.getElementById('detail-date').textContent = new Date(t.createdAt).toLocaleDateString(currentLang);
 
-  // Boutons édition / suppression : uniquement pour le propriétaire connecté
+  // Édition : accessible à tout le monde (avec ou sans compte)
+  // Suppression : réservée au propriétaire connecté
   const isOwner = currentUser && t.uid && currentUser.uid === t.uid;
-  document.getElementById('detail-edit-btn').style.display = isOwner ? 'flex' : 'none';
+  document.getElementById('detail-edit-btn').style.display = 'flex';
   document.getElementById('detail-delete-btn').style.display = isOwner ? 'flex' : 'none';
+
+  renderContributors(t);
 
   // Tomates similaires
   const similar = similarTomatoes(tomatoesData, t, 3);
@@ -1122,6 +1141,31 @@ document.getElementById('lightbox-close').onclick = closeLightbox;
 document.getElementById('lightbox-overlay').addEventListener('click', (e) => {
   if (e.target.id === 'lightbox-overlay') closeLightbox();
 });
+
+// ----------------- CONTRIBUTEURS -----------------
+// Affiche les personnes ayant modifié la tomate (nom qu'elles ont saisi lors de l'édition)
+function renderContributors(t) {
+  const block = document.getElementById('detail-contributors');
+  const list = document.getElementById('detail-contributors-list');
+  const contributors = t.contributors ? Object.values(t.contributors).filter(c => c && c.name) : [];
+
+  if (contributors.length === 0) {
+    block.style.display = 'none';
+    list.innerHTML = '';
+    return;
+  }
+
+  list.innerHTML = contributors.map(c => `
+    <div class="contributor-chip" ${c.uid ? `data-uid="${c.uid}"` : ''} data-name="${c.name.replace(/"/g,'&quot;')}" style="${c.uid ? '' : 'cursor:default;'}">
+      <span class="contributor-avatar">${c.name.charAt(0)}</span>
+      <span>${c.name}</span>
+    </div>
+  `).join('');
+  list.querySelectorAll('.contributor-chip[data-uid]').forEach(chip => {
+    chip.onclick = () => openAuthorModal(chip.getAttribute('data-uid'), chip.getAttribute('data-name'));
+  });
+  block.style.display = 'block';
+}
 
 // ----------------- PAGE / PROFIL AUTEUR -----------------
 function openAuthorModal(uid, name) {
@@ -1398,6 +1442,17 @@ document.getElementById('btn-submit').onclick = async () => {
     errBox.style.display = 'block';
     return;
   }
+
+  const isOwnerEdit = editingTomatoId && currentUser && editOwnerUid && currentUser.uid === editOwnerUid;
+  let contributorName = '';
+  if (editingTomatoId && !isOwnerEdit) {
+    contributorName = document.getElementById('f-contributor-name').value.trim();
+    if (!contributorName) {
+      errBox.textContent = 'Merci d\'indiquer votre prénom et nom pour valider la modification.';
+      errBox.style.display = 'block';
+      return;
+    }
+  }
   errBox.style.display = 'none';
   
   const fill = document.getElementById('progress-fill');
@@ -1432,7 +1487,7 @@ document.getElementById('btn-submit').onclick = async () => {
     }
 
     if (editingTomatoId) {
-      // ----- MODE ÉDITION -----
+      // ----- MODE ÉDITION (accessible à tous, avec ou sans compte) -----
       const updates = {
         name: name,
         color: document.getElementById('f-color').value,
@@ -1442,6 +1497,15 @@ document.getElementById('btn-submit').onclick = async () => {
         description: document.getElementById('f-desc').value || "",
         country: document.getElementById('f-country-value').value || ""
       };
+      if (!isOwnerEdit) {
+        // On garde une trace de qui a fait la modification (nom saisi, uid si connecté)
+        const newContribRef = push(ref(db, `tomatoes/${editingTomatoId}/contributors`));
+        updates[`contributors/${newContribRef.key}`] = {
+          name: contributorName,
+          uid: currentUser ? currentUser.uid : null,
+          at: Date.now()
+        };
+      }
       await update(ref(db, `tomatoes/${editingTomatoId}`), updates);
 
       fill.style.width = '100%';
@@ -1486,6 +1550,11 @@ document.getElementById('btn-submit').onclick = async () => {
 
 function resetForm() {
   editingTomatoId = null;
+  editOwnerUid = null;
+  const contribBlock = document.getElementById('edit-contributor-note');
+  if (contribBlock) contribBlock.style.display = 'none';
+  const contribInput = document.getElementById('f-contributor-name');
+  if (contribInput) contribInput.value = '';
   document.getElementById('add-modal-title').setAttribute('data-i18n', 'add_title');
   document.getElementById('add-modal-title').textContent = tr('add_title');
   document.getElementById('btn-submit-label').setAttribute('data-i18n', 'submit');
@@ -1531,11 +1600,11 @@ function closeAddModalWithConfirm() {
 }
 
 function openEditModal(t) {
-  if (!currentUser || currentUser.uid !== t.uid) {
-    showToast(tr('not_owner'), 'fa-lock');
-    return;
-  }
+  // Édition libre pour tous, avec ou sans compte. Seul l'auteur connecté peut supprimer.
   editingTomatoId = t.id;
+  editOwnerUid = t.uid || null;
+  const isOwner = currentUser && editOwnerUid && currentUser.uid === editOwnerUid;
+
   document.getElementById('add-modal-title').removeAttribute('data-i18n');
   document.getElementById('add-modal-title').textContent = tr('edit_title');
   document.getElementById('btn-submit-label').removeAttribute('data-i18n');
@@ -1546,6 +1615,12 @@ function openEditModal(t) {
   document.getElementById('f-weight').value = t.weight || '';
   document.getElementById('f-size').value = t.averageSize || '';
   document.getElementById('f-desc').value = t.description || '';
+
+  // Si ce n'est pas l'auteur connecté, on demande son nom pour l'afficher comme contributeur
+  const contribBlock = document.getElementById('edit-contributor-note');
+  const contribInput = document.getElementById('f-contributor-name');
+  if (contribBlock) contribBlock.style.display = isOwner ? 'none' : 'block';
+  if (contribInput) contribInput.value = (!isOwner && currentProfile) ? `${currentProfile.firstname || ''} ${currentProfile.lastname || ''}`.trim() : '';
 
   if (t.country) {
     const c = countriesList.find(x => x.name === t.country);
