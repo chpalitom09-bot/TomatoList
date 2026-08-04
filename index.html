@@ -220,10 +220,13 @@
   .map-pin:hover .map-pin-flag { transform: scale(1.15); }
 
   /* Tomates similaires */
-  .similar-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; margin-top: 8px; }
-  .similar-card { cursor: pointer; border-radius: 10px; overflow: hidden; border: 1px solid var(--line); }
-  .similar-card img { width: 100%; height: 90px; object-fit: cover; display: block; }
-  .similar-card .similar-name { font-size: 12px; font-weight: 600; padding: 6px 8px; }
+  .similar-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 12px; margin-top: 8px; }
+  .similar-card { cursor: pointer; border-radius: 12px; overflow: hidden; border: 1px solid var(--line); background: var(--surface); transition: transform 0.15s, box-shadow 0.15s; }
+  .similar-card:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(0,0,0,0.1); }
+  .similar-card-imgwrap { position: relative; width: 100%; aspect-ratio: 4 / 3; background: #f1f1f1; overflow: hidden; }
+  .similar-card-imgwrap img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; }
+  .similar-card-imgwrap .no-img { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; color: var(--text-muted); font-size: 22px; }
+  .similar-card .similar-name { font-size: 12.5px; font-weight: 600; padding: 8px 10px; color: var(--text-main); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
   /* Bannière d'installation PWA */
   .install-banner {
@@ -633,6 +636,28 @@ async function loadTranslations() {
   applyI18n();
 }
 function tr(key) { return (TRANSLATIONS[currentLang] && TRANSLATIONS[currentLang][key]) || (TRANSLATIONS.fr && TRANSLATIONS.fr[key]) || key; }
+
+// Les valeurs stockées en base (color, averageSize) sont en français, alors que les clés
+// de langue sont en anglais (color_red, size_cherry...) : ces tables font la correspondance.
+const COLOR_KEY_MAP = {
+  'rouge': 'color_red', 'jaune': 'color_yellow', 'noire': 'color_black',
+  'verte': 'color_green', 'orange': 'color_orange', 'rose': 'color_pink',
+  'blanche': 'color_white', 'bicolore': 'color_bicolor'
+};
+const SIZE_KEY_MAP = {
+  'cerise': 'size_cherry', 'petite': 'size_small', 'moyenne': 'size_medium',
+  'grosse': 'size_large', 'très grosse': 'size_xl', 'tres grosse': 'size_xl'
+};
+function trColor(color) {
+  if (!color) return tr('color_red');
+  const key = COLOR_KEY_MAP[color.toLowerCase()];
+  return key ? tr(key) : color;
+}
+function trSize(size) {
+  if (!size) return '';
+  const key = SIZE_KEY_MAP[size.toLowerCase()];
+  return key ? tr(key) : size;
+}
 function applyI18n() {
   document.querySelectorAll('[data-i18n]').forEach(el => {
     if(el.tagName === 'SPAN' && el.classList.contains('hide-mobile')) el.textContent = tr(el.getAttribute('data-i18n'));
@@ -853,7 +878,7 @@ function renderGrid() {
         <div class="card-body">
           <h3 class="card-title">${t.name}</h3>
           <div class="card-meta">
-            <span class="badge"><i class="color-dot" style="background:${colorBg}"></i> ${tr('color_'+(t.color||'Rouge').toLowerCase()) || t.color}</span>
+            <span class="badge"><i class="color-dot" style="background:${colorBg}"></i> ${trColor(t.color)}</span>
             ${t.weight ? `<span class="badge"><i class="fa-solid fa-scale-balanced"></i> ${t.weight}g</span>` : ''}
             ${countryBadge}
           </div>
@@ -967,10 +992,10 @@ function openDetailModal(tomatoId) {
       countryBadge = `<span class="badge"><img src="https://flagcdn.com/w20/${countryObj.code}.png" style="width:14px;border-radius:2px" alt=""> ${t.country}</span>`;
     }
   }
-  const sizeLabel = t.averageSize ? (tr('size_' + t.averageSize.toLowerCase()) || t.averageSize) : '';
+  const sizeLabel = trSize(t.averageSize);
 
   document.getElementById('detail-meta').innerHTML = `
-    <span class="badge"><i class="color-dot" style="background:${colorBg}"></i> ${tr('color_' + (t.color || 'Rouge').toLowerCase()) || t.color}</span>
+    <span class="badge"><i class="color-dot" style="background:${colorBg}"></i> ${trColor(t.color)}</span>
     ${t.weight ? `<span class="badge"><i class="fa-solid fa-scale-balanced"></i> ${t.weight}g</span>` : ''}
     ${sizeLabel ? `<span class="badge"><i class="fa-solid fa-ruler"></i> ${sizeLabel}</span>` : ''}
     ${countryBadge}
@@ -1005,7 +1030,9 @@ function openDetailModal(tomatoId) {
       const sImg = sImgs[0] || '';
       return `
         <div class="similar-card" data-id="${s.id}">
-          ${sImg ? `<img src="${sImg}" alt="${s.name}">` : `<div style="height:90px;background:#eee"></div>`}
+          <div class="similar-card-imgwrap">
+            ${sImg ? `<img src="${sImg}" alt="${s.name}" loading="lazy">` : `<div class="no-img"><i class="fa-solid fa-image"></i></div>`}
+          </div>
           <div class="similar-name">${s.name}</div>
         </div>
       `;
