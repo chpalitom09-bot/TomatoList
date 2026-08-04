@@ -7,7 +7,6 @@
   window.dataLayer = window.dataLayer || [];
   function gtag(){dataLayer.push(arguments);}
   gtag('js', new Date());
-
   gtag('config', 'G-CFVW23MWP2');
 </script>
 <meta charset="UTF-8">
@@ -28,11 +27,9 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
-<!-- EMPLACEMENT GOOGLE ANALYTICS -->
 <script>
   // Script Google Analytics
 </script>
-<!-- FIN GOOGLE ANALYTICS -->
 
 <style>
   :root {
@@ -88,7 +85,7 @@
   .filter-pill { padding: 10px 16px; border: 1px solid var(--line); border-radius: 30px; background: var(--surface); color: var(--text-muted); cursor: pointer; font-size: 14px; font-weight: 500; transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1); display: flex; align-items: center; gap: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
   .filter-pill:hover { border-color: var(--line-h); transform: translateY(-1px); box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
   .filter-pill.active { background: var(--surface); color: var(--text-main); font-weight: 600; box-shadow: 0 0 0 1.5px var(--text-main); border-color: transparent; }
-  .filter-pill .color-dot { width: 16px; height: 16px; border-radius: 50%; display: inline-block; box-shadow: inset 0 2px 4px rgba(0,0,0,0.2), 0 0 0 1px rgba(0,0,0,0.05); }
+  .filter-pill .color-dot { width: 16px; height: 16px; border-radius: 50%; display: inline-block; box-shadow: inset 0 2px 4px rgba(0,0,0,0.2), 0 0 0 1px rgba(0,0,0,0.05); flex-shrink: 0; }
   .foryou-pill { background: linear-gradient(135deg, #fef2f2, #fff); border-color: #fca5a5 !important; color: var(--primary) !important; }
 
   /* CARDS & IMAGES CADRÉES */
@@ -96,7 +93,6 @@
   .card { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; overflow: hidden; transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s; display: flex; flex-direction: column; }
   .card:hover { transform: translateY(-6px); box-shadow: 0 20px 40px rgba(0,0,0,0.08); }
   
-  /* Conteneur Image Glassmorphism (Permet de voir l'image entière sans couper) */
   .card-img-wrapper { position: relative; width: 100%; height: 260px; background: #f3f4f6; overflow: hidden; border-bottom: 1px solid var(--line); }
   .card-img { width: 100%; height: 100%; object-fit: cover; object-position: center; display: block; }
   .img-count { position: absolute; bottom: 10px; right: 10px; background: rgba(0,0,0,0.6); color: #fff; padding: 4px 8px; border-radius: 12px; font-size: 11px; font-weight: 600; z-index: 3; backdrop-filter: blur(4px); }
@@ -118,7 +114,105 @@
   /* Carte cliquable */
   .card { cursor: pointer; }
 
-  /* Modal Détail (vue "fiche produit") */
+  /* ──────────────────────────────────────────────────────────────────
+     BANDEAU DE PARTAGE (inséré dans la grille tous les 50 tomates)
+  ────────────────────────────────────────────────────────────────── */
+  .share-banner {
+    grid-column: 1 / -1;
+    position: relative;
+    overflow: hidden;
+    border-radius: 20px;
+    padding: 28px 32px;
+    background: linear-gradient(135deg, #7f1d1d 0%, #b91c1c 45%, #ef4444 100%);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    flex-wrap: wrap;
+    box-shadow: 0 12px 40px rgba(185,28,28,0.35);
+    animation: shareReveal 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+  @keyframes shareReveal {
+    from { opacity: 0; transform: translateY(16px) scale(0.98); }
+    to   { opacity: 1; transform: translateY(0)    scale(1); }
+  }
+  /* Cercles décoratifs en arrière-plan */
+  .share-banner::before,
+  .share-banner::after {
+    content: '';
+    position: absolute;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.07);
+    pointer-events: none;
+  }
+  .share-banner::before { width: 220px; height: 220px; top: -80px; right: -60px; }
+  .share-banner::after  { width: 140px; height: 140px; bottom: -60px; left: 120px; }
+
+  .share-banner-left {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex: 1;
+    min-width: 0;
+    position: relative;
+    z-index: 1;
+  }
+  .share-banner-emoji {
+    font-size: 44px;
+    line-height: 1;
+    flex-shrink: 0;
+    filter: drop-shadow(0 4px 8px rgba(0,0,0,0.25));
+  }
+  .share-banner-title {
+    font-family: var(--display);
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 4px;
+    line-height: 1.2;
+  }
+  .share-banner-sub {
+    font-size: 13.5px;
+    opacity: 0.85;
+    line-height: 1.4;
+  }
+  .share-banner-actions {
+    display: flex;
+    gap: 10px;
+    flex-shrink: 0;
+    flex-wrap: wrap;
+    position: relative;
+    z-index: 1;
+  }
+  .share-banner-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 11px 20px;
+    border-radius: 12px;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    border: none;
+    transition: transform 0.15s, box-shadow 0.15s;
+    white-space: nowrap;
+  }
+  .share-banner-btn:active { transform: scale(0.96); }
+  .share-banner-btn.primary {
+    background: #fff;
+    color: var(--primary);
+    box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+  }
+  .share-banner-btn.primary:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(0,0,0,0.25); }
+  .share-banner-btn.secondary {
+    background: rgba(255,255,255,0.18);
+    color: #fff;
+    border: 1.5px solid rgba(255,255,255,0.35);
+    backdrop-filter: blur(4px);
+  }
+  .share-banner-btn.secondary:hover { background: rgba(255,255,255,0.28); }
+
+  /* Modal Détail */
   .detail-modal { max-width: 640px; }
   .detail-gallery-wrap { position: relative; width: 100%; height: 380px; background: #000; overflow: hidden; border-radius: 20px 20px 0 0; }
   .detail-carousel { position: relative; display: flex; width: 100%; height: 100%; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; z-index: 2; }
@@ -188,7 +282,6 @@
   .progress-bar { width: 100%; height: 6px; background: var(--line); border-radius: 3px; overflow: hidden; display: none; margin-bottom: 16px; }
   .progress-fill { width: 0%; height: 100%; background: var(--primary); transition: width 0.3s; }
 
-  /* Barre de chargement intégrée directement dans le bouton "Publier" */
   #btn-submit { position: relative; overflow: hidden; }
   #btn-submit .btn-progress-fill { position: absolute; left: 0; top: 0; bottom: 0; width: 0%; background: rgba(255,255,255,0.28); transition: width 0.3s ease; z-index: 0; }
   #btn-submit #btn-submit-label { position: relative; z-index: 1; }
@@ -210,10 +303,7 @@
   .skeleton-line.short { width: 40%; }
   @keyframes shimmer { 0% { background-position: 100% 0; } 100% { background-position: -100% 0; } }
 
-  /* Bouton carte + select pays */
   .country-select { width: 100%; padding: 12px 14px; border: 1px solid var(--line); border-radius: 10px; outline: none; font-size: 14px; background: var(--surface); }
-
-  /* Bouton auteur cliquable */
   .author-link { cursor: pointer; }
   .author-link:hover { text-decoration: underline; color: var(--primary); }
 
@@ -221,7 +311,6 @@
   .contributor-chip:hover { border-color: var(--primary); color: var(--primary); }
   .contributor-chip .contributor-avatar { width: 22px; height: 22px; border-radius: 50%; background: var(--primary); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; text-transform: uppercase; flex-shrink: 0; }
 
-  /* Boutons action détail */
   .detail-actions { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
   .btn-sm { padding: 8px 14px; font-size: 13px; border-radius: 8px; }
   .btn-danger { background: #fef2f2; color: #d92d20; border: 1px solid #fecaca; }
@@ -233,7 +322,10 @@
   .lightbox-overlay img { max-width: 100%; max-height: 100%; object-fit: contain; }
   .lightbox-close { position: absolute; top: 20px; right: 24px; background: rgba(255,255,255,0.15); border: none; color: #fff; width: 40px; height: 40px; border-radius: 50%; font-size: 18px; cursor: pointer; }
 
-  /* Carte du monde interactive (zoom/pan) */
+  /* ──────────────────────────────────────────────────────────────────
+     CARTE DU MONDE — Les pins se contre-scalent pour rester visuels
+     à taille constante (ou légèrement réduits) quand on zoome
+  ────────────────────────────────────────────────────────────────── */
   .map-viewport { position: relative; width: 100%; aspect-ratio: 2 / 1; border-radius: 12px; overflow: hidden; background: #dbeafe; touch-action: none; cursor: grab; user-select: none; }
   .map-viewport.grabbing { cursor: grabbing; }
   .map-inner { position: absolute; top: 0; left: 0; width: 100%; height: 100%; transform-origin: 0 0; will-change: transform; }
@@ -242,11 +334,24 @@
   .map-ctrl-btn { width: 34px; height: 34px; border-radius: 8px; border: 1px solid var(--line); background: rgba(255,255,255,0.92); color: var(--text-main); font-size: 15px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 6px rgba(0,0,0,0.15); }
   .map-ctrl-btn:hover { background: #fff; }
   .map-hint { position: absolute; top: 10px; left: 12px; background: rgba(17,24,39,0.55); color: #fff; font-size: 11px; padding: 5px 10px; border-radius: 20px; z-index: 10; pointer-events: none; }
-  .map-pin { position: absolute; transform: translate(-50%, -100%); display: flex; flex-direction: column; align-items: center; cursor: pointer; }
+
+  /* Les pins utilisent --map-pin-scale pour se counter-scaler */
+  .map-pin {
+    position: absolute;
+    /* Décalage centré sur la pointe en bas — le scale se fait depuis ce point */
+    transform: translate(-50%, -100%) scale(var(--map-pin-scale, 1));
+    transform-origin: bottom center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    cursor: pointer;
+    transition: transform 0.05s linear; /* Fluidité légère */
+  }
   .map-pin-flag { width: 22px; height: 16px; object-fit: cover; border-radius: 3px; border: 1.5px solid #fff; box-shadow: 0 2px 5px rgba(0,0,0,0.35); margin-bottom: 2px; }
   .map-dot { position: relative; width: 12px; height: 12px; background: var(--primary); border: 2px solid #fff; border-radius: 50%; box-shadow: 0 2px 5px rgba(0,0,0,0.3); }
   .map-dot-count { position: absolute; top: -6px; right: -8px; background: var(--text-main); color: #fff; font-size: 9px; font-weight: 700; border-radius: 50%; width: 15px; height: 15px; display: flex; align-items: center; justify-content: center; }
-  .map-pin:hover .map-pin-flag { transform: scale(1.15); }
+  /* Pas de transform supplémentaire sur hover (le pin est déjà counter-scalé) */
+  .map-pin:hover .map-pin-flag { filter: brightness(1.1); }
 
   /* Tomates similaires */
   .similar-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 12px; margin-top: 8px; }
@@ -257,67 +362,27 @@
   .similar-card-imgwrap .no-img { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; color: var(--text-muted); font-size: 22px; }
   .similar-card .similar-name { font-size: 12.5px; font-weight: 600; padding: 8px 10px; color: var(--text-main); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-  /* Bannière d'installation PWA */
+  /* Bannière PWA */
   .install-banner {
-    position: fixed;
-    left: 20px;
-    right: 20px;
-    bottom: -140px;
-    max-width: 420px;
-    margin: 0 auto;
-    background: var(--surface);
-    border: 1px solid var(--line);
-    border-radius: 18px;
-    box-shadow: 0 12px 40px rgba(0,0,0,0.18);
-    padding: 16px;
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    z-index: 1500;
-    transition: bottom 0.45s cubic-bezier(.2,.9,.3,1.2), opacity 0.3s;
-    opacity: 0;
+    position: fixed; left: 20px; right: 20px; bottom: -140px; max-width: 420px; margin: 0 auto;
+    background: var(--surface); border: 1px solid var(--line); border-radius: 18px;
+    box-shadow: 0 12px 40px rgba(0,0,0,0.18); padding: 16px; display: flex; align-items: center;
+    gap: 14px; z-index: 1500; transition: bottom 0.45s cubic-bezier(.2,.9,.3,1.2), opacity 0.3s; opacity: 0;
   }
   .install-banner.visible { bottom: 20px; opacity: 1; }
-  .install-banner-icon {
-    width: 52px; height: 52px; border-radius: 14px; flex-shrink: 0;
-    box-shadow: 0 4px 12px rgba(185,28,28,0.25);
-    background: #fff;
-  }
+  .install-banner-icon { width: 52px; height: 52px; border-radius: 14px; flex-shrink: 0; box-shadow: 0 4px 12px rgba(185,28,28,0.25); background: #fff; }
   .install-banner-body { flex: 1; min-width: 0; }
   .install-banner-title { font-size: 14.5px; font-weight: 700; color: var(--text-main); margin-bottom: 2px; }
   .install-banner-sub { font-size: 12.5px; color: var(--text-muted); line-height: 1.35; }
   .install-banner-actions { display: flex; flex-direction: column; gap: 6px; align-items: stretch; flex-shrink: 0; }
-  .install-banner-btn {
-    background: var(--primary); color: #fff; border: none; padding: 9px 16px;
-    border-radius: 10px; font-size: 13px; font-weight: 700; cursor: pointer;
-    white-space: nowrap; display: flex; align-items: center; gap: 6px; justify-content: center;
-    transition: background 0.15s, transform 0.1s;
-  }
-  .install-banner-btn:hover { background: var(--primary-dark, #991b1b); }
+  .install-banner-btn { background: var(--primary); color: #fff; border: none; padding: 9px 16px; border-radius: 10px; font-size: 13px; font-weight: 700; cursor: pointer; white-space: nowrap; display: flex; align-items: center; gap: 6px; justify-content: center; transition: background 0.15s, transform 0.1s; }
+  .install-banner-btn:hover { background: #991b1b; }
   .install-banner-btn:active { transform: scale(0.96); }
-  .install-banner-close {
-    background: none; border: none; color: var(--text-muted); font-size: 12px;
-    cursor: pointer; padding: 4px; text-align: center;
-  }
+  .install-banner-close { background: none; border: none; color: var(--text-muted); font-size: 12px; cursor: pointer; padding: 4px; text-align: center; }
   .install-banner-close:hover { color: var(--text-main); text-decoration: underline; }
-  .install-banner-ios-steps {
-    display: flex; align-items: center; gap: 4px; font-size: 12px; color: var(--text-muted); margin-top: 4px;
-  }
-  .install-banner-ios-steps i { color: var(--primary); }
 
-  @media (max-width: 480px) {
-    .install-banner { left: 12px; right: 12px; padding: 14px; gap: 10px; }
-    .install-banner-icon { width: 44px; height: 44px; }
-    .install-banner-btn { padding: 8px 12px; font-size: 12.5px; }
-  }
-
-  @media (max-width: 768px) {
-    .hide-mobile { display: none !important; }
-    .btn { padding: 10px; border-radius: 8px; }
-    .btn i { margin: 0; font-size: 16px; }
-    .grid { grid-template-columns: 1fr; }
-    .form-row { flex-direction: column; gap: 0; }
-  }
+  @media (max-width: 480px) { .install-banner { left: 12px; right: 12px; padding: 14px; gap: 10px; } .install-banner-icon { width: 44px; height: 44px; } .install-banner-btn { padding: 8px 12px; font-size: 12.5px; } }
+  @media (max-width: 768px) { .hide-mobile { display: none !important; } .btn { padding: 10px; border-radius: 8px; } .btn i { margin: 0; font-size: 16px; } .grid { grid-template-columns: 1fr; } .form-row { flex-direction: column; gap: 0; } .share-banner { padding: 20px; } .share-banner-title { font-size: 16px; } }
 </style>
 </head>
 <body>
@@ -327,7 +392,7 @@
   <div class="nav-actions">
     <div class="lang-dropdown">
       <button class="btn btn-outline" id="btn-lang-dropdown">
-        <i class="fa-solid fa-globe"></i> 
+        <i class="fa-solid fa-globe"></i>
         <span class="hide-mobile" id="lang-label">FR</span>
         <i class="fa-solid fa-chevron-down" style="font-size:10px; margin-left:2px"></i>
       </button>
@@ -336,7 +401,6 @@
         <button data-lang="en">English</button>
       </div>
     </div>
-    
     <button class="btn btn-outline" id="btn-auth"><i class="fa-solid fa-user"></i> <span class="hide-mobile" id="auth-label" data-i18n="login">Connexion</span></button>
     <button class="btn btn-primary" id="btn-add-modal"><i class="fa-solid fa-plus"></i> <span class="hide-mobile" data-i18n="add">Ajouter</span></button>
   </div>
@@ -371,20 +435,54 @@
         <button class="filter-pill" data-val="likes"><i class="fa-solid fa-heart" style="color:var(--primary); font-size:12px"></i> Plus populaires</button>
       </div>
     </div>
+
     <div class="filter-group">
       <div class="filter-title" data-i18n="color">Couleur</div>
       <div class="pill-group" id="color-group">
         <button class="filter-pill active" data-val="all" data-i18n="color_all">Toutes les couleurs</button>
-        <button class="filter-pill" data-val="Rouge"><i class="color-dot" style="background:#ef4444"></i> <span data-i18n="color_red">Rouge</span></button>
-        <button class="filter-pill" data-val="Jaune"><i class="color-dot" style="background:#eab308"></i> <span data-i18n="color_yellow">Jaune</span></button>
-        <button class="filter-pill" data-val="Noire"><i class="color-dot" style="background:#4b5563"></i> <span data-i18n="color_black">Noire</span></button>
-        <button class="filter-pill" data-val="Verte"><i class="color-dot" style="background:#22c55e"></i> <span data-i18n="color_green">Verte</span></button>
-        <button class="filter-pill" data-val="Orange"><i class="color-dot" style="background:#f97316"></i> <span data-i18n="color_orange">Orange</span></button>
-        <button class="filter-pill" data-val="Rose"><i class="color-dot" style="background:#ec4899"></i> <span data-i18n="color_pink">Rose</span></button>
-        <button class="filter-pill" data-val="Blanche"><i class="color-dot" style="background:#f9fafb; border:1px solid #d1d5db"></i> <span data-i18n="color_white">Blanche</span></button>
-        <button class="filter-pill" data-val="Bicolore"><i class="color-dot" style="background:linear-gradient(135deg, #ef4444 50%, #eab308 50%)"></i> <span data-i18n="color_bicolor">Bicolore</span></button>
+
+        <!-- Couleurs existantes -->
+        <button class="filter-pill" data-val="Rouge">
+          <i class="color-dot" style="background:#ef4444"></i> <span data-i18n="color_red">Rouge</span>
+        </button>
+        <button class="filter-pill" data-val="Jaune">
+          <i class="color-dot" style="background:#eab308"></i> <span data-i18n="color_yellow">Jaune</span>
+        </button>
+        <button class="filter-pill" data-val="Noire">
+          <i class="color-dot" style="background:#4b5563"></i> <span data-i18n="color_black">Noire</span>
+        </button>
+        <button class="filter-pill" data-val="Verte">
+          <i class="color-dot" style="background:#22c55e"></i> <span data-i18n="color_green">Verte</span>
+        </button>
+        <button class="filter-pill" data-val="Orange">
+          <i class="color-dot" style="background:#f97316"></i> <span data-i18n="color_orange">Orange</span>
+        </button>
+        <button class="filter-pill" data-val="Rose">
+          <i class="color-dot" style="background:#ec4899"></i> <span data-i18n="color_pink">Rose</span>
+        </button>
+        <button class="filter-pill" data-val="Blanche">
+          <i class="color-dot" style="background:#f9fafb; border:1px solid #d1d5db"></i> <span data-i18n="color_white">Blanche</span>
+        </button>
+        <button class="filter-pill" data-val="Bicolore">
+          <i class="color-dot" style="background:linear-gradient(135deg,#ef4444 50%,#eab308 50%)"></i> <span data-i18n="color_bicolor">Bicolore</span>
+        </button>
+
+        <!-- Nouvelles couleurs -->
+        <button class="filter-pill" data-val="Violette">
+          <i class="color-dot" style="background:#7c3aed"></i> <span data-i18n="color_purple">Violette</span>
+        </button>
+        <button class="filter-pill" data-val="Bordeaux">
+          <i class="color-dot" style="background:#7f1d1d"></i> <span data-i18n="color_bordeaux">Bordeaux</span>
+        </button>
+        <button class="filter-pill" data-val="Crème">
+          <i class="color-dot" style="background:#d4a96a; border:1px solid #c9955a"></i> <span data-i18n="color_cream">Crème</span>
+        </button>
+        <button class="filter-pill" data-val="Rayée">
+          <i class="color-dot" style="background:repeating-linear-gradient(135deg,#22c55e 0px,#22c55e 4px,#eab308 4px,#eab308 8px)"></i> <span data-i18n="color_striped">Rayée / Striée</span>
+        </button>
       </div>
     </div>
+
     <div class="filter-group">
       <div class="filter-title" data-i18n="country_filter">Pays</div>
       <select class="country-select" id="country-filter-select">
@@ -395,10 +493,10 @@
 </div>
 
 <div class="grid" id="tomatoes-grid">
-  <!-- JavaScript -->
+  <!-- Rempli par JavaScript -->
 </div>
 
-<!-- Bannière d'installation PWA -->
+<!-- Bannière PWA -->
 <div class="install-banner" id="install-banner">
   <img src="icon.svg" alt="TomatoList" class="install-banner-icon">
   <div class="install-banner-body">
@@ -422,7 +520,7 @@
   </div>
 </footer>
 
-<!-- Detail Modal (fiche produit) -->
+<!-- Detail Modal -->
 <div class="modal-overlay" id="detail-modal">
   <div class="modal detail-modal">
     <div class="modal-header" style="position:absolute; top:12px; right:12px; left:auto; border:none; padding:0; background:transparent; z-index:20;">
@@ -437,16 +535,13 @@
     <div class="modal-body">
       <div class="modal-title" id="detail-title" style="margin-bottom:12px;"></div>
       <div class="card-meta" id="detail-meta" style="margin-bottom:20px;"></div>
-
       <div class="detail-section-title" data-i18n="t_desc">Description / Histoire</div>
       <p class="detail-desc" id="detail-desc">-</p>
-
       <div class="detail-actions">
         <button class="btn btn-outline btn-sm" id="detail-share-btn"><i class="fa-solid fa-share-nodes"></i> <span data-i18n="share">Partager</span></button>
         <button class="btn btn-outline btn-sm" id="detail-edit-btn" style="display:none"><i class="fa-solid fa-pen"></i> <span data-i18n="edit">Modifier</span></button>
         <button class="btn btn-danger btn-sm" id="detail-delete-btn" style="display:none"><i class="fa-solid fa-trash"></i> <span data-i18n="delete">Supprimer</span></button>
       </div>
-
       <div class="card-footer">
         <div class="card-footer-left" id="detail-author"></div>
         <div style="display:flex; gap:12px; align-items:center;">
@@ -457,12 +552,10 @@
           </button>
         </div>
       </div>
-
       <div id="detail-contributors" style="display:none; margin-top:14px; padding-top:14px; border-top:1px solid var(--line);">
         <div class="detail-section-title" style="margin-bottom:10px;">Contributeurs</div>
         <div id="detail-contributors-list" style="display:flex; flex-wrap:wrap; gap:8px;"></div>
       </div>
-
       <div id="similar-block" style="margin-top:22px; display:none;">
         <div class="detail-section-title" data-i18n="similar_title">Tomates similaires</div>
         <div class="similar-grid" id="similar-grid"></div>
@@ -528,9 +621,7 @@
         </div>
         <input type="text" class="form-control" id="f-contributor-name" placeholder="Votre prénom et nom">
       </div>
-      
       <input type="file" id="file-input" accept="image/*" multiple style="display:none">
-      
       <label class="field-label" style="margin-bottom:8px">Photos de la variété *</label>
       <div class="upload-gallery" id="upload-gallery">
         <div class="add-img-btn" id="btn-add-img">
@@ -538,7 +629,6 @@
           <span>Ajouter</span>
         </div>
       </div>
-
       <div class="pref-block">
         <div class="pref-block-text">
           <div class="pref-block-title" data-i18n="anon_title">Publier en anonyme</div>
@@ -546,12 +636,10 @@
         </div>
         <button class="toggle on" id="toggle-anon" type="button"></button>
       </div>
-
       <div class="form-group">
         <label data-i18n="t_name">Nom de la variété *</label>
         <input type="text" class="form-control" id="f-name" required>
       </div>
-
       <div class="form-row">
         <div class="form-group">
           <label data-i18n="t_color">Couleur dominante *</label>
@@ -564,6 +652,10 @@
             <option value="Rose" data-i18n="color_pink">Rose</option>
             <option value="Blanche" data-i18n="color_white">Blanche</option>
             <option value="Bicolore" data-i18n="color_bicolor">Bicolore / Bigarrée</option>
+            <option value="Violette" data-i18n="color_purple">Violette / Mauve</option>
+            <option value="Bordeaux" data-i18n="color_bordeaux">Bordeaux / Brun</option>
+            <option value="Crème" data-i18n="color_cream">Crème / Beige</option>
+            <option value="Rayée" data-i18n="color_striped">Rayée / Striée</option>
           </select>
         </div>
         <div class="form-group">
@@ -581,7 +673,6 @@
           </div>
         </div>
       </div>
-
       <div class="form-row">
         <div class="form-group">
           <label data-i18n="t_weight">Poids moyen (g)</label>
@@ -599,12 +690,10 @@
           </select>
         </div>
       </div>
-
       <div class="form-group">
         <label data-i18n="t_desc">Description / Histoire</label>
         <textarea class="form-control" id="f-desc" rows="4"></textarea>
       </div>
-
       <button class="btn btn-primary" style="width:100%; justify-content:center; padding:16px; font-size:16px;" id="btn-submit">
         <div class="btn-progress-fill" id="progress-fill"></div>
         <span id="btn-submit-label" data-i18n="submit">Publier la variété</span>
@@ -617,9 +706,9 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.17.0/firebase-app.js";
 import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.17.0/firebase-auth.js";
 import { getDatabase, ref, onValue, push, get, update, remove } from "https://www.gstatic.com/firebasejs/12.17.0/firebase-database.js";
-import { sortTomatoes, similarTomatoes } from "./algo.js";
+import { sortTomatoes, similarTomatoes, recordClick, getClickData } from "./algo.js";
 
-// Coordonnées approximatives (lat, lon) des pays disponibles dans pays.json — pour la carte du monde
+// Coordonnées approximatives (lat, lon) par code pays ISO
 const COUNTRY_COORDS = {
   af:[34,66], za:[-29,24], al:[41,20], dz:[28,3], de:[51,10], ad:[42.5,1.5], ao:[-12,18], ag:[17.1,-61.8], sa:[24,45], ar:[-34,-64], am:[40.1,45], au:[-25,133], at:[47.5,14], az:[40.4,47.6], bs:[24.3,-76], bh:[26,50.5], bd:[24,90], bb:[13.2,-59.6], be:[50.8,4.3], bz:[17.2,-88.5], bt:[27.5,90.4], mm:[21,96], by:[53.5,28], bo:[-17,-65], ba:[44,17.8], bw:[-22,24], bn:[4.5,114.7], br:[-10,-55], bg:[42.7,25], bf:[12.4,-1.5], bi:[-3.4,29.9], bj:[9.3,2.3], kh:[12.5,105], cm:[5.5,12.5], ca:[56,-106], cv:[16,-24], cl:[-35,-71], cn:[35,103], cy:[35,33], co:[4,-72], km:[-11.9,43.3], cg:[-0.5,15.8], cd:[-2.9,23.6], kp:[40,127], kr:[36.5,127.8], cr:[9.7,-83.8], hr:[45.1,15.2], cu:[21.5,-79.5], ci:[7.5,-5.5], dk:[56,10], dj:[11.8,42.6], dm:[15.4,-61.4], es:[40,-3.7], ee:[58.6,25], sz:[-26.5,31.5], fj:[-17.7,178], fi:[64,26], fr:[46.6,2.2], ga:[-0.8,11.6], gm:[13.4,-15.5], gh:[7.9,-1], gd:[12.1,-61.7], gr:[39,22], gt:[15.5,-90.2], gn:[10.6,-10.7], gq:[1.6,10.6], gw:[12,-15], gy:[5,-59], ge:[42.3,43.4], ht:[19,-72.3], hn:[15,-86.5], hu:[47.2,19.5], in:[21,78], id:[-2,118], iq:[33.2,43.7], ir:[32,53.7], ie:[53.4,-8], is:[65,-19], il:[31,34.8], it:[42.8,12.8], jm:[18.1,-77.3], jp:[36.2,138.3], jo:[31,36], kz:[48,66.9], ke:[0.5,37.9], kg:[41.2,74.8], ki:[1.4,173], kw:[29.3,47.5], la:[19.9,102.5], ls:[-29.6,28.2], lv:[56.9,24.6], lb:[33.9,35.9], lr:[6.4,-9.4], ly:[26.3,17.2], li:[47.2,9.5], lt:[55.2,23.9], lu:[49.8,6.1], mk:[41.6,21.7], mg:[-18.8,47], my:[4.2,101.9], mw:[-13.3,34.3], mv:[3.2,73], ml:[17,-4], mt:[35.9,14.4], ma:[31.8,-7.1], mu:[-20.3,57.6], mr:[20.3,-10.3], mx:[23,-102], fm:[6.9,158.2], md:[47.4,28.4], mc:[43.7,7.4], mn:[46.9,103.8], me:[42.7,19.4], mz:[-18.7,35.5], na:[-22.9,17], nr:[-0.5,166.9], ni:[12.9,-85.2], ne:[17.6,8], ng:[9.1,8.7], no:[61,8.5], nz:[-41,174], np:[28.2,84.2], om:[21,57], ug:[1.4,32.3], uz:[41.4,64.6], pk:[30,70], pw:[7.5,134.6], ps:[31.9,35.2], pa:[8.5,-80.8], pg:[-6.3,143.9], py:[-23.4,-58.4], nl:[52.2,5.3], ph:[13,122], pl:[52,19.4], pt:[39.4,-8.2], pe:[-9.2,-75], qa:[25.3,51.2], ro:[45.9,25], gb:[54,-2], ru:[61,105], rw:[-1.9,29.9], cf:[6.6,20.9], do:[18.7,-70.2], kn:[17.3,-62.7], sm:[43.9,12.5], vc:[13,-61.2], lc:[13.9,-61], sv:[13.8,-88.9], ws:[-13.8,-172], st:[0.2,6.6], rs:[44,21], sc:[-4.7,55.5], sl:[8.5,-11.8], sg:[1.35,103.8], sk:[48.7,19.5], si:[46.1,14.8], so:[5.2,46.2], sd:[15.6,32.5], ss:[7,30], lk:[7.9,80.8], ch:[46.8,8.2], sr:[4,-56], se:[62,15], sy:[35,38.5], sn:[14.5,-14.5], tj:[38.9,71.3], tz:[-6.4,34.9], tw:[23.7,121], td:[15.5,19], cz:[49.8,15.5], th:[15,101], tl:[-8.9,125.7], tg:[8.6,0.8], to:[-21.2,-175.2], tt:[10.7,-61.2], tn:[34,9], tm:[38.9,59.6], tr:[39,35], tv:[-7.5,178.7], ua:[49,32], uy:[-32.5,-56], vu:[-16,167.5], va:[41.9,12.45], ve:[8,-66], vn:[16,106], ye:[15.6,48], zm:[-13.1,27.9], zw:[-19,30], eg:[26.8,30.8], ae:[24,54], ec:[-1.8,-78.2], er:[15.2,39.8], us:[39,-98], et:[9.1,40.5], mh:[7.1,171.2], sb:[-9.6,160.2]
 };
@@ -644,24 +733,34 @@ const db = getDatabase(app);
 let tomatoesData = [];
 let countriesList = [];
 let currentUser = null;
-let currentProfile = null; // Contiendra {firstname, lastname, favoriteColors...}
-let currentImagesData = []; // Tableau de base64
+let currentProfile = null;
+let currentImagesData = [];
 
 let currentSort = 'date';
 let currentColor = 'all';
 let currentCountry = 'all';
-let isAnon = true; // Toggle Anonyme activé par défaut
-let editingTomatoId = null; // null = création, sinon id de la tomate en cours d'édition
-let editOwnerUid = null; // uid de l'auteur initial de la tomate en cours d'édition (null si inconnu/anonyme)
-let hasFirstData = false; // pour savoir si on doit encore afficher le squelette
+let isAnon = true;
+let editingTomatoId = null;
+let editOwnerUid = null;
+let hasFirstData = false;
 
 let currentLang = localStorage.getItem('tl_lang') || (navigator.language || 'fr').slice(0,2);
 let TRANSLATIONS = {};
 
+// ── colorMap étendu avec les nouvelles couleurs ──────────────────────────────
 const colorMap = {
-  'Rouge': '#ef4444', 'Jaune': '#eab308', 'Noire': '#4b5563',
-  'Verte': '#22c55e', 'Orange': '#f97316', 'Rose': '#ec4899',
-  'Blanche': '#f9fafb', 'Bicolore': 'linear-gradient(135deg, #ef4444 50%, #eab308 50%)'
+  'Rouge':    '#ef4444',
+  'Jaune':    '#eab308',
+  'Noire':    '#4b5563',
+  'Verte':    '#22c55e',
+  'Orange':   '#f97316',
+  'Rose':     '#ec4899',
+  'Blanche':  '#f9fafb',
+  'Bicolore': 'linear-gradient(135deg, #ef4444 50%, #eab308 50%)',
+  'Violette': '#7c3aed',
+  'Bordeaux': '#7f1d1d',
+  'Crème':    '#d4a96a',
+  'Rayée':    'repeating-linear-gradient(135deg,#22c55e 0px,#22c55e 6px,#eab308 6px,#eab308 12px)',
 };
 
 function showToast(msg, icon = 'fa-circle-info') {
@@ -673,7 +772,7 @@ function showToast(msg, icon = 'fa-circle-info') {
   setTimeout(() => { if (toast.parentNode) toast.remove(); }, 3500);
 }
 
-// ----------------- LANGUE & UI -----------------
+// ─── LANGUE & UI ──────────────────────────────────────────────────────────────
 async function loadTranslations() {
   try {
     const res = await fetch('lang.json');
@@ -683,12 +782,12 @@ async function loadTranslations() {
 }
 function tr(key) { return (TRANSLATIONS[currentLang] && TRANSLATIONS[currentLang][key]) || (TRANSLATIONS.fr && TRANSLATIONS.fr[key]) || key; }
 
-// Les valeurs stockées en base (color, averageSize) sont en français, alors que les clés
-// de langue sont en anglais (color_red, size_cherry...) : ces tables font la correspondance.
 const COLOR_KEY_MAP = {
   'rouge': 'color_red', 'jaune': 'color_yellow', 'noire': 'color_black',
   'verte': 'color_green', 'orange': 'color_orange', 'rose': 'color_pink',
-  'blanche': 'color_white', 'bicolore': 'color_bicolor'
+  'blanche': 'color_white', 'bicolore': 'color_bicolor',
+  'violette': 'color_purple', 'bordeaux': 'color_bordeaux',
+  'crème': 'color_cream', 'creme': 'color_cream', 'rayée': 'color_striped', 'rayee': 'color_striped'
 };
 const SIZE_KEY_MAP = {
   'cerise': 'size_cherry', 'petite': 'size_small', 'moyenne': 'size_medium',
@@ -706,8 +805,7 @@ function trSize(size) {
 }
 function applyI18n() {
   document.querySelectorAll('[data-i18n]').forEach(el => {
-    if(el.tagName === 'SPAN' && el.classList.contains('hide-mobile')) el.textContent = tr(el.getAttribute('data-i18n'));
-    else el.textContent = tr(el.getAttribute('data-i18n'));
+    el.textContent = tr(el.getAttribute('data-i18n'));
   });
   document.getElementById('lang-label').textContent = currentLang.toUpperCase();
 }
@@ -727,25 +825,18 @@ document.addEventListener('click', (e) => {
   if (!e.target.closest('.custom-select-wrapper')) document.getElementById('f-country-menu').classList.remove('active');
 });
 
-// ----------------- SQUELETTE DE CHARGEMENT -----------------
+// ─── SQUELETTE DE CHARGEMENT ──────────────────────────────────────────────────
 function renderSkeleton(count = 6) {
   const grid = document.getElementById('tomatoes-grid');
   let html = '';
   for (let i = 0; i < count; i++) {
-    html += `
-      <div class="skeleton-card">
-        <div class="skeleton-img"></div>
-        <div class="skeleton-line"></div>
-        <div class="skeleton-line short"></div>
-        <div class="skeleton-line" style="margin-bottom:20px"></div>
-      </div>
-    `;
+    html += `<div class="skeleton-card"><div class="skeleton-img"></div><div class="skeleton-line"></div><div class="skeleton-line short"></div><div class="skeleton-line" style="margin-bottom:20px"></div></div>`;
   }
   grid.innerHTML = html;
 }
 renderSkeleton();
 
-// ----------------- PAYS -----------------
+// ─── PAYS ─────────────────────────────────────────────────────────────────────
 async function loadCountries() {
   try {
     const res = await fetch('pays.json');
@@ -757,7 +848,7 @@ async function loadCountries() {
 function renderCountryFilterOptions() {
   const sel = document.getElementById('country-filter-select');
   const current = sel.value || 'all';
-  sel.innerHTML = `<option value="all" data-i18n="country_all">${tr('country_all')}</option>` +
+  sel.innerHTML = `<option value="all">${tr('country_all')}</option>` +
     countriesList.map(c => `<option value="${c.name}">${c.name}</option>`).join('');
   sel.value = current;
 }
@@ -785,8 +876,7 @@ document.getElementById('f-country-btn').onclick = (e) => {
 };
 document.getElementById('f-country-search').oninput = (e) => renderCountryList(e.target.value);
 
-
-// ----------------- FILTRES -----------------
+// ─── FILTRES ──────────────────────────────────────────────────────────────────
 document.getElementById('btn-toggle-filters').onclick = () => document.getElementById('filters-panel').classList.toggle('active');
 document.querySelectorAll('#sort-group .filter-pill').forEach(btn => {
   btn.onclick = (e) => {
@@ -809,22 +899,18 @@ document.getElementById('country-filter-select').onchange = (e) => {
   renderGrid();
 };
 
-// ----------------- AUTHENTIFICATION & TOGGLE ANONYME -----------------
+// ─── AUTHENTIFICATION & TOGGLE ANONYME ────────────────────────────────────────
 const anonToggle = document.getElementById('toggle-anon');
 
 onAuthStateChanged(auth, async (user) => {
   currentUser = user;
   const authLabel = document.getElementById('auth-label');
   const btnAuth = document.getElementById('btn-auth');
-  
   if (user) {
     authLabel.textContent = tr('logout') || "Déconnexion";
     btnAuth.onclick = () => { signOut(auth); showToast('Déconnexion réussie', 'fa-check'); };
     const snap = await get(ref(db, `users/${user.uid}/profile`));
-    if (snap.exists()) {
-      currentProfile = snap.val();
-    }
-    // L'utilisateur peut choisir d'enlever l'anonymat
+    if (snap.exists()) currentProfile = snap.val();
     isAnon = true;
     anonToggle.classList.add('on');
     anonToggle.style.opacity = '1';
@@ -833,7 +919,6 @@ onAuthStateChanged(auth, async (user) => {
     authLabel.textContent = tr('login') || "Connexion";
     btnAuth.onclick = () => window.location.href = 'auth.html';
     currentProfile = null;
-    // Forcé anonyme
     isAnon = true;
     anonToggle.classList.add('on');
     anonToggle.style.opacity = '0.5';
@@ -843,46 +928,35 @@ onAuthStateChanged(auth, async (user) => {
 });
 
 anonToggle.onclick = () => {
-  if (!currentUser) {
-    showToast("Connectez-vous pour publier avec votre nom.", "fa-lock");
-    return;
-  }
+  if (!currentUser) { showToast("Connectez-vous pour publier avec votre nom.", "fa-lock"); return; }
   isAnon = !isAnon;
   anonToggle.classList.toggle('on', isAnon);
 };
 
-// ----------------- LECTURE DES DONNÉES & GRID -----------------
-// ----------------- Compteur de variétés (animé, basé sur les vraies données) -----------------
+// ─── COMPTEUR ANIMÉ ───────────────────────────────────────────────────────────
 let varietyCounterCurrentValue = 0;
 let varietyCounterRAF = null;
 
 function updateVarietyCounter(target) {
   const el = document.getElementById('variety-counter-num');
   if (!el) return;
-
   const start = varietyCounterCurrentValue;
   const diff = target - start;
   if (diff === 0) return;
-
   if (varietyCounterRAF) cancelAnimationFrame(varietyCounterRAF);
-
-  const duration = 700; // ms
+  const duration = 700;
   const startTime = performance.now();
-
   function step(now) {
     const progress = Math.min((now - startTime) / duration, 1);
-    const eased = 1 - Math.pow(1 - progress, 3); // ease-out cubic
-    const value = Math.round(start + diff * eased);
-    el.textContent = value.toLocaleString(currentLang || 'fr');
-    if (progress < 1) {
-      varietyCounterRAF = requestAnimationFrame(step);
-    } else {
-      varietyCounterCurrentValue = target;
-    }
+    const eased = 1 - Math.pow(1 - progress, 3);
+    el.textContent = Math.round(start + diff * eased).toLocaleString(currentLang || 'fr');
+    if (progress < 1) { varietyCounterRAF = requestAnimationFrame(step); }
+    else { varietyCounterCurrentValue = target; }
   }
   varietyCounterRAF = requestAnimationFrame(step);
 }
 
+// ─── LECTURE DES DONNÉES ──────────────────────────────────────────────────────
 onValue(ref(db, 'tomatoes'), (snapshot) => {
   tomatoesData = [];
   snapshot.forEach(child => { tomatoesData.push({ id: child.key, ...child.val() }); });
@@ -893,11 +967,35 @@ onValue(ref(db, 'tomatoes'), (snapshot) => {
   maybeOpenSharedTomato();
 });
 
+// ─── BANDEAU DE PARTAGE ───────────────────────────────────────────────────────
+// Insère un bandeau dans la grille tous les 50 tomates
+function buildShareBannerHTML(index) {
+  return `
+    <div class="share-banner" role="complementary" aria-label="Partager TomatoList">
+      <div class="share-banner-left">
+        <div class="share-banner-emoji">🍅</div>
+        <div>
+          <div class="share-banner-title">Faites grandir la TomatoList&nbsp;!</div>
+          <div class="share-banner-sub">Plus on est de passionnés, plus la liste s'enrichit. Partagez le site avec vos amis jardiniers&nbsp;🌱</div>
+        </div>
+      </div>
+      <div class="share-banner-actions">
+        <button class="share-banner-btn primary" data-share-copy="true" id="share-copy-btn-${index}">
+          <i class="fa-solid fa-link"></i> Copier le lien
+        </button>
+        <button class="share-banner-btn secondary" data-share-native="true" id="share-native-btn-${index}">
+          <i class="fa-solid fa-share-nodes"></i> Partager
+        </button>
+      </div>
+    </div>
+  `;
+}
+
+// ─── RENDU DE LA GRILLE ───────────────────────────────────────────────────────
 function renderGrid() {
   const grid = document.getElementById('tomatoes-grid');
   const search = document.getElementById('search-input').value.toLowerCase();
 
-  // Filtrage
   let filtered = tomatoesData.filter(t => {
     const matchSearch = (t.name || '').toLowerCase().includes(search) || (t.country || '').toLowerCase().includes(search);
     const matchColor = currentColor === 'all' || t.color === currentColor;
@@ -905,7 +1003,6 @@ function renderGrid() {
     return matchSearch && matchColor && matchCountry;
   });
 
-  // Tri via Algo
   filtered = sortTomatoes(filtered, currentSort, currentProfile, currentUser ? currentUser.uid : null);
 
   if (filtered.length === 0) {
@@ -913,13 +1010,21 @@ function renderGrid() {
     return;
   }
 
-  grid.innerHTML = filtered.map(t => {
+  const BANNER_INTERVAL = 50; // Bandeau tous les N tomates
+  let htmlParts = [];
+  let bannerIndex = 0;
+
+  filtered.forEach((t, i) => {
+    // Insérer le bandeau AVANT la tomate n°50, 100, 150... (index 49, 99...)
+    if (i > 0 && i % BANNER_INTERVAL === 0) {
+      htmlParts.push(buildShareBannerHTML(bannerIndex++));
+    }
+
     const date = new Date(t.createdAt).toLocaleDateString(currentLang);
     const colorBg = colorMap[t.color] || '#ccc';
-    
     const likesCount = t.likes ? Object.keys(t.likes).length : 0;
     const isLiked = currentUser && t.likes && t.likes[currentUser.uid];
-    
+
     let countryBadge = '';
     if (t.country) {
       const countryObj = countriesList.find(c => c.name === t.country);
@@ -928,26 +1033,17 @@ function renderGrid() {
       }
     }
 
-    // Gestion de l'affichage des images : UNE SEULE image sur la carte (le carrousel complet est dans la fiche détail)
+    const imagesArray = t.imageURLs || (t.imageURL ? [t.imageURL] : []);
     let imagesHtml = '';
     let imgCountBadge = '';
-    const imagesArray = t.imageURLs || (t.imageURL ? [t.imageURL] : []);
-    
     if (imagesArray.length > 0) {
-      const firstUrl = imagesArray[0];
-      imagesHtml = `
-        <div class="card-img-wrapper">
-          <img src="${firstUrl}" class="card-img" alt="${t.name}" loading="lazy">
-        </div>
-      `;
-      if (imagesArray.length > 1) {
-        imgCountBadge = `<div class="img-count"><i class="fa-regular fa-images"></i> ${imagesArray.length}</div>`;
-      }
+      imagesHtml = `<div class="card-img-wrapper"><img src="${imagesArray[0]}" class="card-img" alt="${t.name}" loading="lazy"></div>`;
+      if (imagesArray.length > 1) imgCountBadge = `<div class="img-count"><i class="fa-regular fa-images"></i> ${imagesArray.length}</div>`;
     } else {
       imagesHtml = `<div class="card-img-wrapper" style="background:#eee"></div>`;
     }
 
-    return `
+    htmlParts.push(`
       <div class="card" data-id="${t.id}">
         <div style="position:relative">
           ${imagesHtml}
@@ -961,7 +1057,6 @@ function renderGrid() {
             ${countryBadge}
           </div>
           <div class="card-desc">${t.description || '-'}</div>
-          
           <div class="card-footer">
             <div class="card-footer-left ${t.uid ? 'author-link' : ''}" ${t.uid ? `data-author-uid="${t.uid}" data-author-name="${(t.author || 'Anonyme').replace(/"/g,'&quot;')}"` : ''}>
               <i class="fa-solid fa-user" style="color:var(--text-muted)"></i> ${t.author || 'Anonyme'}
@@ -976,49 +1071,82 @@ function renderGrid() {
           </div>
         </div>
       </div>
-    `;
-  }).join('');
+    `);
+  });
+
+  grid.innerHTML = htmlParts.join('');
+
+  // Attacher les événements sur les boutons des bandeaux de partage
+  grid.querySelectorAll('[data-share-copy]').forEach(btn => {
+    btn.onclick = async (e) => {
+      e.stopPropagation();
+      const url = window.location.origin + window.location.pathname;
+      try {
+        await navigator.clipboard.writeText(url);
+        showToast('Lien copié dans le presse-papier !', 'fa-link');
+      } catch (_) {
+        showToast(url, 'fa-link');
+      }
+    };
+  });
+  grid.querySelectorAll('[data-share-native]').forEach(btn => {
+    btn.onclick = async (e) => {
+      e.stopPropagation();
+      const url = window.location.origin + window.location.pathname;
+      if (navigator.share) {
+        try {
+          await navigator.share({ title: 'TomatoList', text: 'Découvrez des centaines de variétés de tomates 🍅', url });
+        } catch (_) {}
+      } else {
+        try {
+          await navigator.clipboard.writeText(url);
+          showToast('Lien copié !', 'fa-link');
+        } catch (_) {
+          showToast(url, 'fa-link');
+        }
+      }
+    };
+  });
 }
 
 document.getElementById('search-input').addEventListener('input', renderGrid);
 
+// ─── LIKES ────────────────────────────────────────────────────────────────────
 async function toggleLike(tomatoId) {
   if (!currentUser) return showToast('Connectez-vous pour ajouter aux favoris', 'fa-lock');
   const tomato = tomatoesData.find(t => t.id === tomatoId);
   if (!tomato) return;
-
   const isLiked = tomato.likes && tomato.likes[currentUser.uid];
   const updates = {};
   updates[`tomatoes/${tomatoId}/likes/${currentUser.uid}`] = isLiked ? null : true;
   updates[`users/${currentUser.uid}/likes/${tomatoId}`] = isLiked ? null : true;
-
   try { await update(ref(db), updates); } catch(err) { showToast("Erreur lors de l'action.", 'fa-triangle-exclamation'); }
 }
 
 document.getElementById('tomatoes-grid').addEventListener('click', async (e) => {
+  // Ne pas propager depuis les bandeaux de partage
+  if (e.target.closest('.share-banner')) return;
+
   const likeBtn = e.target.closest('.like-btn');
-  if (likeBtn) {
-    toggleLike(likeBtn.getAttribute('data-id'));
-    return;
-  }
+  if (likeBtn) { toggleLike(likeBtn.getAttribute('data-id')); return; }
+
   const authorLink = e.target.closest('.author-link');
-  if (authorLink) {
-    openAuthorModal(authorLink.getAttribute('data-author-uid'), authorLink.getAttribute('data-author-name'));
-    return;
-  }
+  if (authorLink) { openAuthorModal(authorLink.getAttribute('data-author-uid'), authorLink.getAttribute('data-author-name')); return; }
+
   const card = e.target.closest('.card');
-  if (card) {
-    openDetailModal(card.getAttribute('data-id'));
-  }
+  if (card) { openDetailModal(card.getAttribute('data-id')); }
 });
 
-// ----------------- MODAL DÉTAIL (Fiche produit) -----------------
+// ─── MODAL DÉTAIL ─────────────────────────────────────────────────────────────
 let detailCurrentId = null;
 
 function openDetailModal(tomatoId) {
   const t = tomatoesData.find(x => x.id === tomatoId);
   if (!t) return;
   detailCurrentId = tomatoId;
+
+  // ── Enregistrement du clic pour l'algorithme ──────────────────────────────
+  recordClick(t);
 
   const imagesArray = t.imageURLs || (t.imageURL ? [t.imageURL] : []);
   const carousel = document.getElementById('detail-carousel');
@@ -1046,14 +1174,8 @@ function openDetailModal(tomatoId) {
   const showNav = imagesArray.length > 1;
   prevBtn.style.display = showNav ? 'flex' : 'none';
   nextBtn.style.display = showNav ? 'flex' : 'none';
-
-  prevBtn.onclick = () => {
-    carousel.scrollBy({ left: -carousel.offsetWidth, behavior: 'smooth' });
-  };
-  nextBtn.onclick = () => {
-    carousel.scrollBy({ left: carousel.offsetWidth, behavior: 'smooth' });
-  };
-
+  prevBtn.onclick = () => carousel.scrollBy({ left: -carousel.offsetWidth, behavior: 'smooth' });
+  nextBtn.onclick = () => carousel.scrollBy({ left: carousel.offsetWidth, behavior: 'smooth' });
   carousel.onscroll = () => {
     if (imagesArray.length <= 1) return;
     const index = Math.round(carousel.scrollLeft / carousel.offsetWidth);
@@ -1066,12 +1188,9 @@ function openDetailModal(tomatoId) {
   let countryBadge = '';
   if (t.country) {
     const countryObj = countriesList.find(c => c.name === t.country);
-    if (countryObj) {
-      countryBadge = `<span class="badge"><img src="https://flagcdn.com/w20/${countryObj.code}.png" style="width:14px;border-radius:2px" alt=""> ${t.country}</span>`;
-    }
+    if (countryObj) countryBadge = `<span class="badge"><img src="https://flagcdn.com/w20/${countryObj.code}.png" style="width:14px;border-radius:2px" alt=""> ${t.country}</span>`;
   }
   const sizeLabel = trSize(t.averageSize);
-
   document.getElementById('detail-meta').innerHTML = `
     <span class="badge"><i class="color-dot" style="background:${colorBg}"></i> ${trColor(t.color)}</span>
     ${t.weight ? `<span class="badge"><i class="fa-solid fa-scale-balanced"></i> ${t.weight}g</span>` : ''}
@@ -1093,15 +1212,12 @@ function openDetailModal(tomatoId) {
 
   document.getElementById('detail-date').textContent = new Date(t.createdAt).toLocaleDateString(currentLang);
 
-  // Édition : accessible à tout le monde (avec ou sans compte)
-  // Suppression : réservée au propriétaire connecté
   const isOwner = currentUser && t.uid && currentUser.uid === t.uid;
   document.getElementById('detail-edit-btn').style.display = 'flex';
   document.getElementById('detail-delete-btn').style.display = isOwner ? 'flex' : 'none';
 
   renderContributors(t);
 
-  // Tomates similaires
   const similar = similarTomatoes(tomatoesData, t, 3);
   const similarBlock = document.getElementById('similar-block');
   if (similar.length > 0) {
@@ -1109,14 +1225,12 @@ function openDetailModal(tomatoId) {
     document.getElementById('similar-grid').innerHTML = similar.map(s => {
       const sImgs = s.imageURLs || (s.imageURL ? [s.imageURL] : []);
       const sImg = sImgs[0] || '';
-      return `
-        <div class="similar-card" data-id="${s.id}">
-          <div class="similar-card-imgwrap">
-            ${sImg ? `<img src="${sImg}" alt="${s.name}" loading="lazy">` : `<div class="no-img"><i class="fa-solid fa-image"></i></div>`}
-          </div>
-          <div class="similar-name">${s.name}</div>
+      return `<div class="similar-card" data-id="${s.id}">
+        <div class="similar-card-imgwrap">
+          ${sImg ? `<img src="${sImg}" alt="${s.name}" loading="lazy">` : `<div class="no-img"><i class="fa-solid fa-image"></i></div>`}
         </div>
-      `;
+        <div class="similar-name">${s.name}</div>
+      </div>`;
     }).join('');
     document.getElementById('similar-grid').querySelectorAll('.similar-card').forEach(card => {
       card.onclick = () => openDetailModal(card.getAttribute('data-id'));
@@ -1126,7 +1240,6 @@ function openDetailModal(tomatoId) {
   }
 
   refreshDetailLikeBtn();
-
   document.getElementById('detail-modal').classList.add('active');
   history.replaceState(null, '', `?tomato=${tomatoId}`);
 }
@@ -1142,9 +1255,7 @@ function refreshDetailLikeBtn() {
   document.getElementById('detail-like-count').textContent = likesCount;
 }
 
-document.getElementById('detail-like-btn').onclick = () => {
-  if (detailCurrentId) toggleLike(detailCurrentId);
-};
+document.getElementById('detail-like-btn').onclick = () => { if (detailCurrentId) toggleLike(detailCurrentId); };
 
 function closeDetailModal() {
   document.getElementById('detail-modal').classList.remove('active');
@@ -1152,32 +1263,29 @@ function closeDetailModal() {
   history.replaceState(null, '', window.location.pathname);
 }
 document.getElementById('close-detail-modal').onclick = closeDetailModal;
-document.getElementById('detail-modal').addEventListener('click', (e) => {
-  if (e.target.id === 'detail-modal') closeDetailModal();
-});
+document.getElementById('detail-modal').addEventListener('click', (e) => { if (e.target.id === 'detail-modal') closeDetailModal(); });
 
-// ----------------- PARTAGE -----------------
+// ─── PARTAGE ──────────────────────────────────────────────────────────────────
 document.getElementById('detail-share-btn').onclick = async () => {
   if (!detailCurrentId) return;
   const url = `${window.location.origin}${window.location.pathname}?tomato=${detailCurrentId}`;
+  if (navigator.share) {
+    try { await navigator.share({ title: 'TomatoList', text: document.getElementById('detail-title').textContent, url }); return; } catch(_) {}
+  }
   try {
     await navigator.clipboard.writeText(url);
-    showToast(tr('share_copied'), 'fa-link');
-  } catch (e) {
-    showToast(url, 'fa-link');
-  }
+    showToast(tr('share_copied') || 'Lien copié !', 'fa-link');
+  } catch (e) { showToast(url, 'fa-link'); }
 };
 
 function maybeOpenSharedTomato() {
   if (detailCurrentId) return;
   const params = new URLSearchParams(window.location.search);
   const id = params.get('tomato');
-  if (id && tomatoesData.find(t => t.id === id)) {
-    openDetailModal(id);
-  }
+  if (id && tomatoesData.find(t => t.id === id)) openDetailModal(id);
 }
 
-// ----------------- LIGHTBOX -----------------
+// ─── LIGHTBOX ─────────────────────────────────────────────────────────────────
 function openLightbox(url) {
   document.getElementById('lightbox-img').src = url;
   document.getElementById('lightbox-overlay').classList.add('active');
@@ -1187,23 +1295,14 @@ function closeLightbox() {
   document.getElementById('lightbox-img').src = '';
 }
 document.getElementById('lightbox-close').onclick = closeLightbox;
-document.getElementById('lightbox-overlay').addEventListener('click', (e) => {
-  if (e.target.id === 'lightbox-overlay') closeLightbox();
-});
+document.getElementById('lightbox-overlay').addEventListener('click', (e) => { if (e.target.id === 'lightbox-overlay') closeLightbox(); });
 
-// ----------------- CONTRIBUTEURS -----------------
-// Affiche les personnes ayant modifié la tomate (nom qu'elles ont saisi lors de l'édition)
+// ─── CONTRIBUTEURS ────────────────────────────────────────────────────────────
 function renderContributors(t) {
   const block = document.getElementById('detail-contributors');
   const list = document.getElementById('detail-contributors-list');
   const contributors = t.contributors ? Object.values(t.contributors).filter(c => c && c.name) : [];
-
-  if (contributors.length === 0) {
-    block.style.display = 'none';
-    list.innerHTML = '';
-    return;
-  }
-
+  if (contributors.length === 0) { block.style.display = 'none'; list.innerHTML = ''; return; }
   list.innerHTML = contributors.map(c => `
     <div class="contributor-chip" ${c.uid ? `data-uid="${c.uid}"` : ''} data-name="${c.name.replace(/"/g,'&quot;')}" style="${c.uid ? '' : 'cursor:default;'}">
       <span class="contributor-avatar">${c.name.charAt(0)}</span>
@@ -1216,7 +1315,7 @@ function renderContributors(t) {
   block.style.display = 'block';
 }
 
-// ----------------- PAGE / PROFIL AUTEUR -----------------
+// ─── PAGE AUTEUR ──────────────────────────────────────────────────────────────
 function openAuthorModal(uid, name) {
   if (!uid) return;
   const list = tomatoesData.filter(t => t.uid === uid);
@@ -1229,19 +1328,17 @@ function openAuthorModal(uid, name) {
       const imgs = t.imageURLs || (t.imageURL ? [t.imageURL] : []);
       const img = imgs[0] || '';
       const likesCount = t.likes ? Object.keys(t.likes).length : 0;
-      return `
-        <div class="card" data-id="${t.id}">
-          <div class="card-img-wrapper">${img ? `<img src="${img}" class="card-img" alt="${t.name}" loading="lazy">` : ''}</div>
-          <div class="card-body">
-            <h3 class="card-title">${t.name}</h3>
-            <div class="card-desc">${t.description || '-'}</div>
-            <div class="card-footer">
-              <span style="font-size:12px">${new Date(t.createdAt).toLocaleDateString(currentLang)}</span>
-              <span style="font-size:13px"><i class="fa-solid fa-heart" style="color:var(--primary)"></i> ${likesCount}</span>
-            </div>
+      return `<div class="card" data-id="${t.id}">
+        <div class="card-img-wrapper">${img ? `<img src="${img}" class="card-img" alt="${t.name}" loading="lazy">` : ''}</div>
+        <div class="card-body">
+          <h3 class="card-title">${t.name}</h3>
+          <div class="card-desc">${t.description || '-'}</div>
+          <div class="card-footer">
+            <span style="font-size:12px">${new Date(t.createdAt).toLocaleDateString(currentLang)}</span>
+            <span style="font-size:13px"><i class="fa-solid fa-heart" style="color:var(--primary)"></i> ${likesCount}</span>
           </div>
         </div>
-      `;
+      </div>`;
     }).join('');
     grid.querySelectorAll('.card').forEach(card => {
       card.onclick = () => {
@@ -1253,22 +1350,22 @@ function openAuthorModal(uid, name) {
   document.getElementById('author-modal').classList.add('active');
 }
 document.getElementById('close-author-modal').onclick = () => document.getElementById('author-modal').classList.remove('active');
-document.getElementById('author-modal').addEventListener('click', (e) => {
-  if (e.target.id === 'author-modal') document.getElementById('author-modal').classList.remove('active');
-});
+document.getElementById('author-modal').addEventListener('click', (e) => { if (e.target.id === 'author-modal') document.getElementById('author-modal').classList.remove('active'); });
 
-// ----------------- CARTE DU MONDE (zoom / pan / drapeaux) -----------------
+// ─── CARTE DU MONDE ───────────────────────────────────────────────────────────
 const mapViewport = document.getElementById('map-viewport');
 const mapInner = document.getElementById('map-inner');
-
 const mapState = { scale: 1, x: 0, y: 0, minScale: 1, maxScale: 8 };
 
 function applyMapTransform() {
   mapInner.style.transform = `translate(${mapState.x}px, ${mapState.y}px) scale(${mapState.scale})`;
+  // Counter-scale des pins : on inverse le zoom pour qu'ils restent visuellement constants
+  // On les réduit légèrement (facteur 0.75) pour qu'ils soient moins encombrants à fort zoom
+  const pinScale = Math.min(1, 0.75 / mapState.scale);
+  mapViewport.style.setProperty('--map-pin-scale', pinScale);
 }
 
 function clampMapPosition() {
-  // Empêche de faire glisser la carte complètement hors du cadre
   const vw = mapViewport.clientWidth;
   const vh = mapViewport.clientHeight;
   const scaledW = vw * mapState.scale;
@@ -1283,14 +1380,11 @@ function zoomMapAt(factor, clientX, clientY) {
   const rect = mapViewport.getBoundingClientRect();
   const originX = clientX !== undefined ? clientX - rect.left : rect.width / 2;
   const originY = clientY !== undefined ? clientY - rect.top : rect.height / 2;
-
   const newScale = Math.max(mapState.minScale, Math.min(mapState.maxScale, mapState.scale * factor));
   const realFactor = newScale / mapState.scale;
-
   mapState.x = originX - (originX - mapState.x) * realFactor;
   mapState.y = originY - (originY - mapState.y) * realFactor;
   mapState.scale = newScale;
-
   clampMapPosition();
   applyMapTransform();
 }
@@ -1300,14 +1394,13 @@ function resetMapView() {
   applyMapTransform();
 }
 
-// Molette souris = zoom centré sur le curseur
+// Molette
 mapViewport.addEventListener('wheel', (e) => {
   e.preventDefault();
-  const factor = e.deltaY < 0 ? 1.2 : 1 / 1.2;
-  zoomMapAt(factor, e.clientX, e.clientY);
+  zoomMapAt(e.deltaY < 0 ? 1.2 : 1 / 1.2, e.clientX, e.clientY);
 }, { passive: false });
 
-// Glisser-déposer (souris + doigt) via Pointer Events, + pincement à 2 doigts
+// Pointer events (drag + pinch)
 const activePointers = new Map();
 let dragStart = null;
 let pinchStartDist = null;
@@ -1321,68 +1414,44 @@ function midpoint(a, b) { return { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 }; }
 mapViewport.addEventListener('pointerdown', (e) => {
   mapViewport.setPointerCapture(e.pointerId);
   activePointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
-  if (activePointers.size === 1) {
-    dragStart = { x: e.clientX, y: e.clientY, origX: mapState.x, origY: mapState.y };
-    mapViewport.classList.add('grabbing');
-  } else if (activePointers.size === 2) {
+  if (activePointers.size === 1) { dragStart = { x: e.clientX, y: e.clientY, origX: mapState.x, origY: mapState.y }; mapViewport.classList.add('grabbing'); }
+  else if (activePointers.size === 2) {
     const [p1, p2] = getPointersArray();
-    pinchStartDist = dist(p1, p2);
-    pinchStartScale = mapState.scale;
-    pinchMidpoint = midpoint(p1, p2);
-    dragStart = null;
+    pinchStartDist = dist(p1, p2); pinchStartScale = mapState.scale; pinchMidpoint = midpoint(p1, p2); dragStart = null;
   }
 });
-
 mapViewport.addEventListener('pointermove', (e) => {
   if (!activePointers.has(e.pointerId)) return;
   activePointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
-
   if (activePointers.size === 2) {
     const [p1, p2] = getPointersArray();
     const newDist = dist(p1, p2);
-    if (pinchStartDist) {
-      const factor = (newDist / pinchStartDist) * pinchStartScale / mapState.scale;
-      zoomMapAt(factor, pinchMidpoint.x, pinchMidpoint.y);
-    }
+    if (pinchStartDist) { const factor = (newDist / pinchStartDist) * pinchStartScale / mapState.scale; zoomMapAt(factor, pinchMidpoint.x, pinchMidpoint.y); }
   } else if (dragStart && activePointers.size === 1) {
     mapState.x = dragStart.origX + (e.clientX - dragStart.x);
     mapState.y = dragStart.origY + (e.clientY - dragStart.y);
-    clampMapPosition();
-    applyMapTransform();
+    clampMapPosition(); applyMapTransform();
   }
 });
-
 function endMapPointer(e) {
-  activePointers.delete(e.pointerId);
-  mapViewport.classList.remove('grabbing');
-  if (activePointers.size < 2) { pinchStartDist = null; }
-  if (activePointers.size === 1) {
-    const [p] = getPointersArray();
-    dragStart = { x: p.x, y: p.y, origX: mapState.x, origY: mapState.y };
-  } else if (activePointers.size === 0) {
-    dragStart = null;
-  }
+  activePointers.delete(e.pointerId); mapViewport.classList.remove('grabbing');
+  if (activePointers.size < 2) pinchStartDist = null;
+  if (activePointers.size === 1) { const [p] = getPointersArray(); dragStart = { x: p.x, y: p.y, origX: mapState.x, origY: mapState.y }; }
+  else if (activePointers.size === 0) dragStart = null;
 }
 mapViewport.addEventListener('pointerup', endMapPointer);
 mapViewport.addEventListener('pointercancel', endMapPointer);
 mapViewport.addEventListener('pointerleave', (e) => { if (activePointers.has(e.pointerId)) endMapPointer(e); });
 
-// Boutons de zoom
 document.getElementById('map-zoom-in').onclick = () => zoomMapAt(1.4);
 document.getElementById('map-zoom-out').onclick = () => zoomMapAt(1 / 1.4);
 document.getElementById('map-zoom-reset').onclick = () => resetMapView();
-
-// Double-clic / double-tap = zoom rapide
 mapViewport.addEventListener('dblclick', (e) => zoomMapAt(1.6, e.clientX, e.clientY));
 
 function renderMap() {
   mapInner.querySelectorAll('.map-pin').forEach(d => d.remove());
-
   const counts = {};
-  tomatoesData.forEach(t => {
-    if (!t.country) return;
-    counts[t.country] = (counts[t.country] || 0) + 1;
-  });
+  tomatoesData.forEach(t => { if (!t.country) return; counts[t.country] = (counts[t.country] || 0) + 1; });
 
   Object.keys(counts).forEach(countryName => {
     const c = countriesList.find(x => x.name === countryName);
@@ -1410,46 +1479,30 @@ function renderMap() {
     });
     mapInner.appendChild(pin);
   });
+
+  // Appliquer le scale initial des pins
+  applyMapTransform();
 }
-document.getElementById('btn-open-map').onclick = () => {
-  renderMap();
-  resetMapView();
-  document.getElementById('map-modal').classList.add('active');
-};
+
+document.getElementById('btn-open-map').onclick = () => { renderMap(); resetMapView(); document.getElementById('map-modal').classList.add('active'); };
 document.getElementById('close-map-modal').onclick = () => document.getElementById('map-modal').classList.remove('active');
-document.getElementById('map-modal').addEventListener('click', (e) => {
-  if (e.target.id === 'map-modal') document.getElementById('map-modal').classList.remove('active');
-});
+document.getElementById('map-modal').addEventListener('click', (e) => { if (e.target.id === 'map-modal') document.getElementById('map-modal').classList.remove('active'); });
 
-
-
-// ----------------- PUBLICATION MULTI-IMAGES -----------------
+// ─── PUBLICATION MULTI-IMAGES ─────────────────────────────────────────────────
 const fileInput = document.getElementById('file-input');
 document.getElementById('btn-add-img').onclick = () => fileInput.click();
-
 fileInput.onchange = async (e) => {
   const files = Array.from(e.target.files);
   if (!files.length) return;
-  
-  const gallery = document.getElementById('upload-gallery');
-  const addBtn = document.getElementById('btn-add-img');
-  
-  for (const file of files) {
-    const base64 = await resizeImage(file);
-    addImageToGallery(base64);
-  }
+  for (const file of files) { const base64 = await resizeImage(file); addImageToGallery(base64); }
 };
-
 function addImageToGallery(value) {
   currentImagesData.push(value);
   const gallery = document.getElementById('upload-gallery');
   const addBtn = document.getElementById('btn-add-img');
   const div = document.createElement('div');
   div.className = 'upload-item';
-  div.innerHTML = `
-    <img src="${value}" alt="">
-    <button class="del-btn"><i class="fa-solid fa-xmark"></i></button>
-  `;
+  div.innerHTML = `<img src="${value}" alt=""><button class="del-btn"><i class="fa-solid fa-xmark"></i></button>`;
   div.querySelector('.del-btn').onclick = () => {
     const idx = currentImagesData.indexOf(value);
     if (idx > -1) currentImagesData.splice(idx, 1);
@@ -1457,7 +1510,6 @@ function addImageToGallery(value) {
   };
   gallery.insertBefore(div, addBtn);
 }
-
 function resizeImage(file) {
   return new Promise((resolve) => {
     const reader = new FileReader();
@@ -1465,15 +1517,14 @@ function resizeImage(file) {
       const img = new Image();
       img.onload = () => {
         const canvas = document.createElement('canvas');
-        let width = img.width; let height = img.height;
+        let width = img.width, height = img.height;
         const MAX = 1600;
         if (width > MAX || height > MAX) {
-          if (width > height) { height = Math.round((height * MAX)/width); width = MAX; }
-          else { width = Math.round((width * MAX)/height); height = MAX; }
+          if (width > height) { height = Math.round((height * MAX) / width); width = MAX; }
+          else { width = Math.round((width * MAX) / height); height = MAX; }
         }
         canvas.width = width; canvas.height = height;
-        const ctx = canvas.getContext('2d');
-        ctx.drawImage(img, 0, 0, width, height);
+        canvas.getContext('2d').drawImage(img, 0, 0, width, height);
         resolve(canvas.toDataURL('image/webp', 0.8));
       };
       img.src = ev.target.result;
@@ -1485,121 +1536,60 @@ function resizeImage(file) {
 document.getElementById('btn-submit').onclick = async () => {
   const name = document.getElementById('f-name').value.trim();
   const errBox = document.getElementById('form-error');
-  
   if (!name || currentImagesData.length === 0) {
     errBox.textContent = 'Nom de la variété et au moins une photo requis.';
-    errBox.style.display = 'block';
-    return;
+    errBox.style.display = 'block'; return;
   }
-
   const isOwnerEdit = editingTomatoId && currentUser && editOwnerUid && currentUser.uid === editOwnerUid;
   let contributorName = '';
   if (editingTomatoId && !isOwnerEdit) {
     contributorName = document.getElementById('f-contributor-name').value.trim();
-    if (!contributorName) {
-      errBox.textContent = 'Merci d\'indiquer votre prénom et nom pour valider la modification.';
-      errBox.style.display = 'block';
-      return;
-    }
+    if (!contributorName) { errBox.textContent = 'Merci d\'indiquer votre prénom et nom pour valider la modification.'; errBox.style.display = 'block'; return; }
   }
   errBox.style.display = 'none';
-  
   const fill = document.getElementById('progress-fill');
   const btn = document.getElementById('btn-submit');
-  
-  btn.disabled = true;
-  fill.style.width = '20%';
+  btn.disabled = true; fill.style.width = '20%';
 
   try {
     const urls = [];
-    const toUpload = currentImagesData.filter(v => v.startsWith('data:'));
     let i = 1;
-    // Upload de chaque nouvelle image (base64) séquentiellement vers GAS ; les URLs existantes sont conservées telles quelles
     for (const value of currentImagesData) {
       if (value.startsWith('data:')) {
-        const res = await fetch(GAS_URL, {
-          method: 'POST',
-          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-          body: JSON.stringify({
-            name: name.replace(/\s+/g, '_') + '_' + Date.now() + '_' + i + '.webp',
-            image: value
-          })
-        });
+        const res = await fetch(GAS_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ name: name.replace(/\s+/g, '_') + '_' + Date.now() + '_' + i + '.webp', image: value }) });
         const result = await res.json();
         if (!result.success) throw new Error("Upload failed");
         urls.push(result.url);
-        fill.style.width = (20 + (80 * i / (toUpload.length || 1))) + '%';
+        fill.style.width = (20 + (80 * i / (currentImagesData.filter(v => v.startsWith('data:')).length || 1))) + '%';
         i++;
-      } else {
-        urls.push(value);
-      }
+      } else { urls.push(value); }
     }
 
     if (editingTomatoId) {
-      // ----- MODE ÉDITION (accessible à tous, avec ou sans compte) -----
-      const updates = {
-        name: name,
-        color: document.getElementById('f-color').value,
-        imageURLs: urls,
-        weight: parseInt(document.getElementById('f-weight').value) || null,
-        averageSize: document.getElementById('f-size').value || null,
-        description: document.getElementById('f-desc').value || "",
-        country: document.getElementById('f-country-value').value || ""
-      };
+      const updates = { name, color: document.getElementById('f-color').value, imageURLs: urls, weight: parseInt(document.getElementById('f-weight').value) || null, averageSize: document.getElementById('f-size').value || null, description: document.getElementById('f-desc').value || "", country: document.getElementById('f-country-value').value || "" };
       if (!isOwnerEdit) {
-        // On garde une trace de qui a fait la modification (nom saisi, uid si connecté)
         const newContribRef = push(ref(db, `tomatoes/${editingTomatoId}/contributors`));
-        updates[`contributors/${newContribRef.key}`] = {
-          name: contributorName,
-          uid: currentUser ? currentUser.uid : null,
-          at: Date.now()
-        };
+        updates[`contributors/${newContribRef.key}`] = { name: contributorName, uid: currentUser ? currentUser.uid : null, at: Date.now() };
       }
       await update(ref(db, `tomatoes/${editingTomatoId}`), updates);
-
       fill.style.width = '100%';
-      setTimeout(() => {
-        document.getElementById('add-modal').classList.remove('active');
-        resetForm();
-        showToast(tr('update_done'), 'fa-seedling');
-      }, 400);
+      setTimeout(() => { document.getElementById('add-modal').classList.remove('active'); resetForm(); showToast(tr('update_done'), 'fa-seedling'); }, 400);
     } else {
-      // ----- MODE CRÉATION -----
       let authorName = "Anonyme";
-      if (!isAnon && currentUser && currentProfile) {
-        authorName = `${currentProfile.firstname} ${currentProfile.lastname}`.trim();
-      }
-
-      const tomatoData = {
-        name: name,
-        color: document.getElementById('f-color').value,
-        imageURLs: urls,
-        weight: parseInt(document.getElementById('f-weight').value) || null,
-        averageSize: document.getElementById('f-size').value || null,
-        description: document.getElementById('f-desc').value || "",
-        country: document.getElementById('f-country-value').value || "",
-        author: authorName,
-        uid: currentUser ? currentUser.uid : null,
-        createdAt: Date.now()
-      };
-
+      if (!isAnon && currentUser && currentProfile) authorName = `${currentProfile.firstname} ${currentProfile.lastname}`.trim();
+      const tomatoData = { name, color: document.getElementById('f-color').value, imageURLs: urls, weight: parseInt(document.getElementById('f-weight').value) || null, averageSize: document.getElementById('f-size').value || null, description: document.getElementById('f-desc').value || "", country: document.getElementById('f-country-value').value || "", author: authorName, uid: currentUser ? currentUser.uid : null, createdAt: Date.now() };
       await push(ref(db, 'tomatoes'), tomatoData);
-
       fill.style.width = '100%';
       setTimeout(() => { document.getElementById('add-modal').classList.remove('active'); resetForm(); showToast(tr('publish_success'), 'fa-seedling'); }, 500);
     }
-
   } catch(e) {
     errBox.textContent = "Erreur de connexion. L'image est-elle trop lourde ?";
-    errBox.style.display = 'block';
-    fill.style.width = '0%';
-    btn.disabled = false;
+    errBox.style.display = 'block'; fill.style.width = '0%'; btn.disabled = false;
   }
 };
 
 function resetForm() {
-  editingTomatoId = null;
-  editOwnerUid = null;
+  editingTomatoId = null; editOwnerUid = null;
   const contribBlock = document.getElementById('edit-contributor-note');
   if (contribBlock) contribBlock.style.display = 'none';
   const contribInput = document.getElementById('f-contributor-name');
@@ -1615,33 +1605,19 @@ function resetForm() {
   document.getElementById('f-country-btn').innerHTML = `<span>Sélectionner un pays...</span> <i class="fa-solid fa-chevron-down" style="color:var(--text-muted)"></i>`;
   document.getElementById('f-country-search').value = '';
   renderCountryList();
-  
   currentImagesData = [];
-  const gallery = document.getElementById('upload-gallery');
-  gallery.querySelectorAll('.upload-item').forEach(el => el.remove());
-  
+  document.getElementById('upload-gallery').querySelectorAll('.upload-item').forEach(el => el.remove());
   document.getElementById('progress-fill').style.width = '0%';
   document.getElementById('btn-submit').disabled = false;
   document.getElementById('form-error').style.display = 'none';
-  
-  // Réinitialiser le bouton anonyme en fonction de la connexion
-  if (!currentUser) {
-    isAnon = true;
-    anonToggle.classList.add('on');
-    anonToggle.style.opacity = '0.5';
-    anonToggle.style.cursor = 'not-allowed';
-  } else {
-    isAnon = true;
-    anonToggle.classList.add('on');
-  }
+  isAnon = true;
+  anonToggle.classList.add('on');
+  if (!currentUser) { anonToggle.style.opacity = '0.5'; anonToggle.style.cursor = 'not-allowed'; }
 }
 
 function isFormDirty() {
-  const name = document.getElementById('f-name').value.trim();
-  const desc = document.getElementById('f-desc').value.trim();
-  return !!name || !!desc || currentImagesData.length > 0;
+  return !!document.getElementById('f-name').value.trim() || !!document.getElementById('f-desc').value.trim() || currentImagesData.length > 0;
 }
-
 function closeAddModalWithConfirm() {
   if (isFormDirty() && !confirm(tr('leave_confirm'))) return;
   document.getElementById('add-modal').classList.remove('active');
@@ -1649,84 +1625,56 @@ function closeAddModalWithConfirm() {
 }
 
 function openEditModal(t) {
-  // Édition libre pour tous, avec ou sans compte. Seul l'auteur connecté peut supprimer.
-  editingTomatoId = t.id;
-  editOwnerUid = t.uid || null;
+  editingTomatoId = t.id; editOwnerUid = t.uid || null;
   const isOwner = currentUser && editOwnerUid && currentUser.uid === editOwnerUid;
-
   document.getElementById('add-modal-title').removeAttribute('data-i18n');
   document.getElementById('add-modal-title').textContent = tr('edit_title');
   document.getElementById('btn-submit-label').removeAttribute('data-i18n');
   document.getElementById('btn-submit-label').textContent = tr('save');
-
   document.getElementById('f-name').value = t.name || '';
   document.getElementById('f-color').value = t.color || 'Rouge';
   document.getElementById('f-weight').value = t.weight || '';
   document.getElementById('f-size').value = t.averageSize || '';
   document.getElementById('f-desc').value = t.description || '';
-
-  // Si ce n'est pas l'auteur connecté, on demande son nom pour l'afficher comme contributeur
   const contribBlock = document.getElementById('edit-contributor-note');
   const contribInput = document.getElementById('f-contributor-name');
   if (contribBlock) contribBlock.style.display = isOwner ? 'none' : 'block';
   if (contribInput) contribInput.value = (!isOwner && currentProfile) ? `${currentProfile.firstname || ''} ${currentProfile.lastname || ''}`.trim() : '';
-
   if (t.country) {
     const c = countriesList.find(x => x.name === t.country);
     document.getElementById('f-country-value').value = t.country;
-    if (c) {
-      document.getElementById('f-country-btn').innerHTML = `<div style="display:flex;align-items:center"><img src="https://flagcdn.com/w20/${c.code}.png" alt=""> <span>${t.country}</span></div> <i class="fa-solid fa-chevron-down" style="color:var(--text-muted)"></i>`;
-    }
+    if (c) document.getElementById('f-country-btn').innerHTML = `<div style="display:flex;align-items:center"><img src="https://flagcdn.com/w20/${c.code}.png" alt=""> <span>${t.country}</span></div> <i class="fa-solid fa-chevron-down" style="color:var(--text-muted)"></i>`;
   }
-
   currentImagesData = [];
   document.getElementById('upload-gallery').querySelectorAll('.upload-item').forEach(el => el.remove());
   const imgs = t.imageURLs || (t.imageURL ? [t.imageURL] : []);
   imgs.forEach(url => addImageToGallery(url));
-
   document.getElementById('detail-modal').classList.remove('active');
   document.getElementById('add-modal').classList.add('active');
 }
 
-document.getElementById('detail-edit-btn').onclick = () => {
-  const t = tomatoesData.find(x => x.id === detailCurrentId);
-  if (t) openEditModal(t);
-};
-
+document.getElementById('detail-edit-btn').onclick = () => { const t = tomatoesData.find(x => x.id === detailCurrentId); if (t) openEditModal(t); };
 document.getElementById('detail-delete-btn').onclick = async () => {
   if (!detailCurrentId) return;
   const t = tomatoesData.find(x => x.id === detailCurrentId);
-  if (!t || !currentUser || currentUser.uid !== t.uid) {
-    showToast(tr('not_owner'), 'fa-lock');
-    return;
-  }
+  if (!t || !currentUser || currentUser.uid !== t.uid) { showToast(tr('not_owner'), 'fa-lock'); return; }
   if (!confirm(tr('delete_confirm'))) return;
-  try {
-    await remove(ref(db, `tomatoes/${detailCurrentId}`));
-    closeDetailModal();
-    showToast(tr('delete_done'), 'fa-check');
-  } catch (e) {
-    showToast("Erreur lors de la suppression.", 'fa-triangle-exclamation');
-  }
+  try { await remove(ref(db, `tomatoes/${detailCurrentId}`)); closeDetailModal(); showToast(tr('delete_done'), 'fa-check'); }
+  catch (e) { showToast("Erreur lors de la suppression.", 'fa-triangle-exclamation'); }
 };
 
 document.getElementById('btn-add-modal').onclick = () => { editingTomatoId = null; resetForm(); document.getElementById('add-modal').classList.add('active'); };
 document.getElementById('close-modal').onclick = closeAddModalWithConfirm;
-document.getElementById('add-modal').addEventListener('click', (e) => {
-  if (e.target.id === 'add-modal') closeAddModalWithConfirm();
-});
+document.getElementById('add-modal').addEventListener('click', (e) => { if (e.target.id === 'add-modal') closeAddModalWithConfirm(); });
 
 loadTranslations();
 loadCountries();
 
-// ----------------- PWA : service worker -----------------
+// ─── PWA ──────────────────────────────────────────────────────────────────────
 if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('sw.js').catch(() => {});
-  });
+  window.addEventListener('load', () => { navigator.serviceWorker.register('sw.js').catch(() => {}); });
 }
 
-// ----------------- PWA : bannière d'installation -----------------
 (function initInstallBanner() {
   const banner = document.getElementById('install-banner');
   const subEl = document.getElementById('install-banner-sub');
@@ -1735,67 +1683,38 @@ if ('serviceWorker' in navigator) {
   const DISMISS_KEY = 'tl_install_dismissed_at';
   const DISMISS_DAYS = 7;
 
-  const isStandalone = window.matchMedia('(display-mode: standalone)').matches
-    || window.navigator.standalone === true; // iOS Safari
-  if (isStandalone) return; // déjà installée, on ne montre rien
+  const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+  if (isStandalone) return;
 
   const dismissedAt = parseInt(localStorage.getItem(DISMISS_KEY) || '0', 10);
-  const daysSinceDismiss = (Date.now() - dismissedAt) / 86400000;
-  if (dismissedAt && daysSinceDismiss < DISMISS_DAYS) return;
+  if (dismissedAt && (Date.now() - dismissedAt) / 86400000 < DISMISS_DAYS) return;
 
   const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
   let deferredPrompt = null;
 
-  function showBanner() {
-    banner.classList.add('visible');
-  }
-  function hideBanner() {
-    banner.classList.remove('visible');
-  }
+  const showBanner = () => banner.classList.add('visible');
+  const hideBanner = () => banner.classList.remove('visible');
 
-  btnClose.onclick = () => {
-    hideBanner();
-    localStorage.setItem(DISMISS_KEY, String(Date.now()));
-  };
+  btnClose.onclick = () => { hideBanner(); localStorage.setItem(DISMISS_KEY, String(Date.now())); };
 
   if (isIOS) {
-    // Safari iOS n'a pas d'API d'installation : on affiche les instructions manuelles
     subEl.innerHTML = tr('install_sub_ios') || 'Appuyez sur <i class="fa-solid fa-arrow-up-from-bracket"></i> puis "Sur l\'écran d\'accueil".';
     btnInstall.innerHTML = `<i class="fa-solid fa-arrow-up-from-bracket"></i> <span>${tr('install_ios_hint') || 'Voir comment'}</span>`;
-    btnInstall.onclick = () => {
-      // On ne peut pas déclencher l'installation en JS sur iOS : on met juste l'accent visuellement
-      subEl.style.color = 'var(--primary)';
-      subEl.style.fontWeight = '600';
-    };
+    btnInstall.onclick = () => { subEl.style.color = 'var(--primary)'; subEl.style.fontWeight = '600'; };
     setTimeout(showBanner, 2500);
     return;
   }
 
-  // Android / Chrome / Edge : on attend l'événement natif du navigateur
-  window.addEventListener('beforeinstallprompt', (e) => {
-    e.preventDefault();
-    deferredPrompt = e;
-    setTimeout(showBanner, 2000);
-  });
-
+  window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); deferredPrompt = e; setTimeout(showBanner, 2000); });
   btnInstall.onclick = async () => {
     if (!deferredPrompt) { hideBanner(); return; }
-    hideBanner();
-    deferredPrompt.prompt();
+    hideBanner(); deferredPrompt.prompt();
     const { outcome } = await deferredPrompt.userChoice;
-    if (outcome !== 'accepted') {
-      localStorage.setItem(DISMISS_KEY, String(Date.now()));
-    }
+    if (outcome !== 'accepted') localStorage.setItem(DISMISS_KEY, String(Date.now()));
     deferredPrompt = null;
   };
-
-  window.addEventListener('appinstalled', () => {
-    hideBanner();
-    localStorage.setItem(DISMISS_KEY, String(Date.now()));
-    showToast(tr('install_success') || 'TomatoList est installé !', 'fa-circle-check');
-  });
+  window.addEventListener('appinstalled', () => { hideBanner(); localStorage.setItem(DISMISS_KEY, String(Date.now())); showToast(tr('install_success') || 'TomatoList est installé !', 'fa-circle-check'); });
 })();
-
 </script>
 </body>
 </html>
