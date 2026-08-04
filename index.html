@@ -35,7 +35,8 @@
     --sans: 'Inter', sans-serif; --display: 'Space Grotesk', sans-serif;
   }
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-  body { background: var(--bg); color: var(--text-main); font-family: var(--sans); -webkit-font-smoothing: antialiased; overflow-x: hidden; }
+  body { background: linear-gradient(120deg, #fef2f2 0%, #ffffff 50%, #fee2e2 100%); background-size: 200% 200%; animation: gradientBG 15s ease-in-out infinite; color: var(--text-main); font-family: var(--sans); -webkit-font-smoothing: antialiased; overflow-x: hidden; }
+  @keyframes gradientBG { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
   a { text-decoration: none; color: inherit; }
   button, input, select, textarea { font-family: inherit; }
 
@@ -1816,18 +1817,32 @@ if ('serviceWorker' in navigator) {
   const DISMISS_DAYS = 7;
 
   const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
-  if (isStandalone) return;
+  if (isStandalone) {
+    localStorage.removeItem(DISMISS_KEY);
+    return;
+  }
 
   const dismissedAt = parseInt(localStorage.getItem(DISMISS_KEY) || '0', 10);
   if (dismissedAt && (Date.now() - dismissedAt) / 86400000 < DISMISS_DAYS) return;
 
-  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+  const userAgent = navigator.userAgent || navigator.vendor || window.opera;
+  const isIOS = /iPad|iPhone|iPod/.test(userAgent) && !window.MSStream;
+  const isInAppBrowser = /FBAN|FBAV|Instagram|LinkedIn|Twitter|Snapchat/i.test(userAgent);
+  
   let deferredPrompt = null;
 
   const showBanner = () => banner.classList.add('visible');
   const hideBanner = () => banner.classList.remove('visible');
 
   btnClose.onclick = () => { hideBanner(); localStorage.setItem(DISMISS_KEY, String(Date.now())); };
+
+  if (isInAppBrowser) {
+    subEl.innerHTML = 'Vous êtes dans un navigateur intégré. Ouvrez dans Safari/Chrome pour installer.';
+    btnInstall.innerHTML = `<i class="fa-solid fa-compass"></i> <span>Ouvrir</span>`;
+    btnInstall.onclick = () => { alert('Appuyez sur les 3 points du menu (en haut ou en bas) et choisissez "Ouvrir dans le navigateur" pour pouvoir installer l\'application.'); };
+    setTimeout(showBanner, 2000);
+    return;
+  }
 
   if (isIOS) {
     subEl.innerHTML = tr('install_sub_ios') || 'Appuyez sur <i class="fa-solid fa-arrow-up-from-bracket"></i> puis "Sur l\'écran d\'accueil".';
@@ -1845,7 +1860,7 @@ if ('serviceWorker' in navigator) {
     if (outcome !== 'accepted') localStorage.setItem(DISMISS_KEY, String(Date.now()));
     deferredPrompt = null;
   };
-  window.addEventListener('appinstalled', () => { hideBanner(); localStorage.setItem(DISMISS_KEY, String(Date.now())); showToast(tr('install_success') || 'TomatoList est installé !', 'fa-circle-check'); });
+  window.addEventListener('appinstalled', () => { hideBanner(); localStorage.removeItem(DISMISS_KEY); showToast(tr('install_success') || 'TomatoList est installé !', 'fa-circle-check'); });
 })();
 </script>
 </body>
