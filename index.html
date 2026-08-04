@@ -66,6 +66,9 @@
 
   /* Toolbar */
   .toolbar-wrap { max-width: 1200px; margin: 32px auto 24px; }
+  .variety-counter { display: flex; align-items: center; justify-content: center; gap: 8px; padding: 0 24px; margin-bottom: 20px; font-family: var(--display); font-size: 14px; font-weight: 600; color: var(--text-muted); letter-spacing: 0.02em; }
+  .variety-counter i { color: var(--primary); font-size: 13px; }
+  .variety-counter #variety-counter-num { font-size: 20px; font-weight: 700; color: var(--text-main); letter-spacing: -0.01em; }
   .toolbar { padding: 0 24px; display: flex; gap: 12px; margin-bottom: 16px; }
   .search-box { flex: 1; position: relative; }
   .search-box i { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: var(--text-muted); }
@@ -340,6 +343,11 @@
 </nav>
 
 <div class="toolbar-wrap">
+  <div class="variety-counter" id="variety-counter">
+    <i class="fa-solid fa-seedling"></i>
+    <span id="variety-counter-num">0</span>
+    <span id="variety-counter-label">variétés référencées</span>
+  </div>
   <div class="toolbar">
     <div class="search-box">
       <i class="fa-solid fa-magnifying-glass"></i>
@@ -845,10 +853,42 @@ anonToggle.onclick = () => {
 };
 
 // ----------------- LECTURE DES DONNÉES & GRID -----------------
+// ----------------- Compteur de variétés (animé, basé sur les vraies données) -----------------
+let varietyCounterCurrentValue = 0;
+let varietyCounterRAF = null;
+
+function updateVarietyCounter(target) {
+  const el = document.getElementById('variety-counter-num');
+  if (!el) return;
+
+  const start = varietyCounterCurrentValue;
+  const diff = target - start;
+  if (diff === 0) return;
+
+  if (varietyCounterRAF) cancelAnimationFrame(varietyCounterRAF);
+
+  const duration = 700; // ms
+  const startTime = performance.now();
+
+  function step(now) {
+    const progress = Math.min((now - startTime) / duration, 1);
+    const eased = 1 - Math.pow(1 - progress, 3); // ease-out cubic
+    const value = Math.round(start + diff * eased);
+    el.textContent = value.toLocaleString(currentLang || 'fr');
+    if (progress < 1) {
+      varietyCounterRAF = requestAnimationFrame(step);
+    } else {
+      varietyCounterCurrentValue = target;
+    }
+  }
+  varietyCounterRAF = requestAnimationFrame(step);
+}
+
 onValue(ref(db, 'tomatoes'), (snapshot) => {
   tomatoesData = [];
   snapshot.forEach(child => { tomatoesData.push({ id: child.key, ...child.val() }); });
   hasFirstData = true;
+  updateVarietyCounter(tomatoesData.length);
   renderGrid();
   if (detailCurrentId) refreshDetailLikeBtn();
   maybeOpenSharedTomato();
