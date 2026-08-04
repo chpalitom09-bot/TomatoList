@@ -1930,6 +1930,109 @@ async function migrateLegacyTomatoes() {
 }
 
 migrateLegacyTomatoes();
+
+// =====================================================================
+// ----------------- NETTOYAGE : suppression des doublons --------------
+// =====================================================================
+// Corrige les doublons créés par un bug d'import (mêmes tomates
+// enregistrées 2 ou 3 fois). On ne considère comme "doublon" que les
+// fiches strictement identiques : même nom, même description, même
+// pays, même couleur, même poids et exactement les mêmes images.
+// On garde la plus ancienne (createdAt le plus petit) et on supprime
+// les autres. Verrouillé pour toujours (local + base) pour ne jamais
+// re-scanner ni resupprimer par erreur des fiches ajoutées plus tard.
+
+const DEDUP_LOCAL_KEY = 'tl_dedup_v1_done';
+const DEDUP_DB_FLAG = 'meta/dedupV1Done';
+
+function buildDedupSignature(t) {
+  const images = Array.isArray(t.imageURLs) ? [...t.imageURLs].sort().join('|') : '';
+  return [
+    (t.name || '').trim().toLowerCase(),
+    (t.description || '').trim().toLowerCase(),
+    (t.country || '').trim().toLowerCase(),
+    (t.color || '').trim().toLowerCase(),
+    t.weight == null ? '' : String(t.weight),
+    images
+  ].join('###');
+}
+
+async function dedupeTomatoes() {
+  if (localStorage.getItem(DEDUP_LOCAL_KEY) === 'true') {
+    console.log('[Dedup] Déjà exécuté sur cet appareil, nettoyage ignoré.');
+    return;
+  }
+
+  try {
+    const flagSnap = await get(ref(db, DEDUP_DB_FLAG));
+    if (flagSnap.exists() && flagSnap.val() === true) {
+      console.log('[Dedup] Déjà exécuté côté base de données, nettoyage ignoré.');
+      localStorage.setItem(DEDUP_LOCAL_KEY, 'true');
+      return;
+    }
+  } catch (e) {
+    console.warn('[Dedup] Impossible de vérifier le verrou distant, on continue prudemment.', e);
+  }
+
+  console.log('[Dedup] Analyse des tomates à la recherche de doublons stricts...');
+
+  let allTomatoes = [];
+  try {
+    const snap = await get(ref(db, 'tomatoes'));
+    if (snap.exists()) {
+      snap.forEach(child => { allTomatoes.push({ id: child.key, ...child.val() }); });
+    }
+  } catch (e) {
+    console.error('[Dedup] Impossible de lire les tomates.', e);
+    return;
+  }
+
+  if (allTomatoes.length === 0) {
+    console.log('[Dedup] Aucune tomate trouvée.');
+    return;
+  }
+
+  // Regroupement par signature stricte
+  const groups = new Map();
+  for (const t of allTomatoes) {
+    const sig = buildDedupSignature(t);
+    if (!groups.has(sig)) groups.set(sig, []);
+    groups.get(sig).push(t);
+  }
+
+  let removedCount = 0;
+  let groupsWithDuplicates = 0;
+
+  for (const [, group] of groups) {
+    if (group.length <= 1) continue;
+    groupsWithDuplicates++;
+
+    // On garde la plus ancienne fiche (createdAt le plus petit ; si absent, on garde la première rencontrée)
+    group.sort((a, b) => (a.createdAt ?? 0) - (b.createdAt ?? 0));
+    const [keep, ...duplicates] = group;
+
+    for (const dup of duplicates) {
+      try {
+        await remove(ref(db, `tomatoes/${dup.id}`));
+        removedCount++;
+      } catch (e) {
+        console.error('[Dedup] Erreur en supprimant le doublon :', dup.id, dup.name, e);
+      }
+    }
+    console.log(`[Dedup] "${keep.name}" : ${duplicates.length} doublon(s) supprimé(s), fiche conservée = ${keep.id}`);
+  }
+
+  try {
+    await update(ref(db, 'meta'), { dedupV1Done: true });
+  } catch (e) {
+    console.warn('[Dedup] Impossible d\'écrire le verrou distant.', e);
+  }
+
+  localStorage.setItem(DEDUP_LOCAL_KEY, 'true');
+  console.log(`[Dedup] Terminé : ${removedCount} doublon(s) supprimé(s) sur ${groupsWithDuplicates} variété(s) concernée(s). Verrou posé définitivement.`);
+}
+
+dedupeTomatoes();
 </script>
 </body>
 </html>
