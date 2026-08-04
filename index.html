@@ -27,10 +27,6 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
-<script>
-  // Script Google Analytics
-</script>
-
 <style>
   :root {
     --primary: #b91c1c; --primary-hover: #991b1b;
@@ -43,7 +39,7 @@
   a { text-decoration: none; color: inherit; }
   button, input, select, textarea { font-family: inherit; }
 
-  /* Navbar */
+  /* ── Navbar ─────────────────────────────────────────────────────────────── */
   .navbar { background: var(--surface); border-bottom: 1px solid var(--line); padding: 16px 24px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; }
   .brand { font-family: var(--display); font-size: 24px; font-weight: 700; color: var(--primary); letter-spacing: -0.03em; }
   .nav-actions { display: flex; align-items: center; gap: 12px; }
@@ -53,7 +49,7 @@
   .btn-outline { background: transparent; border: 1px solid var(--line); color: var(--text-main); }
   .btn-outline:hover { background: var(--bg); }
 
-  /* Menu Langue */
+  /* ── Menu Langue ─────────────────────────────────────────────────────────── */
   .lang-dropdown { position: relative; }
   .lang-menu { position: absolute; top: calc(100% + 8px); right: 0; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); min-width: 130px; display: none; flex-direction: column; overflow: hidden; z-index: 200; }
   .lang-menu.active { display: flex; animation: slideDown 0.2s cubic-bezier(0.16, 1, 0.3, 1); }
@@ -61,7 +57,7 @@
   .lang-menu button:hover { background: var(--bg); }
   .lang-menu button.active { font-weight: 700; background: var(--bg); color: var(--primary); }
 
-  /* Toolbar */
+  /* ── Toolbar ─────────────────────────────────────────────────────────────── */
   .toolbar-wrap { max-width: 1200px; margin: 32px auto 24px; }
   .variety-counter { display: flex; align-items: center; justify-content: center; gap: 8px; padding: 0 24px; margin-bottom: 20px; font-family: var(--display); font-size: 14px; font-weight: 600; color: var(--text-muted); letter-spacing: 0.02em; }
   .variety-counter i { color: var(--primary); font-size: 13px; }
@@ -71,16 +67,15 @@
   .search-box i { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: var(--text-muted); }
   .search-box input { width: 100%; padding: 14px 16px 14px 44px; border: 1px solid var(--line); border-radius: 10px; outline: none; font-size: 15px; background: var(--surface); transition: border-color 0.2s; }
   .search-box input:focus { border-color: var(--primary); }
-  
+
   .filters-panel { display: none; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 24px; margin: 0 24px; box-shadow: 0 12px 24px rgba(0,0,0,0.04); animation: slideDown 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
   .filters-panel.active { display: block; }
   @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
-  
+
   .filter-group { margin-bottom: 24px; }
   .filter-group:last-child { margin-bottom: 0; }
   .filter-title { font-size: 13px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 12px; }
-  
-  /* PILULES PREMIUM (Filtres) */
+
   .pill-group { display: flex; flex-wrap: wrap; gap: 10px; }
   .filter-pill { padding: 10px 16px; border: 1px solid var(--line); border-radius: 30px; background: var(--surface); color: var(--text-muted); cursor: pointer; font-size: 14px; font-weight: 500; transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1); display: flex; align-items: center; gap: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
   .filter-pill:hover { border-color: var(--line-h); transform: translateY(-1px); box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
@@ -88,11 +83,11 @@
   .filter-pill .color-dot { width: 16px; height: 16px; border-radius: 50%; display: inline-block; box-shadow: inset 0 2px 4px rgba(0,0,0,0.2), 0 0 0 1px rgba(0,0,0,0.05); flex-shrink: 0; }
   .foryou-pill { background: linear-gradient(135deg, #fef2f2, #fff); border-color: #fca5a5 !important; color: var(--primary) !important; }
 
-  /* CARDS & IMAGES CADRÉES */
-  .grid { max-width: 1200px; margin: 0 auto 64px; padding: 0 24px; display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 24px; }
-  .card { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; overflow: hidden; transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s; display: flex; flex-direction: column; }
+  /* ── Grid & Cards ────────────────────────────────────────────────────────── */
+  .grid { max-width: 1200px; margin: 0 auto 0; padding: 0 24px; display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 24px; }
+  .card { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; overflow: hidden; transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s; display: flex; flex-direction: column; cursor: pointer; }
   .card:hover { transform: translateY(-6px); box-shadow: 0 20px 40px rgba(0,0,0,0.08); }
-  
+
   .card-img-wrapper { position: relative; width: 100%; height: 260px; background: #f3f4f6; overflow: hidden; border-bottom: 1px solid var(--line); }
   .card-img { width: 100%; height: 100%; object-fit: cover; object-position: center; display: block; }
   .img-count { position: absolute; bottom: 10px; right: 10px; background: rgba(0,0,0,0.6); color: #fff; padding: 4px 8px; border-radius: 12px; font-size: 11px; font-weight: 600; z-index: 3; backdrop-filter: blur(4px); }
@@ -102,21 +97,49 @@
   .card-meta { display: flex; gap: 8px; font-size: 13px; color: var(--text-muted); margin-bottom: 14px; flex-wrap: wrap; }
   .badge { background: var(--bg); padding: 5px 10px; border-radius: 8px; font-weight: 500; border: 1px solid var(--line); display:flex; align-items:center; gap:6px; }
   .card-desc { font-size: 14px; color: var(--text-muted); line-height: 1.6; margin-bottom: 16px; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; flex: 1; }
-  
+
   .card-footer { border-top: 1px solid var(--line); padding-top: 16px; font-size: 13px; color: var(--text-muted); display: flex; justify-content: space-between; align-items: center; }
   .card-footer-left { display: flex; align-items: center; gap: 8px; font-weight: 500; }
   .like-btn { background: none; border: none; cursor: pointer; display: flex; align-items: center; gap: 6px; color: var(--text-muted); font-size: 14px; font-weight: 600; transition: all 0.2s; padding: 4px 8px; border-radius: 6px; margin: -4px -8px; }
   .like-btn:hover { color: var(--primary); background: #fef2f2; }
   .like-btn.liked { color: var(--primary); }
-
   .empty-state { grid-column: 1 / -1; text-align: center; padding: 64px 24px; color: var(--text-muted); }
 
-  /* Carte cliquable */
-  .card { cursor: pointer; }
+  /* ── Pagination ──────────────────────────────────────────────────────────── */
+  .pagination-wrap {
+    max-width: 1200px;
+    margin: 32px auto 48px;
+    padding: 0 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+  .page-btn {
+    min-width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    border: 1px solid var(--line);
+    background: var(--surface);
+    color: var(--text-main);
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 10px;
+    transition: all 0.18s;
+    gap: 6px;
+  }
+  .page-btn:hover:not(:disabled):not(.active) { background: var(--bg); border-color: var(--line-h); transform: translateY(-1px); }
+  .page-btn.active { background: var(--primary); color: #fff; border-color: var(--primary); box-shadow: 0 4px 12px rgba(185,28,28,0.3); }
+  .page-btn:disabled { opacity: 0.35; cursor: default; pointer-events: none; }
+  .page-ellipsis { color: var(--text-muted); font-size: 14px; padding: 0 4px; line-height: 40px; }
+  .page-info { font-size: 13px; color: var(--text-muted); font-weight: 500; padding: 0 8px; }
 
-  /* ──────────────────────────────────────────────────────────────────
-     BANDEAU DE PARTAGE (inséré dans la grille tous les 50 tomates)
-  ────────────────────────────────────────────────────────────────── */
+  /* ── Bandeau de partage ──────────────────────────────────────────────────── */
   .share-banner {
     grid-column: 1 / -1;
     position: relative;
@@ -130,89 +153,26 @@
     justify-content: space-between;
     gap: 20px;
     flex-wrap: wrap;
-    box-shadow: 0 12px 40px rgba(185,28,28,0.35);
+    box-shadow: 0 12px 40px rgba(185,28,28,0.3);
     animation: shareReveal 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
   }
-  @keyframes shareReveal {
-    from { opacity: 0; transform: translateY(16px) scale(0.98); }
-    to   { opacity: 1; transform: translateY(0)    scale(1); }
-  }
-  /* Cercles décoratifs en arrière-plan */
-  .share-banner::before,
-  .share-banner::after {
-    content: '';
-    position: absolute;
-    border-radius: 50%;
-    background: rgba(255,255,255,0.07);
-    pointer-events: none;
-  }
+  @keyframes shareReveal { from { opacity: 0; transform: translateY(16px) scale(0.98); } to { opacity: 1; transform: none; } }
+  .share-banner::before, .share-banner::after { content: ''; position: absolute; border-radius: 50%; background: rgba(255,255,255,0.07); pointer-events: none; }
   .share-banner::before { width: 220px; height: 220px; top: -80px; right: -60px; }
   .share-banner::after  { width: 140px; height: 140px; bottom: -60px; left: 120px; }
-
-  .share-banner-left {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    flex: 1;
-    min-width: 0;
-    position: relative;
-    z-index: 1;
-  }
-  .share-banner-emoji {
-    font-size: 44px;
-    line-height: 1;
-    flex-shrink: 0;
-    filter: drop-shadow(0 4px 8px rgba(0,0,0,0.25));
-  }
-  .share-banner-title {
-    font-family: var(--display);
-    font-size: 18px;
-    font-weight: 700;
-    margin-bottom: 4px;
-    line-height: 1.2;
-  }
-  .share-banner-sub {
-    font-size: 13.5px;
-    opacity: 0.85;
-    line-height: 1.4;
-  }
-  .share-banner-actions {
-    display: flex;
-    gap: 10px;
-    flex-shrink: 0;
-    flex-wrap: wrap;
-    position: relative;
-    z-index: 1;
-  }
-  .share-banner-btn {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 11px 20px;
-    border-radius: 12px;
-    font-size: 14px;
-    font-weight: 700;
-    cursor: pointer;
-    border: none;
-    transition: transform 0.15s, box-shadow 0.15s;
-    white-space: nowrap;
-  }
+  .share-banner-left { display: flex; align-items: center; gap: 16px; flex: 1; min-width: 0; position: relative; z-index: 1; }
+  .share-banner-emoji { font-size: 44px; line-height: 1; flex-shrink: 0; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.25)); }
+  .share-banner-title { font-family: var(--display); font-size: 18px; font-weight: 700; margin-bottom: 4px; line-height: 1.2; }
+  .share-banner-sub { font-size: 13.5px; opacity: 0.85; line-height: 1.4; }
+  .share-banner-actions { display: flex; gap: 10px; flex-shrink: 0; flex-wrap: wrap; position: relative; z-index: 1; }
+  .share-banner-btn { display: flex; align-items: center; gap: 8px; padding: 11px 20px; border-radius: 12px; font-size: 14px; font-weight: 700; cursor: pointer; border: none; transition: transform 0.15s, box-shadow 0.15s; white-space: nowrap; }
   .share-banner-btn:active { transform: scale(0.96); }
-  .share-banner-btn.primary {
-    background: #fff;
-    color: var(--primary);
-    box-shadow: 0 4px 16px rgba(0,0,0,0.2);
-  }
+  .share-banner-btn.primary { background: #fff; color: var(--primary); box-shadow: 0 4px 16px rgba(0,0,0,0.2); }
   .share-banner-btn.primary:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(0,0,0,0.25); }
-  .share-banner-btn.secondary {
-    background: rgba(255,255,255,0.18);
-    color: #fff;
-    border: 1.5px solid rgba(255,255,255,0.35);
-    backdrop-filter: blur(4px);
-  }
+  .share-banner-btn.secondary { background: rgba(255,255,255,0.18); color: #fff; border: 1.5px solid rgba(255,255,255,0.35); backdrop-filter: blur(4px); }
   .share-banner-btn.secondary:hover { background: rgba(255,255,255,0.28); }
 
-  /* Modal Détail */
+  /* ── Modal Détail ────────────────────────────────────────────────────────── */
   .detail-modal { max-width: 640px; }
   .detail-gallery-wrap { position: relative; width: 100%; height: 380px; background: #000; overflow: hidden; border-radius: 20px 20px 0 0; }
   .detail-carousel { position: relative; display: flex; width: 100%; height: 100%; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; z-index: 2; }
@@ -229,9 +189,58 @@
   .detail-nav-next { right: 10px; }
   .detail-section-title { font-family: var(--display); font-size: 15px; font-weight: 700; margin-bottom: 8px; color: var(--text-main); }
   .detail-desc { font-size: 14.5px; color: var(--text-main); line-height: 1.7; white-space: pre-wrap; margin-bottom: 22px; }
-  .detail-stats { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 22px; }
 
-  /* Modal & Form Upload Multi-images */
+  /* ── Commentaires ────────────────────────────────────────────────────────── */
+  .comments-section {
+    margin-top: 24px;
+    padding-top: 22px;
+    border-top: 1px solid var(--line);
+  }
+  .comments-heading {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 18px;
+  }
+  .comments-heading-title {
+    font-family: var(--display);
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--text-main);
+  }
+  .comments-count-badge {
+    background: var(--bg);
+    border: 1px solid var(--line);
+    color: var(--text-muted);
+    font-size: 12px;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 20px;
+  }
+  .comments-list { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
+  .comment-item {
+    background: var(--bg);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 14px 16px;
+    animation: fadeIn 0.25s ease both;
+  }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+  .comment-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; flex-wrap: wrap; gap: 4px; }
+  .comment-author { font-size: 13px; font-weight: 700; color: var(--text-main); }
+  .comment-date { font-size: 11px; color: var(--text-muted); }
+  .comment-text { font-size: 13.5px; color: var(--text-main); line-height: 1.65; white-space: pre-wrap; word-break: break-word; }
+  .comments-empty { text-align: center; padding: 20px; color: var(--text-muted); font-size: 13.5px; }
+  .comments-loading { text-align: center; padding: 16px; color: var(--text-muted); font-size: 13px; }
+
+  .comment-form { border: 1px solid var(--line); border-radius: 14px; padding: 16px; background: var(--surface); }
+  .comment-form-title { font-size: 13px; font-weight: 700; color: var(--text-muted); margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.04em; }
+  .comment-form-row { display: flex; gap: 12px; margin-bottom: 10px; }
+  .comment-form-name { flex: 0 0 180px; }
+  .comment-form-actions { display: flex; align-items: center; justify-content: flex-end; margin-top: 10px; }
+  .comment-char-count { font-size: 12px; color: var(--text-muted); margin-right: auto; }
+
+  /* ── Modals ──────────────────────────────────────────────────────────────── */
   .modal-overlay { position: fixed; inset: 0; background: rgba(17, 24, 39, 0.6); backdrop-filter: blur(4px); display: flex; align-items: center; justify-content: center; z-index: 1000; opacity: 0; pointer-events: none; transition: opacity 0.25s; padding: 16px; }
   .modal-overlay.active { opacity: 1; pointer-events: all; }
   .modal { background: var(--surface); width: 100%; max-width: 600px; border-radius: 20px; max-height: 90vh; overflow-y: auto; box-shadow: 0 24px 48px rgba(0,0,0,0.2); transform: scale(0.95) translateY(20px); transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1); }
@@ -240,8 +249,8 @@
   .modal-title { font-family: var(--display); font-size: 20px; font-weight: 700; }
   .modal-close { background: var(--bg); border: 1px solid var(--line); width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 16px; cursor: pointer; color: var(--text-muted); }
   .modal-body { padding: 24px; }
-  
-  /* Upload Gallery UI */
+
+  /* ── Upload Gallery ──────────────────────────────────────────────────────── */
   .upload-gallery { display: flex; gap: 12px; overflow-x: auto; padding-bottom: 12px; margin-bottom: 16px; }
   .upload-gallery::-webkit-scrollbar { height: 6px; }
   .upload-gallery::-webkit-scrollbar-thumb { background: var(--line-h); border-radius: 6px; }
@@ -253,14 +262,14 @@
   .add-img-btn i { font-size: 24px; margin-bottom: 4px; }
   .add-img-btn span { font-size: 11px; font-weight: 600; }
 
+  /* ── Form controls ───────────────────────────────────────────────────────── */
   .form-group { margin-bottom: 20px; }
   .form-group label { display: block; font-size: 13.5px; font-weight: 600; margin-bottom: 8px; color: var(--text-main); }
-  .form-control { width: 100%; padding: 12px 14px; border: 1px solid var(--line); border-radius: 10px; outline: none; font-size: 14px; background: var(--bg); transition: border-color 0.2s; font-family: inherit; }
+  .form-control { width: 100%; padding: 12px 14px; border: 1px solid var(--line); border-radius: 10px; outline: none; font-size: 14px; background: var(--bg); transition: border-color 0.2s; font-family: inherit; color: var(--text-main); }
   .form-control:focus { border-color: var(--primary); background: #fff; }
   .form-row { display: flex; gap: 16px; }
   .form-row .form-group { flex: 1; }
-  
-  /* Toggle Anonyme */
+
   .pref-block { border: 1px solid var(--line); border-radius: 12px; padding: 16px; margin: 16px 0; display: flex; align-items: flex-start; justify-content: space-between; gap: 14px; background: var(--bg); }
   .pref-block-title { font-size: 13.5px; font-weight: 600; margin-bottom: 3px; color: var(--text-main); }
   .pref-block-sub { font-size: 12px; color: var(--text-muted); line-height: 1.4; }
@@ -271,7 +280,7 @@
 
   .custom-select-wrapper { position: relative; width: 100%; }
   .custom-select-btn { width: 100%; padding: 12px 14px; background: var(--bg); border: 1px solid var(--line); border-radius: 10px; text-align: left; cursor: pointer; display: flex; align-items: center; justify-content: space-between; font-size: 14px; color: var(--text-main); }
-  .custom-select-btn img { width: 22px; border-radius: 2px; margin-right: 10px; object-fit: cover; }
+  .custom-select-btn img { width: 22px; border-radius: 2px; margin-right: 10px; }
   .custom-select-menu { position: absolute; top: 100%; left: 0; right: 0; background: #fff; border: 1px solid var(--line); border-radius: 10px; margin-top: 4px; max-height: 220px; overflow-y: auto; z-index: 100; display: none; padding: 8px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
   .custom-select-menu.active { display: block; }
   .custom-search-input { width: 100%; padding: 10px 12px; border: 1px solid var(--line); border-radius: 8px; outline: none; font-size: 14px; margin-bottom: 8px; }
@@ -279,53 +288,48 @@
   .custom-option:hover { background: var(--bg); }
   .custom-option img { width: 22px; border-radius: 2px; margin-right: 10px; }
 
-  .progress-bar { width: 100%; height: 6px; background: var(--line); border-radius: 3px; overflow: hidden; display: none; margin-bottom: 16px; }
-  .progress-fill { width: 0%; height: 100%; background: var(--primary); transition: width 0.3s; }
-
   #btn-submit { position: relative; overflow: hidden; }
   #btn-submit .btn-progress-fill { position: absolute; left: 0; top: 0; bottom: 0; width: 0%; background: rgba(255,255,255,0.28); transition: width 0.3s ease; z-index: 0; }
   #btn-submit #btn-submit-label { position: relative; z-index: 1; }
   .error-msg { color: #d92d20; background: #fef2f2; border: 1px solid #fecaca; padding: 12px; border-radius: 8px; font-size: 13.5px; margin-bottom: 20px; display: none; }
 
+  /* ── Toast ───────────────────────────────────────────────────────────────── */
   .toast-container { position: fixed; bottom: 32px; left: 50%; transform: translateX(-50%); z-index: 9999; display: flex; flex-direction: column; gap: 10px; pointer-events: none; }
   .toast { background: var(--text-main); color: #fff; padding: 12px 24px; border-radius: 10px; font-size: 14px; font-weight: 500; opacity: 0; transform: translateY(20px); animation: slideUpToast 0.3s forwards, fadeOutToast 0.4s 3s forwards; display: flex; align-items: center; gap: 10px; }
   @keyframes slideUpToast { to { opacity: 1; transform: translateY(0); } }
   @keyframes fadeOutToast { to { opacity: 0; transform: translateY(20px); } }
 
+  /* ── Footer ──────────────────────────────────────────────────────────────── */
   .footer { background: #111; color: #fff; padding: 48px 24px; text-align: center; font-size: 14px; }
   .credits { margin-top: 24px; color: #888; font-size: 13px; display: flex; justify-content: center; gap: 32px; flex-wrap: wrap; }
   .credits span { color: #fff; font-weight: 600; }
 
-  /* Skeleton loading */
+  /* ── Skeleton ────────────────────────────────────────────────────────────── */
   .skeleton-card { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; overflow: hidden; }
   .skeleton-img { width: 100%; height: 260px; background: linear-gradient(90deg, #eee 25%, #f5f5f5 37%, #eee 63%); background-size: 400% 100%; animation: shimmer 1.4s ease infinite; }
   .skeleton-line { height: 14px; border-radius: 6px; margin: 12px 20px; background: linear-gradient(90deg, #eee 25%, #f5f5f5 37%, #eee 63%); background-size: 400% 100%; animation: shimmer 1.4s ease infinite; }
   .skeleton-line.short { width: 40%; }
   @keyframes shimmer { 0% { background-position: 100% 0; } 100% { background-position: -100% 0; } }
 
+  /* ── Divers ──────────────────────────────────────────────────────────────── */
   .country-select { width: 100%; padding: 12px 14px; border: 1px solid var(--line); border-radius: 10px; outline: none; font-size: 14px; background: var(--surface); }
   .author-link { cursor: pointer; }
   .author-link:hover { text-decoration: underline; color: var(--primary); }
-
   .contributor-chip { display: flex; align-items: center; gap: 6px; background: var(--bg); border: 1px solid var(--line); padding: 5px 10px 5px 5px; border-radius: 20px; font-size: 12.5px; font-weight: 500; cursor: pointer; transition: all 0.2s; }
   .contributor-chip:hover { border-color: var(--primary); color: var(--primary); }
   .contributor-chip .contributor-avatar { width: 22px; height: 22px; border-radius: 50%; background: var(--primary); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; text-transform: uppercase; flex-shrink: 0; }
-
   .detail-actions { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
   .btn-sm { padding: 8px 14px; font-size: 13px; border-radius: 8px; }
   .btn-danger { background: #fef2f2; color: #d92d20; border: 1px solid #fecaca; }
   .btn-danger:hover { background: #fee2e2; }
 
-  /* Lightbox */
+  /* ── Lightbox ────────────────────────────────────────────────────────────── */
   .lightbox-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 2000; display: none; align-items: center; justify-content: center; padding: 24px; }
   .lightbox-overlay.active { display: flex; }
   .lightbox-overlay img { max-width: 100%; max-height: 100%; object-fit: contain; }
   .lightbox-close { position: absolute; top: 20px; right: 24px; background: rgba(255,255,255,0.15); border: none; color: #fff; width: 40px; height: 40px; border-radius: 50%; font-size: 18px; cursor: pointer; }
 
-  /* ──────────────────────────────────────────────────────────────────
-     CARTE DU MONDE — Les pins se contre-scalent pour rester visuels
-     à taille constante (ou légèrement réduits) quand on zoome
-  ────────────────────────────────────────────────────────────────── */
+  /* ── Carte du monde ──────────────────────────────────────────────────────── */
   .map-viewport { position: relative; width: 100%; aspect-ratio: 2 / 1; border-radius: 12px; overflow: hidden; background: #dbeafe; touch-action: none; cursor: grab; user-select: none; }
   .map-viewport.grabbing { cursor: grabbing; }
   .map-inner { position: absolute; top: 0; left: 0; width: 100%; height: 100%; transform-origin: 0 0; will-change: transform; }
@@ -334,26 +338,13 @@
   .map-ctrl-btn { width: 34px; height: 34px; border-radius: 8px; border: 1px solid var(--line); background: rgba(255,255,255,0.92); color: var(--text-main); font-size: 15px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 6px rgba(0,0,0,0.15); }
   .map-ctrl-btn:hover { background: #fff; }
   .map-hint { position: absolute; top: 10px; left: 12px; background: rgba(17,24,39,0.55); color: #fff; font-size: 11px; padding: 5px 10px; border-radius: 20px; z-index: 10; pointer-events: none; }
-
-  /* Les pins utilisent --map-pin-scale pour se counter-scaler */
-  .map-pin {
-    position: absolute;
-    /* Décalage centré sur la pointe en bas — le scale se fait depuis ce point */
-    transform: translate(-50%, -100%) scale(var(--map-pin-scale, 1));
-    transform-origin: bottom center;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    cursor: pointer;
-    transition: transform 0.05s linear; /* Fluidité légère */
-  }
+  /* Pins avec counter-scale pour rester petits au zoom */
+  .map-pin { position: absolute; transform: translate(-50%, -100%) scale(var(--map-pin-scale, 1)); transform-origin: bottom center; display: flex; flex-direction: column; align-items: center; cursor: pointer; transition: transform 0.05s linear; }
   .map-pin-flag { width: 22px; height: 16px; object-fit: cover; border-radius: 3px; border: 1.5px solid #fff; box-shadow: 0 2px 5px rgba(0,0,0,0.35); margin-bottom: 2px; }
   .map-dot { position: relative; width: 12px; height: 12px; background: var(--primary); border: 2px solid #fff; border-radius: 50%; box-shadow: 0 2px 5px rgba(0,0,0,0.3); }
   .map-dot-count { position: absolute; top: -6px; right: -8px; background: var(--text-main); color: #fff; font-size: 9px; font-weight: 700; border-radius: 50%; width: 15px; height: 15px; display: flex; align-items: center; justify-content: center; }
-  /* Pas de transform supplémentaire sur hover (le pin est déjà counter-scalé) */
-  .map-pin:hover .map-pin-flag { filter: brightness(1.1); }
 
-  /* Tomates similaires */
+  /* ── Tomates similaires ──────────────────────────────────────────────────── */
   .similar-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 12px; margin-top: 8px; }
   .similar-card { cursor: pointer; border-radius: 12px; overflow: hidden; border: 1px solid var(--line); background: var(--surface); transition: transform 0.15s, box-shadow 0.15s; }
   .similar-card:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(0,0,0,0.1); }
@@ -362,13 +353,8 @@
   .similar-card-imgwrap .no-img { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; color: var(--text-muted); font-size: 22px; }
   .similar-card .similar-name { font-size: 12.5px; font-weight: 600; padding: 8px 10px; color: var(--text-main); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-  /* Bannière PWA */
-  .install-banner {
-    position: fixed; left: 20px; right: 20px; bottom: -140px; max-width: 420px; margin: 0 auto;
-    background: var(--surface); border: 1px solid var(--line); border-radius: 18px;
-    box-shadow: 0 12px 40px rgba(0,0,0,0.18); padding: 16px; display: flex; align-items: center;
-    gap: 14px; z-index: 1500; transition: bottom 0.45s cubic-bezier(.2,.9,.3,1.2), opacity 0.3s; opacity: 0;
-  }
+  /* ── Bannière PWA ────────────────────────────────────────────────────────── */
+  .install-banner { position: fixed; left: 20px; right: 20px; bottom: -140px; max-width: 420px; margin: 0 auto; background: var(--surface); border: 1px solid var(--line); border-radius: 18px; box-shadow: 0 12px 40px rgba(0,0,0,0.18); padding: 16px; display: flex; align-items: center; gap: 14px; z-index: 1500; transition: bottom 0.45s cubic-bezier(.2,.9,.3,1.2), opacity 0.3s; opacity: 0; }
   .install-banner.visible { bottom: 20px; opacity: 1; }
   .install-banner-icon { width: 52px; height: 52px; border-radius: 14px; flex-shrink: 0; box-shadow: 0 4px 12px rgba(185,28,28,0.25); background: #fff; }
   .install-banner-body { flex: 1; min-width: 0; }
@@ -382,7 +368,17 @@
   .install-banner-close:hover { color: var(--text-main); text-decoration: underline; }
 
   @media (max-width: 480px) { .install-banner { left: 12px; right: 12px; padding: 14px; gap: 10px; } .install-banner-icon { width: 44px; height: 44px; } .install-banner-btn { padding: 8px 12px; font-size: 12.5px; } }
-  @media (max-width: 768px) { .hide-mobile { display: none !important; } .btn { padding: 10px; border-radius: 8px; } .btn i { margin: 0; font-size: 16px; } .grid { grid-template-columns: 1fr; } .form-row { flex-direction: column; gap: 0; } .share-banner { padding: 20px; } .share-banner-title { font-size: 16px; } }
+  @media (max-width: 768px) {
+    .hide-mobile { display: none !important; }
+    .btn { padding: 10px; border-radius: 8px; }
+    .btn i { margin: 0; font-size: 16px; }
+    .grid { grid-template-columns: 1fr; }
+    .form-row { flex-direction: column; gap: 0; }
+    .comment-form-row { flex-direction: column; }
+    .comment-form-name { flex: none; }
+    .share-banner { padding: 20px; }
+    .share-banner-title { font-size: 15px; }
+  }
 </style>
 </head>
 <body>
@@ -415,7 +411,7 @@
   <div class="toolbar">
     <div class="search-box">
       <i class="fa-solid fa-magnifying-glass"></i>
-      <input type="text" id="search-input" data-i18n-ph="search_ph" placeholder="Rechercher une variété...">
+      <input type="text" id="search-input" placeholder="Rechercher une variété...">
     </div>
     <button class="btn btn-outline" id="btn-toggle-filters">
       <i class="fa-solid fa-sliders"></i> <span class="hide-mobile" data-i18n="filters">Filtres</span>
@@ -435,54 +431,24 @@
         <button class="filter-pill" data-val="likes"><i class="fa-solid fa-heart" style="color:var(--primary); font-size:12px"></i> Plus populaires</button>
       </div>
     </div>
-
     <div class="filter-group">
       <div class="filter-title" data-i18n="color">Couleur</div>
       <div class="pill-group" id="color-group">
         <button class="filter-pill active" data-val="all" data-i18n="color_all">Toutes les couleurs</button>
-
-        <!-- Couleurs existantes -->
-        <button class="filter-pill" data-val="Rouge">
-          <i class="color-dot" style="background:#ef4444"></i> <span data-i18n="color_red">Rouge</span>
-        </button>
-        <button class="filter-pill" data-val="Jaune">
-          <i class="color-dot" style="background:#eab308"></i> <span data-i18n="color_yellow">Jaune</span>
-        </button>
-        <button class="filter-pill" data-val="Noire">
-          <i class="color-dot" style="background:#4b5563"></i> <span data-i18n="color_black">Noire</span>
-        </button>
-        <button class="filter-pill" data-val="Verte">
-          <i class="color-dot" style="background:#22c55e"></i> <span data-i18n="color_green">Verte</span>
-        </button>
-        <button class="filter-pill" data-val="Orange">
-          <i class="color-dot" style="background:#f97316"></i> <span data-i18n="color_orange">Orange</span>
-        </button>
-        <button class="filter-pill" data-val="Rose">
-          <i class="color-dot" style="background:#ec4899"></i> <span data-i18n="color_pink">Rose</span>
-        </button>
-        <button class="filter-pill" data-val="Blanche">
-          <i class="color-dot" style="background:#f9fafb; border:1px solid #d1d5db"></i> <span data-i18n="color_white">Blanche</span>
-        </button>
-        <button class="filter-pill" data-val="Bicolore">
-          <i class="color-dot" style="background:linear-gradient(135deg,#ef4444 50%,#eab308 50%)"></i> <span data-i18n="color_bicolor">Bicolore</span>
-        </button>
-
-        <!-- Nouvelles couleurs -->
-        <button class="filter-pill" data-val="Violette">
-          <i class="color-dot" style="background:#7c3aed"></i> <span data-i18n="color_purple">Violette</span>
-        </button>
-        <button class="filter-pill" data-val="Bordeaux">
-          <i class="color-dot" style="background:#7f1d1d"></i> <span data-i18n="color_bordeaux">Bordeaux</span>
-        </button>
-        <button class="filter-pill" data-val="Crème">
-          <i class="color-dot" style="background:#d4a96a; border:1px solid #c9955a"></i> <span data-i18n="color_cream">Crème</span>
-        </button>
-        <button class="filter-pill" data-val="Rayée">
-          <i class="color-dot" style="background:repeating-linear-gradient(135deg,#22c55e 0px,#22c55e 4px,#eab308 4px,#eab308 8px)"></i> <span data-i18n="color_striped">Rayée / Striée</span>
-        </button>
+        <button class="filter-pill" data-val="Rouge"><i class="color-dot" style="background:#ef4444"></i> <span data-i18n="color_red">Rouge</span></button>
+        <button class="filter-pill" data-val="Jaune"><i class="color-dot" style="background:#eab308"></i> <span data-i18n="color_yellow">Jaune</span></button>
+        <button class="filter-pill" data-val="Noire"><i class="color-dot" style="background:#4b5563"></i> <span data-i18n="color_black">Noire</span></button>
+        <button class="filter-pill" data-val="Verte"><i class="color-dot" style="background:#22c55e"></i> <span data-i18n="color_green">Verte</span></button>
+        <button class="filter-pill" data-val="Orange"><i class="color-dot" style="background:#f97316"></i> <span data-i18n="color_orange">Orange</span></button>
+        <button class="filter-pill" data-val="Rose"><i class="color-dot" style="background:#ec4899"></i> <span data-i18n="color_pink">Rose</span></button>
+        <button class="filter-pill" data-val="Blanche"><i class="color-dot" style="background:#f9fafb; border:1px solid #d1d5db"></i> <span data-i18n="color_white">Blanche</span></button>
+        <button class="filter-pill" data-val="Bicolore"><i class="color-dot" style="background:linear-gradient(135deg,#ef4444 50%,#eab308 50%)"></i> <span data-i18n="color_bicolor">Bicolore</span></button>
+        <button class="filter-pill" data-val="Violette"><i class="color-dot" style="background:#7c3aed"></i> <span data-i18n="color_purple">Violette</span></button>
+        <button class="filter-pill" data-val="Bordeaux"><i class="color-dot" style="background:#7f1d1d"></i> <span data-i18n="color_bordeaux">Bordeaux</span></button>
+        <button class="filter-pill" data-val="Crème"><i class="color-dot" style="background:#d4a96a; border:1px solid #c9955a"></i> <span data-i18n="color_cream">Crème</span></button>
+        <button class="filter-pill" data-val="Rayée"><i class="color-dot" style="background:repeating-linear-gradient(135deg,#22c55e 0px,#22c55e 4px,#eab308 4px,#eab308 8px)"></i> <span data-i18n="color_striped">Rayée</span></button>
       </div>
     </div>
-
     <div class="filter-group">
       <div class="filter-title" data-i18n="country_filter">Pays</div>
       <select class="country-select" id="country-filter-select">
@@ -492,9 +458,11 @@
   </div>
 </div>
 
-<div class="grid" id="tomatoes-grid">
-  <!-- Rempli par JavaScript -->
-</div>
+<!-- Grille principale -->
+<div class="grid" id="tomatoes-grid"></div>
+
+<!-- Pagination -->
+<div class="pagination-wrap" id="pagination-wrap"></div>
 
 <!-- Bannière PWA -->
 <div class="install-banner" id="install-banner">
@@ -520,7 +488,7 @@
   </div>
 </footer>
 
-<!-- Detail Modal -->
+<!-- ── Modal Détail ────────────────────────────────────────────────────────── -->
 <div class="modal-overlay" id="detail-modal">
   <div class="modal detail-modal">
     <div class="modal-header" style="position:absolute; top:12px; right:12px; left:auto; border:none; padding:0; background:transparent; z-index:20;">
@@ -535,13 +503,16 @@
     <div class="modal-body">
       <div class="modal-title" id="detail-title" style="margin-bottom:12px;"></div>
       <div class="card-meta" id="detail-meta" style="margin-bottom:20px;"></div>
+
       <div class="detail-section-title" data-i18n="t_desc">Description / Histoire</div>
       <p class="detail-desc" id="detail-desc">-</p>
+
       <div class="detail-actions">
         <button class="btn btn-outline btn-sm" id="detail-share-btn"><i class="fa-solid fa-share-nodes"></i> <span data-i18n="share">Partager</span></button>
         <button class="btn btn-outline btn-sm" id="detail-edit-btn" style="display:none"><i class="fa-solid fa-pen"></i> <span data-i18n="edit">Modifier</span></button>
         <button class="btn btn-danger btn-sm" id="detail-delete-btn" style="display:none"><i class="fa-solid fa-trash"></i> <span data-i18n="delete">Supprimer</span></button>
       </div>
+
       <div class="card-footer">
         <div class="card-footer-left" id="detail-author"></div>
         <div style="display:flex; gap:12px; align-items:center;">
@@ -552,19 +523,55 @@
           </button>
         </div>
       </div>
+
       <div id="detail-contributors" style="display:none; margin-top:14px; padding-top:14px; border-top:1px solid var(--line);">
         <div class="detail-section-title" style="margin-bottom:10px;">Contributeurs</div>
         <div id="detail-contributors-list" style="display:flex; flex-wrap:wrap; gap:8px;"></div>
       </div>
+
       <div id="similar-block" style="margin-top:22px; display:none;">
         <div class="detail-section-title" data-i18n="similar_title">Tomates similaires</div>
         <div class="similar-grid" id="similar-grid"></div>
       </div>
+
+      <!-- ── Section Commentaires ────────────────────────────────────────── -->
+      <div class="comments-section">
+        <div class="comments-heading">
+          <i class="fa-regular fa-comments" style="color:var(--text-muted); font-size:16px"></i>
+          <span class="comments-heading-title">Commentaires</span>
+          <span class="comments-count-badge" id="comments-count-badge">0</span>
+        </div>
+
+        <div id="comments-list" class="comments-list">
+          <div class="comments-loading"><i class="fa-solid fa-spinner fa-spin"></i> Chargement...</div>
+        </div>
+
+        <!-- Formulaire d'ajout de commentaire -->
+        <div class="comment-form">
+          <div class="comment-form-title">Laisser un commentaire</div>
+          <div class="comment-form-row">
+            <div class="comment-form-name">
+              <input type="text" class="form-control" id="comment-author-input" placeholder="Votre prénom (optionnel)" maxlength="40">
+            </div>
+            <div style="flex:1">
+              <!-- vide : textarea en dessous pour mobile -->
+            </div>
+          </div>
+          <textarea class="form-control" id="comment-text-input" rows="3" placeholder="Partagez votre expérience avec cette variété..." maxlength="1000" style="resize:vertical; margin-top:10px;"></textarea>
+          <div class="comment-form-actions">
+            <span class="comment-char-count" id="comment-char-count">0 / 1000</span>
+            <button class="btn btn-primary btn-sm" id="comment-submit-btn">
+              <i class="fa-solid fa-paper-plane"></i> Envoyer
+            </button>
+          </div>
+        </div>
+      </div>
+      <!-- ── Fin Commentaires ─────────────────────────────────────────────── -->
     </div>
   </div>
 </div>
 
-<!-- Map Modal -->
+<!-- ── Modal Carte ─────────────────────────────────────────────────────────── -->
 <div class="modal-overlay" id="map-modal">
   <div class="modal" style="max-width:820px">
     <div class="modal-header">
@@ -578,16 +585,16 @@
           <img src="https://upload.wikimedia.org/wikipedia/commons/8/83/Equirectangular_projection_SW.jpg" alt="World map" draggable="false">
         </div>
         <div class="map-controls">
-          <button class="map-ctrl-btn" id="map-zoom-in" type="button" title="Zoom +"><i class="fa-solid fa-plus"></i></button>
-          <button class="map-ctrl-btn" id="map-zoom-out" type="button" title="Zoom -"><i class="fa-solid fa-minus"></i></button>
-          <button class="map-ctrl-btn" id="map-zoom-reset" type="button" title="Réinitialiser"><i class="fa-solid fa-compress"></i></button>
+          <button class="map-ctrl-btn" id="map-zoom-in" type="button"><i class="fa-solid fa-plus"></i></button>
+          <button class="map-ctrl-btn" id="map-zoom-out" type="button"><i class="fa-solid fa-minus"></i></button>
+          <button class="map-ctrl-btn" id="map-zoom-reset" type="button"><i class="fa-solid fa-compress"></i></button>
         </div>
       </div>
     </div>
   </div>
 </div>
 
-<!-- Author Modal -->
+<!-- ── Modal Auteur ────────────────────────────────────────────────────────── -->
 <div class="modal-overlay" id="author-modal">
   <div class="modal" style="max-width:960px">
     <div class="modal-header">
@@ -600,13 +607,13 @@
   </div>
 </div>
 
-<!-- Lightbox -->
+<!-- ── Lightbox ────────────────────────────────────────────────────────────── -->
 <div class="lightbox-overlay" id="lightbox-overlay">
   <button class="lightbox-close" id="lightbox-close"><i class="fa-solid fa-xmark"></i></button>
   <img id="lightbox-img" src="" alt="">
 </div>
 
-<!-- Add Modal -->
+<!-- ── Modal Ajout / Édition ─────────────────────────────────────────────── -->
 <div class="modal-overlay" id="add-modal">
   <div class="modal">
     <div class="modal-header">
@@ -622,11 +629,10 @@
         <input type="text" class="form-control" id="f-contributor-name" placeholder="Votre prénom et nom">
       </div>
       <input type="file" id="file-input" accept="image/*" multiple style="display:none">
-      <label class="field-label" style="margin-bottom:8px">Photos de la variété *</label>
+      <label style="display:block; font-size:13.5px; font-weight:600; margin-bottom:8px;">Photos de la variété *</label>
       <div class="upload-gallery" id="upload-gallery">
         <div class="add-img-btn" id="btn-add-img">
-          <i class="fa-solid fa-camera"></i>
-          <span>Ajouter</span>
+          <i class="fa-solid fa-camera"></i><span>Ajouter</span>
         </div>
       </div>
       <div class="pref-block">
@@ -644,18 +650,18 @@
         <div class="form-group">
           <label data-i18n="t_color">Couleur dominante *</label>
           <select class="form-control" id="f-color">
-            <option value="Rouge" data-i18n="color_red">Rouge</option>
-            <option value="Jaune" data-i18n="color_yellow">Jaune</option>
-            <option value="Noire" data-i18n="color_black">Noire / Pourpre</option>
-            <option value="Verte" data-i18n="color_green">Verte</option>
-            <option value="Orange" data-i18n="color_orange">Orange</option>
-            <option value="Rose" data-i18n="color_pink">Rose</option>
-            <option value="Blanche" data-i18n="color_white">Blanche</option>
-            <option value="Bicolore" data-i18n="color_bicolor">Bicolore / Bigarrée</option>
-            <option value="Violette" data-i18n="color_purple">Violette / Mauve</option>
-            <option value="Bordeaux" data-i18n="color_bordeaux">Bordeaux / Brun</option>
-            <option value="Crème" data-i18n="color_cream">Crème / Beige</option>
-            <option value="Rayée" data-i18n="color_striped">Rayée / Striée</option>
+            <option value="Rouge">Rouge</option>
+            <option value="Jaune">Jaune</option>
+            <option value="Noire">Noire / Pourpre</option>
+            <option value="Verte">Verte</option>
+            <option value="Orange">Orange</option>
+            <option value="Rose">Rose</option>
+            <option value="Blanche">Blanche</option>
+            <option value="Bicolore">Bicolore / Bigarrée</option>
+            <option value="Violette">Violette / Mauve</option>
+            <option value="Bordeaux">Bordeaux / Brun</option>
+            <option value="Crème">Crème / Beige</option>
+            <option value="Rayée">Rayée / Striée</option>
           </select>
         </div>
         <div class="form-group">
@@ -681,12 +687,12 @@
         <div class="form-group">
           <label data-i18n="t_size">Taille</label>
           <select class="form-control" id="f-size">
-            <option value="" data-i18n="size_any">-</option>
-            <option value="Cerise" data-i18n="size_cherry">Cerise</option>
-            <option value="Petite" data-i18n="size_small">Petite</option>
-            <option value="Moyenne" data-i18n="size_medium">Moyenne</option>
-            <option value="Grosse" data-i18n="size_large">Grosse</option>
-            <option value="Très grosse" data-i18n="size_xl">Très grosse</option>
+            <option value="">-</option>
+            <option value="Cerise">Cerise</option>
+            <option value="Petite">Petite</option>
+            <option value="Moyenne">Moyenne</option>
+            <option value="Grosse">Grosse</option>
+            <option value="Très grosse">Très grosse</option>
           </select>
         </div>
       </div>
@@ -705,10 +711,10 @@
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.17.0/firebase-app.js";
 import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.17.0/firebase-auth.js";
-import { getDatabase, ref, onValue, push, get, update, remove } from "https://www.gstatic.com/firebasejs/12.17.0/firebase-database.js";
+import { getDatabase, ref, onValue, push, get, update, remove, off } from "https://www.gstatic.com/firebasejs/12.17.0/firebase-database.js";
 import { sortTomatoes, similarTomatoes, recordClick, getClickData } from "./algo.js";
 
-// Coordonnées approximatives (lat, lon) par code pays ISO
+// ── Coords pays ────────────────────────────────────────────────────────────────
 const COUNTRY_COORDS = {
   af:[34,66], za:[-29,24], al:[41,20], dz:[28,3], de:[51,10], ad:[42.5,1.5], ao:[-12,18], ag:[17.1,-61.8], sa:[24,45], ar:[-34,-64], am:[40.1,45], au:[-25,133], at:[47.5,14], az:[40.4,47.6], bs:[24.3,-76], bh:[26,50.5], bd:[24,90], bb:[13.2,-59.6], be:[50.8,4.3], bz:[17.2,-88.5], bt:[27.5,90.4], mm:[21,96], by:[53.5,28], bo:[-17,-65], ba:[44,17.8], bw:[-22,24], bn:[4.5,114.7], br:[-10,-55], bg:[42.7,25], bf:[12.4,-1.5], bi:[-3.4,29.9], bj:[9.3,2.3], kh:[12.5,105], cm:[5.5,12.5], ca:[56,-106], cv:[16,-24], cl:[-35,-71], cn:[35,103], cy:[35,33], co:[4,-72], km:[-11.9,43.3], cg:[-0.5,15.8], cd:[-2.9,23.6], kp:[40,127], kr:[36.5,127.8], cr:[9.7,-83.8], hr:[45.1,15.2], cu:[21.5,-79.5], ci:[7.5,-5.5], dk:[56,10], dj:[11.8,42.6], dm:[15.4,-61.4], es:[40,-3.7], ee:[58.6,25], sz:[-26.5,31.5], fj:[-17.7,178], fi:[64,26], fr:[46.6,2.2], ga:[-0.8,11.6], gm:[13.4,-15.5], gh:[7.9,-1], gd:[12.1,-61.7], gr:[39,22], gt:[15.5,-90.2], gn:[10.6,-10.7], gq:[1.6,10.6], gw:[12,-15], gy:[5,-59], ge:[42.3,43.4], ht:[19,-72.3], hn:[15,-86.5], hu:[47.2,19.5], in:[21,78], id:[-2,118], iq:[33.2,43.7], ir:[32,53.7], ie:[53.4,-8], is:[65,-19], il:[31,34.8], it:[42.8,12.8], jm:[18.1,-77.3], jp:[36.2,138.3], jo:[31,36], kz:[48,66.9], ke:[0.5,37.9], kg:[41.2,74.8], ki:[1.4,173], kw:[29.3,47.5], la:[19.9,102.5], ls:[-29.6,28.2], lv:[56.9,24.6], lb:[33.9,35.9], lr:[6.4,-9.4], ly:[26.3,17.2], li:[47.2,9.5], lt:[55.2,23.9], lu:[49.8,6.1], mk:[41.6,21.7], mg:[-18.8,47], my:[4.2,101.9], mw:[-13.3,34.3], mv:[3.2,73], ml:[17,-4], mt:[35.9,14.4], ma:[31.8,-7.1], mu:[-20.3,57.6], mr:[20.3,-10.3], mx:[23,-102], fm:[6.9,158.2], md:[47.4,28.4], mc:[43.7,7.4], mn:[46.9,103.8], me:[42.7,19.4], mz:[-18.7,35.5], na:[-22.9,17], nr:[-0.5,166.9], ni:[12.9,-85.2], ne:[17.6,8], ng:[9.1,8.7], no:[61,8.5], nz:[-41,174], np:[28.2,84.2], om:[21,57], ug:[1.4,32.3], uz:[41.4,64.6], pk:[30,70], pw:[7.5,134.6], ps:[31.9,35.2], pa:[8.5,-80.8], pg:[-6.3,143.9], py:[-23.4,-58.4], nl:[52.2,5.3], ph:[13,122], pl:[52,19.4], pt:[39.4,-8.2], pe:[-9.2,-75], qa:[25.3,51.2], ro:[45.9,25], gb:[54,-2], ru:[61,105], rw:[-1.9,29.9], cf:[6.6,20.9], do:[18.7,-70.2], kn:[17.3,-62.7], sm:[43.9,12.5], vc:[13,-61.2], lc:[13.9,-61], sv:[13.8,-88.9], ws:[-13.8,-172], st:[0.2,6.6], rs:[44,21], sc:[-4.7,55.5], sl:[8.5,-11.8], sg:[1.35,103.8], sk:[48.7,19.5], si:[46.1,14.8], so:[5.2,46.2], sd:[15.6,32.5], ss:[7,30], lk:[7.9,80.8], ch:[46.8,8.2], sr:[4,-56], se:[62,15], sy:[35,38.5], sn:[14.5,-14.5], tj:[38.9,71.3], tz:[-6.4,34.9], tw:[23.7,121], td:[15.5,19], cz:[49.8,15.5], th:[15,101], tl:[-8.9,125.7], tg:[8.6,0.8], to:[-21.2,-175.2], tt:[10.7,-61.2], tn:[34,9], tm:[38.9,59.6], tr:[39,35], tv:[-7.5,178.7], ua:[49,32], uy:[-32.5,-56], vu:[-16,167.5], va:[41.9,12.45], ve:[8,-66], vn:[16,106], ye:[15.6,48], zm:[-13.1,27.9], zw:[-19,30], eg:[26.8,30.8], ae:[24,54], ec:[-1.8,-78.2], er:[15.2,39.8], us:[39,-98], et:[9.1,40.5], mh:[7.1,171.2], sb:[-9.6,160.2]
 };
@@ -723,13 +729,13 @@ const firebaseConfig = {
   measurementId: "G-Q8KHD0WW38",
   databaseURL: "https://tomatolist-efee0-default-rtdb.europe-west1.firebasedatabase.app"
 };
-
 const GAS_URL = "https://script.google.com/macros/s/AKfycbxVu24YbDkU7jbGKQt9kw2BdAo-Qj-_jympy35mMlMoS4guNFyxqqBhIxlts0_WZ1pgvg/exec";
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getDatabase(app);
 
+// ── État global ────────────────────────────────────────────────────────────────
 let tomatoesData = [];
 let countriesList = [];
 let currentUser = null;
@@ -742,26 +748,33 @@ let currentCountry = 'all';
 let isAnon = true;
 let editingTomatoId = null;
 let editOwnerUid = null;
-let hasFirstData = false;
+
+// Pagination
+const PAGE_SIZE = 51;
+const BANNER_INTERVAL = 25; // Bandeau tous les N tomates dans la page
+let currentPage = 1;
+
+// Commentaires
+let commentsListener = null; // Référence Firebase pour cleanup
 
 let currentLang = localStorage.getItem('tl_lang') || (navigator.language || 'fr').slice(0,2);
 let TRANSLATIONS = {};
 
-// ── colorMap étendu avec les nouvelles couleurs ──────────────────────────────
+// ── colorMap ────────────────────────────────────────────────────────────────────
 const colorMap = {
-  'Rouge':    '#ef4444',
-  'Jaune':    '#eab308',
-  'Noire':    '#4b5563',
-  'Verte':    '#22c55e',
-  'Orange':   '#f97316',
-  'Rose':     '#ec4899',
-  'Blanche':  '#f9fafb',
-  'Bicolore': 'linear-gradient(135deg, #ef4444 50%, #eab308 50%)',
-  'Violette': '#7c3aed',
-  'Bordeaux': '#7f1d1d',
-  'Crème':    '#d4a96a',
+  'Rouge':    '#ef4444',   'Jaune':    '#eab308',   'Noire':    '#4b5563',
+  'Verte':    '#22c55e',   'Orange':   '#f97316',   'Rose':     '#ec4899',
+  'Blanche':  '#f9fafb',   'Bicolore': 'linear-gradient(135deg, #ef4444 50%, #eab308 50%)',
+  'Violette': '#7c3aed',   'Bordeaux': '#7f1d1d',   'Crème':    '#d4a96a',
   'Rayée':    'repeating-linear-gradient(135deg,#22c55e 0px,#22c55e 6px,#eab308 6px,#eab308 12px)',
 };
+
+// ── Utilitaires ────────────────────────────────────────────────────────────────
+function escapeHtml(str) {
+  return (str || '')
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
 
 function showToast(msg, icon = 'fa-circle-info') {
   const container = document.getElementById('toast-container');
@@ -772,43 +785,31 @@ function showToast(msg, icon = 'fa-circle-info') {
   setTimeout(() => { if (toast.parentNode) toast.remove(); }, 3500);
 }
 
-// ─── LANGUE & UI ──────────────────────────────────────────────────────────────
+// ── Langue & i18n ──────────────────────────────────────────────────────────────
 async function loadTranslations() {
-  try {
-    const res = await fetch('lang.json');
-    TRANSLATIONS = await res.json();
-  } catch(e) {}
+  try { const res = await fetch('lang.json'); TRANSLATIONS = await res.json(); } catch(e) {}
   applyI18n();
 }
-function tr(key) { return (TRANSLATIONS[currentLang] && TRANSLATIONS[currentLang][key]) || (TRANSLATIONS.fr && TRANSLATIONS.fr[key]) || key; }
+function tr(key) { return (TRANSLATIONS[currentLang]?.[key]) || (TRANSLATIONS.fr?.[key]) || key; }
 
 const COLOR_KEY_MAP = {
-  'rouge': 'color_red', 'jaune': 'color_yellow', 'noire': 'color_black',
-  'verte': 'color_green', 'orange': 'color_orange', 'rose': 'color_pink',
-  'blanche': 'color_white', 'bicolore': 'color_bicolor',
-  'violette': 'color_purple', 'bordeaux': 'color_bordeaux',
-  'crème': 'color_cream', 'creme': 'color_cream', 'rayée': 'color_striped', 'rayee': 'color_striped'
+  'rouge':'color_red','jaune':'color_yellow','noire':'color_black','verte':'color_green',
+  'orange':'color_orange','rose':'color_pink','blanche':'color_white','bicolore':'color_bicolor',
+  'violette':'color_purple','bordeaux':'color_bordeaux','crème':'color_cream','creme':'color_cream',
+  'rayée':'color_striped','rayee':'color_striped'
 };
 const SIZE_KEY_MAP = {
-  'cerise': 'size_cherry', 'petite': 'size_small', 'moyenne': 'size_medium',
-  'grosse': 'size_large', 'très grosse': 'size_xl', 'tres grosse': 'size_xl'
+  'cerise':'size_cherry','petite':'size_small','moyenne':'size_medium',
+  'grosse':'size_large','très grosse':'size_xl','tres grosse':'size_xl'
 };
-function trColor(color) {
-  if (!color) return tr('color_red');
-  const key = COLOR_KEY_MAP[color.toLowerCase()];
-  return key ? tr(key) : color;
-}
-function trSize(size) {
-  if (!size) return '';
-  const key = SIZE_KEY_MAP[size.toLowerCase()];
-  return key ? tr(key) : size;
-}
+function trColor(c) { const k = COLOR_KEY_MAP[(c||'').toLowerCase()]; return k ? tr(k) : (c||''); }
+function trSize(s)  { const k = SIZE_KEY_MAP[(s||'').toLowerCase()];  return k ? tr(k) : (s||''); }
+
 function applyI18n() {
-  document.querySelectorAll('[data-i18n]').forEach(el => {
-    el.textContent = tr(el.getAttribute('data-i18n'));
-  });
+  document.querySelectorAll('[data-i18n]').forEach(el => { el.textContent = tr(el.getAttribute('data-i18n')); });
   document.getElementById('lang-label').textContent = currentLang.toUpperCase();
 }
+
 document.getElementById('btn-lang-dropdown').onclick = (e) => {
   e.stopPropagation(); document.getElementById('lang-menu').classList.toggle('active');
 };
@@ -825,65 +826,61 @@ document.addEventListener('click', (e) => {
   if (!e.target.closest('.custom-select-wrapper')) document.getElementById('f-country-menu').classList.remove('active');
 });
 
-// ─── SQUELETTE DE CHARGEMENT ──────────────────────────────────────────────────
+// ── Skeleton ───────────────────────────────────────────────────────────────────
 function renderSkeleton(count = 6) {
-  const grid = document.getElementById('tomatoes-grid');
-  let html = '';
-  for (let i = 0; i < count; i++) {
-    html += `<div class="skeleton-card"><div class="skeleton-img"></div><div class="skeleton-line"></div><div class="skeleton-line short"></div><div class="skeleton-line" style="margin-bottom:20px"></div></div>`;
-  }
-  grid.innerHTML = html;
+  document.getElementById('tomatoes-grid').innerHTML = Array.from({length:count}, () =>
+    `<div class="skeleton-card"><div class="skeleton-img"></div><div class="skeleton-line"></div><div class="skeleton-line short"></div><div class="skeleton-line" style="margin-bottom:20px"></div></div>`
+  ).join('');
 }
 renderSkeleton();
 
-// ─── PAYS ─────────────────────────────────────────────────────────────────────
+// ── Pays ───────────────────────────────────────────────────────────────────────
 async function loadCountries() {
-  try {
-    const res = await fetch('pays.json');
-    countriesList = await res.json();
-    renderCountryList();
-    renderCountryFilterOptions();
-  } catch (e) {}
+  try { const res = await fetch('pays.json'); countriesList = await res.json(); } catch(e) {}
+  renderCountryList();
+  renderCountryFilterOptions();
 }
 function renderCountryFilterOptions() {
   const sel = document.getElementById('country-filter-select');
-  const current = sel.value || 'all';
+  const cur = sel.value || 'all';
   sel.innerHTML = `<option value="all">${tr('country_all')}</option>` +
     countriesList.map(c => `<option value="${c.name}">${c.name}</option>`).join('');
-  sel.value = current;
+  sel.value = cur;
 }
-function renderCountryList(filterText = '') {
+function renderCountryList(filter = '') {
   const container = document.getElementById('f-country-list');
-  const filtered = countriesList.filter(c => c.name.toLowerCase().includes(filterText.toLowerCase()));
-  container.innerHTML = filtered.map(c => `
-    <div class="custom-option" data-name="${c.name}" data-code="${c.code}">
-      <img src="https://flagcdn.com/w20/${c.code}.png" alt="${c.name}">
-      <span>${c.name}</span>
-    </div>
-  `).join('');
+  const filtered = countriesList.filter(c => c.name.toLowerCase().includes(filter.toLowerCase()));
+  container.innerHTML = filtered.map(c =>
+    `<div class="custom-option" data-name="${c.name}" data-code="${c.code}">
+      <img src="https://flagcdn.com/w20/${c.code}.png" alt="${c.name}"><span>${c.name}</span>
+    </div>`
+  ).join('');
   container.querySelectorAll('.custom-option').forEach(opt => {
     opt.onclick = () => {
       const name = opt.getAttribute('data-name');
       const code = opt.getAttribute('data-code');
-      document.getElementById('f-country-btn').innerHTML = `<div style="display:flex;align-items:center"><img src="https://flagcdn.com/w20/${code}.png" alt=""> <span>${name}</span></div> <i class="fa-solid fa-chevron-down" style="color:var(--text-muted)"></i>`;
+      document.getElementById('f-country-btn').innerHTML =
+        `<div style="display:flex;align-items:center"><img src="https://flagcdn.com/w20/${code}.png" alt=""> <span>${name}</span></div>
+         <i class="fa-solid fa-chevron-down" style="color:var(--text-muted)"></i>`;
       document.getElementById('f-country-value').value = name;
       document.getElementById('f-country-menu').classList.remove('active');
     };
   });
 }
-document.getElementById('f-country-btn').onclick = (e) => {
-  e.stopPropagation(); document.getElementById('f-country-menu').classList.toggle('active');
-};
+document.getElementById('f-country-btn').onclick = (e) => { e.stopPropagation(); document.getElementById('f-country-menu').classList.toggle('active'); };
 document.getElementById('f-country-search').oninput = (e) => renderCountryList(e.target.value);
 
-// ─── FILTRES ──────────────────────────────────────────────────────────────────
+// ── Filtres ────────────────────────────────────────────────────────────────────
 document.getElementById('btn-toggle-filters').onclick = () => document.getElementById('filters-panel').classList.toggle('active');
+
+function resetPageOnFilter() { currentPage = 1; }
+
 document.querySelectorAll('#sort-group .filter-pill').forEach(btn => {
   btn.onclick = (e) => {
     document.querySelectorAll('#sort-group .filter-pill').forEach(b => b.classList.remove('active'));
     e.currentTarget.classList.add('active');
     currentSort = e.currentTarget.getAttribute('data-val');
-    renderGrid();
+    resetPageOnFilter(); renderGrid();
   };
 });
 document.querySelectorAll('#color-group .filter-pill').forEach(btn => {
@@ -891,17 +888,17 @@ document.querySelectorAll('#color-group .filter-pill').forEach(btn => {
     document.querySelectorAll('#color-group .filter-pill').forEach(b => b.classList.remove('active'));
     e.currentTarget.classList.add('active');
     currentColor = e.currentTarget.getAttribute('data-val');
-    renderGrid();
+    resetPageOnFilter(); renderGrid();
   };
 });
 document.getElementById('country-filter-select').onchange = (e) => {
   currentCountry = e.target.value;
-  renderGrid();
+  resetPageOnFilter(); renderGrid();
 };
+document.getElementById('search-input').addEventListener('input', () => { resetPageOnFilter(); renderGrid(); });
 
-// ─── AUTHENTIFICATION & TOGGLE ANONYME ────────────────────────────────────────
+// ── Auth ───────────────────────────────────────────────────────────────────────
 const anonToggle = document.getElementById('toggle-anon');
-
 onAuthStateChanged(auth, async (user) => {
   currentUser = user;
   const authLabel = document.getElementById('auth-label');
@@ -911,67 +908,57 @@ onAuthStateChanged(auth, async (user) => {
     btnAuth.onclick = () => { signOut(auth); showToast('Déconnexion réussie', 'fa-check'); };
     const snap = await get(ref(db, `users/${user.uid}/profile`));
     if (snap.exists()) currentProfile = snap.val();
-    isAnon = true;
-    anonToggle.classList.add('on');
-    anonToggle.style.opacity = '1';
-    anonToggle.style.cursor = 'pointer';
+    isAnon = true; anonToggle.classList.add('on');
+    anonToggle.style.opacity = '1'; anonToggle.style.cursor = 'pointer';
   } else {
     authLabel.textContent = tr('login') || "Connexion";
     btnAuth.onclick = () => window.location.href = 'auth.html';
-    currentProfile = null;
-    isAnon = true;
-    anonToggle.classList.add('on');
-    anonToggle.style.opacity = '0.5';
-    anonToggle.style.cursor = 'not-allowed';
+    currentProfile = null; isAnon = true; anonToggle.classList.add('on');
+    anonToggle.style.opacity = '0.5'; anonToggle.style.cursor = 'not-allowed';
   }
   renderGrid();
 });
-
 anonToggle.onclick = () => {
   if (!currentUser) { showToast("Connectez-vous pour publier avec votre nom.", "fa-lock"); return; }
-  isAnon = !isAnon;
-  anonToggle.classList.toggle('on', isAnon);
+  isAnon = !isAnon; anonToggle.classList.toggle('on', isAnon);
 };
 
-// ─── COMPTEUR ANIMÉ ───────────────────────────────────────────────────────────
-let varietyCounterCurrentValue = 0;
+// ── Compteur animé ─────────────────────────────────────────────────────────────
+let varietyCounterCurrent = 0;
 let varietyCounterRAF = null;
-
 function updateVarietyCounter(target) {
   const el = document.getElementById('variety-counter-num');
   if (!el) return;
-  const start = varietyCounterCurrentValue;
+  const start = varietyCounterCurrent;
   const diff = target - start;
   if (diff === 0) return;
   if (varietyCounterRAF) cancelAnimationFrame(varietyCounterRAF);
   const duration = 700;
   const startTime = performance.now();
   function step(now) {
-    const progress = Math.min((now - startTime) / duration, 1);
-    const eased = 1 - Math.pow(1 - progress, 3);
+    const p = Math.min((now - startTime) / duration, 1);
+    const eased = 1 - Math.pow(1 - p, 3);
     el.textContent = Math.round(start + diff * eased).toLocaleString(currentLang || 'fr');
-    if (progress < 1) { varietyCounterRAF = requestAnimationFrame(step); }
-    else { varietyCounterCurrentValue = target; }
+    if (p < 1) varietyCounterRAF = requestAnimationFrame(step);
+    else varietyCounterCurrent = target;
   }
   varietyCounterRAF = requestAnimationFrame(step);
 }
 
-// ─── LECTURE DES DONNÉES ──────────────────────────────────────────────────────
+// ── Données Firebase ───────────────────────────────────────────────────────────
 onValue(ref(db, 'tomatoes'), (snapshot) => {
   tomatoesData = [];
-  snapshot.forEach(child => { tomatoesData.push({ id: child.key, ...child.val() }); });
-  hasFirstData = true;
+  snapshot.forEach(child => tomatoesData.push({ id: child.key, ...child.val() }));
   updateVarietyCounter(tomatoesData.length);
   renderGrid();
   if (detailCurrentId) refreshDetailLikeBtn();
   maybeOpenSharedTomato();
 });
 
-// ─── BANDEAU DE PARTAGE ───────────────────────────────────────────────────────
-// Insère un bandeau dans la grille tous les 50 tomates
-function buildShareBannerHTML(index) {
+// ── Bandeau de partage ─────────────────────────────────────────────────────────
+function buildShareBannerHTML(idx) {
   return `
-    <div class="share-banner" role="complementary" aria-label="Partager TomatoList">
+    <div class="share-banner" role="complementary">
       <div class="share-banner-left">
         <div class="share-banner-emoji">🍅</div>
         <div>
@@ -980,89 +967,90 @@ function buildShareBannerHTML(index) {
         </div>
       </div>
       <div class="share-banner-actions">
-        <button class="share-banner-btn primary" data-share-copy="true" id="share-copy-btn-${index}">
+        <button class="share-banner-btn primary" data-share-copy id="sbcopy-${idx}">
           <i class="fa-solid fa-link"></i> Copier le lien
         </button>
-        <button class="share-banner-btn secondary" data-share-native="true" id="share-native-btn-${index}">
+        <button class="share-banner-btn secondary" data-share-native id="sbnative-${idx}">
           <i class="fa-solid fa-share-nodes"></i> Partager
         </button>
       </div>
-    </div>
-  `;
+    </div>`;
 }
 
-// ─── RENDU DE LA GRILLE ───────────────────────────────────────────────────────
+// ── Rendu de la grille avec pagination ────────────────────────────────────────
 function renderGrid() {
   const grid = document.getElementById('tomatoes-grid');
   const search = document.getElementById('search-input').value.toLowerCase();
 
+  // Filtrage
   let filtered = tomatoesData.filter(t => {
-    const matchSearch = (t.name || '').toLowerCase().includes(search) || (t.country || '').toLowerCase().includes(search);
+    const matchSearch = (t.name||'').toLowerCase().includes(search) || (t.country||'').toLowerCase().includes(search);
     const matchColor = currentColor === 'all' || t.color === currentColor;
     const matchCountry = currentCountry === 'all' || t.country === currentCountry;
     return matchSearch && matchColor && matchCountry;
   });
 
-  filtered = sortTomatoes(filtered, currentSort, currentProfile, currentUser ? currentUser.uid : null);
+  // Tri
+  filtered = sortTomatoes(filtered, currentSort, currentProfile, currentUser?.uid ?? null);
 
   if (filtered.length === 0) {
-    grid.innerHTML = `<div class="empty-state"><i class="fa-solid fa-leaf"></i><p>Aucune variété trouvée.</p></div>`;
+    grid.innerHTML = `<div class="empty-state"><i class="fa-solid fa-leaf" style="font-size:32px;margin-bottom:12px"></i><p>Aucune variété trouvée.</p></div>`;
+    document.getElementById('pagination-wrap').innerHTML = '';
     return;
   }
 
-  const BANNER_INTERVAL = 50; // Bandeau tous les N tomates
-  let htmlParts = [];
-  let bannerIndex = 0;
+  // Pagination
+  const totalPages = Math.ceil(filtered.length / PAGE_SIZE);
+  if (currentPage > totalPages) currentPage = totalPages;
+  const startIdx = (currentPage - 1) * PAGE_SIZE;
+  const pageItems = filtered.slice(startIdx, startIdx + PAGE_SIZE);
 
-  filtered.forEach((t, i) => {
-    // Insérer le bandeau AVANT la tomate n°50, 100, 150... (index 49, 99...)
+  // Rendu des cartes + bandeaux
+  let bannerCount = 0;
+  let htmlParts = [];
+
+  pageItems.forEach((t, i) => {
+    // Bandeau toutes les BANNER_INTERVAL tomates (sauf avant la première)
     if (i > 0 && i % BANNER_INTERVAL === 0) {
-      htmlParts.push(buildShareBannerHTML(bannerIndex++));
+      htmlParts.push(buildShareBannerHTML(bannerCount++));
     }
 
     const date = new Date(t.createdAt).toLocaleDateString(currentLang);
     const colorBg = colorMap[t.color] || '#ccc';
     const likesCount = t.likes ? Object.keys(t.likes).length : 0;
-    const isLiked = currentUser && t.likes && t.likes[currentUser.uid];
+    const isLiked = currentUser && t.likes?.[currentUser.uid];
+    const imagesArray = t.imageURLs || (t.imageURL ? [t.imageURL] : []);
 
     let countryBadge = '';
     if (t.country) {
-      const countryObj = countriesList.find(c => c.name === t.country);
-      if (countryObj) {
-        countryBadge = `<span class="badge"><img src="https://flagcdn.com/w20/${countryObj.code}.png" style="width:14px;border-radius:2px" alt=""> ${t.country}</span>`;
-      }
+      const co = countriesList.find(c => c.name === t.country);
+      if (co) countryBadge = `<span class="badge"><img src="https://flagcdn.com/w20/${co.code}.png" style="width:14px;border-radius:2px" alt=""> ${t.country}</span>`;
     }
 
-    const imagesArray = t.imageURLs || (t.imageURL ? [t.imageURL] : []);
-    let imagesHtml = '';
-    let imgCountBadge = '';
-    if (imagesArray.length > 0) {
-      imagesHtml = `<div class="card-img-wrapper"><img src="${imagesArray[0]}" class="card-img" alt="${t.name}" loading="lazy"></div>`;
-      if (imagesArray.length > 1) imgCountBadge = `<div class="img-count"><i class="fa-regular fa-images"></i> ${imagesArray.length}</div>`;
-    } else {
-      imagesHtml = `<div class="card-img-wrapper" style="background:#eee"></div>`;
-    }
+    let imgHtml = imagesArray.length > 0
+      ? `<div class="card-img-wrapper"><img src="${imagesArray[0]}" class="card-img" alt="${escapeHtml(t.name)}" loading="lazy"></div>`
+      : `<div class="card-img-wrapper" style="background:#eee"></div>`;
+
+    let imgCount = imagesArray.length > 1
+      ? `<div class="img-count"><i class="fa-regular fa-images"></i> ${imagesArray.length}</div>` : '';
 
     htmlParts.push(`
       <div class="card" data-id="${t.id}">
-        <div style="position:relative">
-          ${imagesHtml}
-          ${imgCountBadge}
-        </div>
+        <div style="position:relative">${imgHtml}${imgCount}</div>
         <div class="card-body">
-          <h3 class="card-title">${t.name}</h3>
+          <h3 class="card-title">${escapeHtml(t.name)}</h3>
           <div class="card-meta">
             <span class="badge"><i class="color-dot" style="background:${colorBg}"></i> ${trColor(t.color)}</span>
             ${t.weight ? `<span class="badge"><i class="fa-solid fa-scale-balanced"></i> ${t.weight}g</span>` : ''}
             ${countryBadge}
           </div>
-          <div class="card-desc">${t.description || '-'}</div>
+          <div class="card-desc">${escapeHtml(t.description || '-')}</div>
           <div class="card-footer">
-            <div class="card-footer-left ${t.uid ? 'author-link' : ''}" ${t.uid ? `data-author-uid="${t.uid}" data-author-name="${(t.author || 'Anonyme').replace(/"/g,'&quot;')}"` : ''}>
-              <i class="fa-solid fa-user" style="color:var(--text-muted)"></i> ${t.author || 'Anonyme'}
+            <div class="card-footer-left ${t.uid ? 'author-link' : ''}" ${t.uid ? `data-author-uid="${t.uid}" data-author-name="${escapeHtml(t.author||'Anonyme')}"` : ''}>
+              <i class="fa-solid fa-user" style="color:var(--text-muted)"></i> ${escapeHtml(t.author || 'Anonyme')}
             </div>
-            <div class="card-footer-right" style="display:flex; gap:12px; align-items:center;">
-              <span style="font-size: 12px">${date}</span>
+            <div style="display:flex; gap:12px; align-items:center;">
+              <span style="font-size:12px">${date}</span>
               <button class="like-btn ${isLiked ? 'liked' : ''}" data-id="${t.id}">
                 <i class="${isLiked ? 'fa-solid' : 'fa-regular'} fa-heart"></i>
                 <span>${likesCount}</span>
@@ -1070,74 +1058,106 @@ function renderGrid() {
             </div>
           </div>
         </div>
-      </div>
-    `);
+      </div>`);
   });
 
   grid.innerHTML = htmlParts.join('');
 
-  // Attacher les événements sur les boutons des bandeaux de partage
+  // Événements sur les bandeaux
   grid.querySelectorAll('[data-share-copy]').forEach(btn => {
     btn.onclick = async (e) => {
       e.stopPropagation();
-      const url = window.location.origin + window.location.pathname;
-      try {
-        await navigator.clipboard.writeText(url);
-        showToast('Lien copié dans le presse-papier !', 'fa-link');
-      } catch (_) {
-        showToast(url, 'fa-link');
-      }
+      const url = location.origin + location.pathname;
+      try { await navigator.clipboard.writeText(url); showToast('Lien copié !', 'fa-link'); }
+      catch(_) { showToast(url, 'fa-link'); }
     };
   });
   grid.querySelectorAll('[data-share-native]').forEach(btn => {
     btn.onclick = async (e) => {
       e.stopPropagation();
-      const url = window.location.origin + window.location.pathname;
+      const url = location.origin + location.pathname;
       if (navigator.share) {
-        try {
-          await navigator.share({ title: 'TomatoList', text: 'Découvrez des centaines de variétés de tomates 🍅', url });
-        } catch (_) {}
-      } else {
-        try {
-          await navigator.clipboard.writeText(url);
-          showToast('Lien copié !', 'fa-link');
-        } catch (_) {
-          showToast(url, 'fa-link');
-        }
+        try { await navigator.share({ title: 'TomatoList', text: 'Découvrez des centaines de variétés de tomates 🍅', url }); return; } catch(_) {}
       }
+      try { await navigator.clipboard.writeText(url); showToast('Lien copié !', 'fa-link'); } catch(_) {}
+    };
+  });
+
+  // Pagination
+  renderPagination(currentPage, totalPages, filtered.length);
+}
+
+// ── Pagination ─────────────────────────────────────────────────────────────────
+function renderPagination(page, total, totalItems) {
+  const wrap = document.getElementById('pagination-wrap');
+  if (total <= 1) { wrap.innerHTML = ''; return; }
+
+  const AROUND = 2;
+  const pages = new Set();
+  pages.add(1); pages.add(total);
+  for (let i = Math.max(1, page - AROUND); i <= Math.min(total, page + AROUND); i++) pages.add(i);
+
+  const sortedPages = Array.from(pages).sort((a,b) => a-b);
+
+  let parts = [];
+
+  // Bouton précédent
+  parts.push(`<button class="page-btn" data-page="${page-1}" ${page <= 1 ? 'disabled' : ''}>
+    <i class="fa-solid fa-chevron-left"></i>
+  </button>`);
+
+  let prev = null;
+  for (const p of sortedPages) {
+    if (prev !== null && p - prev > 1) parts.push(`<span class="page-ellipsis">…</span>`);
+    parts.push(`<button class="page-btn ${p === page ? 'active' : ''}" data-page="${p}">${p}</button>`);
+    prev = p;
+  }
+
+  // Bouton suivant
+  parts.push(`<button class="page-btn" data-page="${page+1}" ${page >= total ? 'disabled' : ''}>
+    <i class="fa-solid fa-chevron-right"></i>
+  </button>`);
+
+  // Info
+  const start = (page - 1) * PAGE_SIZE + 1;
+  const end = Math.min(page * PAGE_SIZE, totalItems);
+  parts.push(`<span class="page-info">${start}–${end} / ${totalItems}</span>`);
+
+  wrap.innerHTML = parts.join('');
+
+  wrap.querySelectorAll('.page-btn:not([disabled])').forEach(btn => {
+    btn.onclick = () => {
+      currentPage = parseInt(btn.getAttribute('data-page'));
+      renderGrid();
+      document.getElementById('tomatoes-grid').scrollIntoView({ behavior: 'smooth', block: 'start' });
     };
   });
 }
 
-document.getElementById('search-input').addEventListener('input', renderGrid);
-
-// ─── LIKES ────────────────────────────────────────────────────────────────────
+// ── Likes ──────────────────────────────────────────────────────────────────────
 async function toggleLike(tomatoId) {
   if (!currentUser) return showToast('Connectez-vous pour ajouter aux favoris', 'fa-lock');
-  const tomato = tomatoesData.find(t => t.id === tomatoId);
-  if (!tomato) return;
-  const isLiked = tomato.likes && tomato.likes[currentUser.uid];
+  const t = tomatoesData.find(x => x.id === tomatoId);
+  if (!t) return;
+  const isLiked = t.likes?.[currentUser.uid];
   const updates = {};
   updates[`tomatoes/${tomatoId}/likes/${currentUser.uid}`] = isLiked ? null : true;
   updates[`users/${currentUser.uid}/likes/${tomatoId}`] = isLiked ? null : true;
-  try { await update(ref(db), updates); } catch(err) { showToast("Erreur lors de l'action.", 'fa-triangle-exclamation'); }
+  try { await update(ref(db), updates); }
+  catch(err) { showToast("Erreur lors de l'action.", 'fa-triangle-exclamation'); }
 }
 
-document.getElementById('tomatoes-grid').addEventListener('click', async (e) => {
-  // Ne pas propager depuis les bandeaux de partage
+document.getElementById('tomatoes-grid').addEventListener('click', (e) => {
   if (e.target.closest('.share-banner')) return;
-
   const likeBtn = e.target.closest('.like-btn');
   if (likeBtn) { toggleLike(likeBtn.getAttribute('data-id')); return; }
-
   const authorLink = e.target.closest('.author-link');
   if (authorLink) { openAuthorModal(authorLink.getAttribute('data-author-uid'), authorLink.getAttribute('data-author-name')); return; }
-
   const card = e.target.closest('.card');
-  if (card) { openDetailModal(card.getAttribute('data-id')); }
+  if (card) openDetailModal(card.getAttribute('data-id'));
 });
 
-// ─── MODAL DÉTAIL ─────────────────────────────────────────────────────────────
+// ── Modal Détail ───────────────────────────────────────────────────────────────
 let detailCurrentId = null;
 
 function openDetailModal(tomatoId) {
@@ -1145,7 +1165,7 @@ function openDetailModal(tomatoId) {
   if (!t) return;
   detailCurrentId = tomatoId;
 
-  // ── Enregistrement du clic pour l'algorithme ──────────────────────────────
+  // Enregistrer le clic pour l'algo
   recordClick(t);
 
   const imagesArray = t.imageURLs || (t.imageURL ? [t.imageURL] : []);
@@ -1158,17 +1178,14 @@ function openDetailModal(tomatoId) {
     ? imagesArray.map(url => `
         <div class="detail-img-slide">
           <div class="detail-carousel-blur" style="background-image:url('${url}')"></div>
-          <img src="${url}" alt="${t.name}" data-zoom="${url}" style="cursor:zoom-in">
-        </div>
-      `).join('')
+          <img src="${url}" alt="${escapeHtml(t.name)}" data-zoom="${url}" style="cursor:zoom-in">
+        </div>`).join('')
     : `<div class="detail-img-slide" style="background:#eee"></div>`;
 
-  carousel.querySelectorAll('img[data-zoom]').forEach(img => {
-    img.onclick = () => openLightbox(img.getAttribute('data-zoom'));
-  });
+  carousel.querySelectorAll('img[data-zoom]').forEach(img => { img.onclick = () => openLightbox(img.getAttribute('data-zoom')); });
 
   dots.innerHTML = imagesArray.length > 1
-    ? imagesArray.map((_, i) => `<span class="${i === 0 ? 'active' : ''}"></span>`).join('')
+    ? imagesArray.map((_,i) => `<span class="${i===0?'active':''}"></span>`).join('')
     : '';
 
   const showNav = imagesArray.length > 1;
@@ -1178,8 +1195,8 @@ function openDetailModal(tomatoId) {
   nextBtn.onclick = () => carousel.scrollBy({ left: carousel.offsetWidth, behavior: 'smooth' });
   carousel.onscroll = () => {
     if (imagesArray.length <= 1) return;
-    const index = Math.round(carousel.scrollLeft / carousel.offsetWidth);
-    dots.querySelectorAll('span').forEach((d, i) => d.classList.toggle('active', i === index));
+    const idx = Math.round(carousel.scrollLeft / carousel.offsetWidth);
+    dots.querySelectorAll('span').forEach((d,i) => d.classList.toggle('active', i === idx));
   };
 
   document.getElementById('detail-title').textContent = t.name;
@@ -1187,8 +1204,8 @@ function openDetailModal(tomatoId) {
   const colorBg = colorMap[t.color] || '#ccc';
   let countryBadge = '';
   if (t.country) {
-    const countryObj = countriesList.find(c => c.name === t.country);
-    if (countryObj) countryBadge = `<span class="badge"><img src="https://flagcdn.com/w20/${countryObj.code}.png" style="width:14px;border-radius:2px" alt=""> ${t.country}</span>`;
+    const co = countriesList.find(c => c.name === t.country);
+    if (co) countryBadge = `<span class="badge"><img src="https://flagcdn.com/w20/${co.code}.png" style="width:14px;border-radius:2px" alt=""> ${t.country}</span>`;
   }
   const sizeLabel = trSize(t.averageSize);
   document.getElementById('detail-meta').innerHTML = `
@@ -1201,7 +1218,7 @@ function openDetailModal(tomatoId) {
   document.getElementById('detail-desc').textContent = t.description || '-';
 
   const authorEl = document.getElementById('detail-author');
-  authorEl.innerHTML = `<i class="fa-solid fa-user" style="color:var(--text-muted)"></i> ${t.author || 'Anonyme'}`;
+  authorEl.innerHTML = `<i class="fa-solid fa-user" style="color:var(--text-muted)"></i> ${escapeHtml(t.author || 'Anonyme')}`;
   if (t.uid) {
     authorEl.classList.add('author-link');
     authorEl.onclick = () => openAuthorModal(t.uid, t.author || 'Anonyme');
@@ -1224,12 +1241,11 @@ function openDetailModal(tomatoId) {
     similarBlock.style.display = 'block';
     document.getElementById('similar-grid').innerHTML = similar.map(s => {
       const sImgs = s.imageURLs || (s.imageURL ? [s.imageURL] : []);
-      const sImg = sImgs[0] || '';
       return `<div class="similar-card" data-id="${s.id}">
         <div class="similar-card-imgwrap">
-          ${sImg ? `<img src="${sImg}" alt="${s.name}" loading="lazy">` : `<div class="no-img"><i class="fa-solid fa-image"></i></div>`}
+          ${sImgs[0] ? `<img src="${sImgs[0]}" alt="${escapeHtml(s.name)}" loading="lazy">` : `<div class="no-img"><i class="fa-solid fa-image"></i></div>`}
         </div>
-        <div class="similar-name">${s.name}</div>
+        <div class="similar-name">${escapeHtml(s.name)}</div>
       </div>`;
     }).join('');
     document.getElementById('similar-grid').querySelectorAll('.similar-card').forEach(card => {
@@ -1240,6 +1256,18 @@ function openDetailModal(tomatoId) {
   }
 
   refreshDetailLikeBtn();
+
+  // Pré-remplir le champ auteur du commentaire si connecté
+  const commentAuthorInput = document.getElementById('comment-author-input');
+  if (currentProfile && !isAnon) {
+    commentAuthorInput.value = `${currentProfile.firstname || ''} ${currentProfile.lastname || ''}`.trim();
+  } else if (currentUser) {
+    commentAuthorInput.value = '';
+  }
+
+  // Charger les commentaires en temps réel
+  loadComments(tomatoId);
+
   document.getElementById('detail-modal').classList.add('active');
   history.replaceState(null, '', `?tomato=${tomatoId}`);
 }
@@ -1248,7 +1276,7 @@ function refreshDetailLikeBtn() {
   const t = tomatoesData.find(x => x.id === detailCurrentId);
   if (!t) return;
   const likesCount = t.likes ? Object.keys(t.likes).length : 0;
-  const isLiked = currentUser && t.likes && t.likes[currentUser.uid];
+  const isLiked = currentUser && t.likes?.[currentUser.uid];
   const btn = document.getElementById('detail-like-btn');
   btn.classList.toggle('liked', !!isLiked);
   btn.querySelector('i').className = isLiked ? 'fa-solid fa-heart' : 'fa-regular fa-heart';
@@ -1258,81 +1286,182 @@ function refreshDetailLikeBtn() {
 document.getElementById('detail-like-btn').onclick = () => { if (detailCurrentId) toggleLike(detailCurrentId); };
 
 function closeDetailModal() {
+  // Détacher le listener des commentaires
+  if (commentsListener) { off(commentsListener); commentsListener = null; }
   document.getElementById('detail-modal').classList.remove('active');
+  document.getElementById('comment-text-input').value = '';
+  document.getElementById('comment-char-count').textContent = '0 / 1000';
   detailCurrentId = null;
-  history.replaceState(null, '', window.location.pathname);
+  history.replaceState(null, '', location.pathname);
 }
 document.getElementById('close-detail-modal').onclick = closeDetailModal;
 document.getElementById('detail-modal').addEventListener('click', (e) => { if (e.target.id === 'detail-modal') closeDetailModal(); });
 
-// ─── PARTAGE ──────────────────────────────────────────────────────────────────
+// ── COMMENTAIRES ───────────────────────────────────────────────────────────────
+
+/**
+ * Active un listener temps-réel sur comments/{tomatoId}.
+ * On détache l'ancien listener avant d'en créer un nouveau.
+ */
+function loadComments(tomatoId) {
+  // Nettoyer l'ancien listener
+  if (commentsListener) { off(commentsListener); commentsListener = null; }
+
+  const commentsRef = ref(db, `comments/${tomatoId}`);
+  commentsListener = commentsRef; // On stocke la ref pour off() plus tard
+
+  document.getElementById('comments-list').innerHTML =
+    `<div class="comments-loading"><i class="fa-solid fa-spinner fa-spin"></i> Chargement...</div>`;
+
+  onValue(commentsRef, (snapshot) => {
+    const comments = [];
+    snapshot.forEach(child => comments.push({ id: child.key, ...child.val() }));
+    renderComments(comments);
+  });
+}
+
+function renderComments(comments) {
+  const list = document.getElementById('comments-list');
+  const badge = document.getElementById('comments-count-badge');
+
+  badge.textContent = comments.length;
+
+  if (comments.length === 0) {
+    list.innerHTML = `<div class="comments-empty">
+      <i class="fa-regular fa-comment-dots" style="font-size:24px; margin-bottom:8px; color:var(--line-h)"></i>
+      <div>Aucun commentaire pour l'instant. Soyez le premier&nbsp;!</div>
+    </div>`;
+    return;
+  }
+
+  // Trier par date croissante (plus ancien en premier)
+  const sorted = [...comments].sort((a,b) => (a.createdAt||0) - (b.createdAt||0));
+
+  list.innerHTML = sorted.map(c => {
+    const date = new Date(c.createdAt).toLocaleDateString(currentLang, { day:'numeric', month:'short', year:'numeric' });
+    const author = escapeHtml(c.author || 'Anonyme');
+    const text = escapeHtml(c.text || '');
+    const initial = (c.author || 'A').charAt(0).toUpperCase();
+
+    return `
+      <div class="comment-item">
+        <div class="comment-header">
+          <div style="display:flex; align-items:center; gap:8px;">
+            <div style="width:28px; height:28px; border-radius:50%; background:var(--primary); color:#fff; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; flex-shrink:0;">${initial}</div>
+            <span class="comment-author">${author}</span>
+          </div>
+          <span class="comment-date">${date}</span>
+        </div>
+        <div class="comment-text" style="margin-top:8px; padding-left:36px;">${text}</div>
+      </div>`;
+  }).join('');
+}
+
+// Compteur de caractères
+document.getElementById('comment-text-input').addEventListener('input', (e) => {
+  const len = e.target.value.length;
+  document.getElementById('comment-char-count').textContent = `${len} / 1000`;
+});
+
+// Soumission du commentaire
+document.getElementById('comment-submit-btn').onclick = async () => {
+  if (!detailCurrentId) return;
+
+  const textInput = document.getElementById('comment-text-input');
+  const authorInput = document.getElementById('comment-author-input');
+  const text = textInput.value.trim();
+  const author = authorInput.value.trim() || 'Anonyme';
+
+  if (!text) {
+    textInput.focus();
+    textInput.style.borderColor = 'var(--primary)';
+    setTimeout(() => textInput.style.borderColor = '', 1500);
+    return;
+  }
+  if (text.length > 1000) {
+    showToast('Le commentaire est trop long (max 1000 caractères).', 'fa-triangle-exclamation');
+    return;
+  }
+
+  const btn = document.getElementById('comment-submit-btn');
+  btn.disabled = true;
+  btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Envoi...`;
+
+  try {
+    await push(ref(db, `comments/${detailCurrentId}`), {
+      text,
+      author,
+      uid: currentUser ? currentUser.uid : null,
+      createdAt: Date.now()
+    });
+    textInput.value = '';
+    document.getElementById('comment-char-count').textContent = '0 / 1000';
+    showToast('Commentaire publié !', 'fa-check');
+  } catch(e) {
+    showToast('Erreur lors de la publication du commentaire.', 'fa-triangle-exclamation');
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = `<i class="fa-solid fa-paper-plane"></i> Envoyer`;
+  }
+};
+
+// ── Partage (bouton fiche) ─────────────────────────────────────────────────────
 document.getElementById('detail-share-btn').onclick = async () => {
   if (!detailCurrentId) return;
-  const url = `${window.location.origin}${window.location.pathname}?tomato=${detailCurrentId}`;
+  const url = `${location.origin}${location.pathname}?tomato=${detailCurrentId}`;
   if (navigator.share) {
     try { await navigator.share({ title: 'TomatoList', text: document.getElementById('detail-title').textContent, url }); return; } catch(_) {}
   }
-  try {
-    await navigator.clipboard.writeText(url);
-    showToast(tr('share_copied') || 'Lien copié !', 'fa-link');
-  } catch (e) { showToast(url, 'fa-link'); }
+  try { await navigator.clipboard.writeText(url); showToast(tr('share_copied')||'Lien copié !', 'fa-link'); }
+  catch(_) { showToast(url, 'fa-link'); }
 };
 
 function maybeOpenSharedTomato() {
   if (detailCurrentId) return;
-  const params = new URLSearchParams(window.location.search);
-  const id = params.get('tomato');
+  const id = new URLSearchParams(location.search).get('tomato');
   if (id && tomatoesData.find(t => t.id === id)) openDetailModal(id);
 }
 
-// ─── LIGHTBOX ─────────────────────────────────────────────────────────────────
-function openLightbox(url) {
-  document.getElementById('lightbox-img').src = url;
-  document.getElementById('lightbox-overlay').classList.add('active');
-}
-function closeLightbox() {
-  document.getElementById('lightbox-overlay').classList.remove('active');
-  document.getElementById('lightbox-img').src = '';
-}
+// ── Lightbox ───────────────────────────────────────────────────────────────────
+function openLightbox(url) { document.getElementById('lightbox-img').src = url; document.getElementById('lightbox-overlay').classList.add('active'); }
+function closeLightbox() { document.getElementById('lightbox-overlay').classList.remove('active'); document.getElementById('lightbox-img').src = ''; }
 document.getElementById('lightbox-close').onclick = closeLightbox;
 document.getElementById('lightbox-overlay').addEventListener('click', (e) => { if (e.target.id === 'lightbox-overlay') closeLightbox(); });
 
-// ─── CONTRIBUTEURS ────────────────────────────────────────────────────────────
+// ── Contributeurs ──────────────────────────────────────────────────────────────
 function renderContributors(t) {
   const block = document.getElementById('detail-contributors');
   const list = document.getElementById('detail-contributors-list');
   const contributors = t.contributors ? Object.values(t.contributors).filter(c => c && c.name) : [];
-  if (contributors.length === 0) { block.style.display = 'none'; list.innerHTML = ''; return; }
+  if (!contributors.length) { block.style.display = 'none'; list.innerHTML = ''; return; }
   list.innerHTML = contributors.map(c => `
-    <div class="contributor-chip" ${c.uid ? `data-uid="${c.uid}"` : ''} data-name="${c.name.replace(/"/g,'&quot;')}" style="${c.uid ? '' : 'cursor:default;'}">
+    <div class="contributor-chip" ${c.uid?`data-uid="${c.uid}"`:''}  data-name="${escapeHtml(c.name)}" style="${c.uid?'':'cursor:default;'}">
       <span class="contributor-avatar">${c.name.charAt(0)}</span>
-      <span>${c.name}</span>
-    </div>
-  `).join('');
+      <span>${escapeHtml(c.name)}</span>
+    </div>`).join('');
   list.querySelectorAll('.contributor-chip[data-uid]').forEach(chip => {
     chip.onclick = () => openAuthorModal(chip.getAttribute('data-uid'), chip.getAttribute('data-name'));
   });
   block.style.display = 'block';
 }
 
-// ─── PAGE AUTEUR ──────────────────────────────────────────────────────────────
+// ── Auteur ────────────────────────────────────────────────────────────────────
 function openAuthorModal(uid, name) {
   if (!uid) return;
   const list = tomatoesData.filter(t => t.uid === uid);
   document.getElementById('author-modal-title').textContent = `${tr('author_title')} ${name}`;
   const grid = document.getElementById('author-grid');
-  if (list.length === 0) {
+  if (!list.length) {
     grid.innerHTML = `<div class="empty-state">${tr('no_tomatoes_author')}</div>`;
   } else {
     grid.innerHTML = list.map(t => {
       const imgs = t.imageURLs || (t.imageURL ? [t.imageURL] : []);
-      const img = imgs[0] || '';
       const likesCount = t.likes ? Object.keys(t.likes).length : 0;
       return `<div class="card" data-id="${t.id}">
-        <div class="card-img-wrapper">${img ? `<img src="${img}" class="card-img" alt="${t.name}" loading="lazy">` : ''}</div>
+        <div class="card-img-wrapper">${imgs[0]?`<img src="${imgs[0]}" class="card-img" alt="${escapeHtml(t.name)}" loading="lazy">`:''}</div>
         <div class="card-body">
-          <h3 class="card-title">${t.name}</h3>
-          <div class="card-desc">${t.description || '-'}</div>
+          <h3 class="card-title">${escapeHtml(t.name)}</h3>
+          <div class="card-desc">${escapeHtml(t.description||'-')}</div>
           <div class="card-footer">
             <span style="font-size:12px">${new Date(t.createdAt).toLocaleDateString(currentLang)}</span>
             <span style="font-size:13px"><i class="fa-solid fa-heart" style="color:var(--primary)"></i> ${likesCount}</span>
@@ -1341,10 +1470,7 @@ function openAuthorModal(uid, name) {
       </div>`;
     }).join('');
     grid.querySelectorAll('.card').forEach(card => {
-      card.onclick = () => {
-        document.getElementById('author-modal').classList.remove('active');
-        openDetailModal(card.getAttribute('data-id'));
-      };
+      card.onclick = () => { document.getElementById('author-modal').classList.remove('active'); openDetailModal(card.getAttribute('data-id')); };
     });
   }
   document.getElementById('author-modal').classList.add('active');
@@ -1352,149 +1478,103 @@ function openAuthorModal(uid, name) {
 document.getElementById('close-author-modal').onclick = () => document.getElementById('author-modal').classList.remove('active');
 document.getElementById('author-modal').addEventListener('click', (e) => { if (e.target.id === 'author-modal') document.getElementById('author-modal').classList.remove('active'); });
 
-// ─── CARTE DU MONDE ───────────────────────────────────────────────────────────
+// ── Carte du monde ─────────────────────────────────────────────────────────────
 const mapViewport = document.getElementById('map-viewport');
 const mapInner = document.getElementById('map-inner');
 const mapState = { scale: 1, x: 0, y: 0, minScale: 1, maxScale: 8 };
 
 function applyMapTransform() {
   mapInner.style.transform = `translate(${mapState.x}px, ${mapState.y}px) scale(${mapState.scale})`;
-  // Counter-scale des pins : on inverse le zoom pour qu'ils restent visuellement constants
-  // On les réduit légèrement (facteur 0.75) pour qu'ils soient moins encombrants à fort zoom
-  const pinScale = Math.min(1, 0.75 / mapState.scale);
-  mapViewport.style.setProperty('--map-pin-scale', pinScale);
+  mapViewport.style.setProperty('--map-pin-scale', Math.min(1, 0.75 / mapState.scale));
 }
-
 function clampMapPosition() {
-  const vw = mapViewport.clientWidth;
-  const vh = mapViewport.clientHeight;
-  const scaledW = vw * mapState.scale;
-  const scaledH = vh * mapState.scale;
-  const minX = Math.min(0, vw - scaledW);
-  const minY = Math.min(0, vh - scaledH);
-  mapState.x = Math.max(minX, Math.min(0, mapState.x));
-  mapState.y = Math.max(minY, Math.min(0, mapState.y));
+  const vw = mapViewport.clientWidth, vh = mapViewport.clientHeight;
+  mapState.x = Math.max(Math.min(0, vw - vw * mapState.scale), Math.min(0, mapState.x));
+  mapState.y = Math.max(Math.min(0, vh - vh * mapState.scale), Math.min(0, mapState.y));
 }
-
-function zoomMapAt(factor, clientX, clientY) {
+function zoomMapAt(factor, cx, cy) {
   const rect = mapViewport.getBoundingClientRect();
-  const originX = clientX !== undefined ? clientX - rect.left : rect.width / 2;
-  const originY = clientY !== undefined ? clientY - rect.top : rect.height / 2;
+  const ox = cx !== undefined ? cx - rect.left : rect.width / 2;
+  const oy = cy !== undefined ? cy - rect.top : rect.height / 2;
   const newScale = Math.max(mapState.minScale, Math.min(mapState.maxScale, mapState.scale * factor));
-  const realFactor = newScale / mapState.scale;
-  mapState.x = originX - (originX - mapState.x) * realFactor;
-  mapState.y = originY - (originY - mapState.y) * realFactor;
+  const rf = newScale / mapState.scale;
+  mapState.x = ox - (ox - mapState.x) * rf;
+  mapState.y = oy - (oy - mapState.y) * rf;
   mapState.scale = newScale;
-  clampMapPosition();
-  applyMapTransform();
+  clampMapPosition(); applyMapTransform();
 }
+function resetMapView() { mapState.scale = 1; mapState.x = 0; mapState.y = 0; applyMapTransform(); }
 
-function resetMapView() {
-  mapState.scale = 1; mapState.x = 0; mapState.y = 0;
-  applyMapTransform();
-}
+mapViewport.addEventListener('wheel', (e) => { e.preventDefault(); zoomMapAt(e.deltaY < 0 ? 1.2 : 1/1.2, e.clientX, e.clientY); }, { passive: false });
 
-// Molette
-mapViewport.addEventListener('wheel', (e) => {
-  e.preventDefault();
-  zoomMapAt(e.deltaY < 0 ? 1.2 : 1 / 1.2, e.clientX, e.clientY);
-}, { passive: false });
-
-// Pointer events (drag + pinch)
 const activePointers = new Map();
-let dragStart = null;
-let pinchStartDist = null;
-let pinchStartScale = 1;
-let pinchMidpoint = null;
-
-function getPointersArray() { return Array.from(activePointers.values()); }
-function dist(a, b) { return Math.hypot(a.x - b.x, a.y - b.y); }
-function midpoint(a, b) { return { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 }; }
+let dragStart = null, pinchStartDist = null, pinchStartScale = 1, pinchMidpoint = null;
+function getPA() { return Array.from(activePointers.values()); }
+function pdist(a,b) { return Math.hypot(a.x-b.x, a.y-b.y); }
+function pmid(a,b) { return {x:(a.x+b.x)/2, y:(a.y+b.y)/2}; }
 
 mapViewport.addEventListener('pointerdown', (e) => {
   mapViewport.setPointerCapture(e.pointerId);
-  activePointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
-  if (activePointers.size === 1) { dragStart = { x: e.clientX, y: e.clientY, origX: mapState.x, origY: mapState.y }; mapViewport.classList.add('grabbing'); }
-  else if (activePointers.size === 2) {
-    const [p1, p2] = getPointersArray();
-    pinchStartDist = dist(p1, p2); pinchStartScale = mapState.scale; pinchMidpoint = midpoint(p1, p2); dragStart = null;
-  }
+  activePointers.set(e.pointerId, {x:e.clientX, y:e.clientY});
+  if (activePointers.size === 1) { dragStart = {x:e.clientX, y:e.clientY, origX:mapState.x, origY:mapState.y}; mapViewport.classList.add('grabbing'); }
+  else if (activePointers.size === 2) { const [p1,p2]=getPA(); pinchStartDist=pdist(p1,p2); pinchStartScale=mapState.scale; pinchMidpoint=pmid(p1,p2); dragStart=null; }
 });
 mapViewport.addEventListener('pointermove', (e) => {
   if (!activePointers.has(e.pointerId)) return;
-  activePointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
-  if (activePointers.size === 2) {
-    const [p1, p2] = getPointersArray();
-    const newDist = dist(p1, p2);
-    if (pinchStartDist) { const factor = (newDist / pinchStartDist) * pinchStartScale / mapState.scale; zoomMapAt(factor, pinchMidpoint.x, pinchMidpoint.y); }
-  } else if (dragStart && activePointers.size === 1) {
-    mapState.x = dragStart.origX + (e.clientX - dragStart.x);
-    mapState.y = dragStart.origY + (e.clientY - dragStart.y);
-    clampMapPosition(); applyMapTransform();
-  }
+  activePointers.set(e.pointerId, {x:e.clientX, y:e.clientY});
+  if (activePointers.size === 2) { const [p1,p2]=getPA(); const nd=pdist(p1,p2); if (pinchStartDist) zoomMapAt((nd/pinchStartDist)*(pinchStartScale/mapState.scale), pinchMidpoint.x, pinchMidpoint.y); }
+  else if (dragStart && activePointers.size === 1) { mapState.x=dragStart.origX+(e.clientX-dragStart.x); mapState.y=dragStart.origY+(e.clientY-dragStart.y); clampMapPosition(); applyMapTransform(); }
 });
-function endMapPointer(e) {
+function endMP(e) {
   activePointers.delete(e.pointerId); mapViewport.classList.remove('grabbing');
   if (activePointers.size < 2) pinchStartDist = null;
-  if (activePointers.size === 1) { const [p] = getPointersArray(); dragStart = { x: p.x, y: p.y, origX: mapState.x, origY: mapState.y }; }
+  if (activePointers.size === 1) { const [p]=getPA(); dragStart={x:p.x, y:p.y, origX:mapState.x, origY:mapState.y}; }
   else if (activePointers.size === 0) dragStart = null;
 }
-mapViewport.addEventListener('pointerup', endMapPointer);
-mapViewport.addEventListener('pointercancel', endMapPointer);
-mapViewport.addEventListener('pointerleave', (e) => { if (activePointers.has(e.pointerId)) endMapPointer(e); });
-
+mapViewport.addEventListener('pointerup', endMP);
+mapViewport.addEventListener('pointercancel', endMP);
+mapViewport.addEventListener('pointerleave', (e) => { if (activePointers.has(e.pointerId)) endMP(e); });
 document.getElementById('map-zoom-in').onclick = () => zoomMapAt(1.4);
-document.getElementById('map-zoom-out').onclick = () => zoomMapAt(1 / 1.4);
+document.getElementById('map-zoom-out').onclick = () => zoomMapAt(1/1.4);
 document.getElementById('map-zoom-reset').onclick = () => resetMapView();
 mapViewport.addEventListener('dblclick', (e) => zoomMapAt(1.6, e.clientX, e.clientY));
 
 function renderMap() {
   mapInner.querySelectorAll('.map-pin').forEach(d => d.remove());
   const counts = {};
-  tomatoesData.forEach(t => { if (!t.country) return; counts[t.country] = (counts[t.country] || 0) + 1; });
-
-  Object.keys(counts).forEach(countryName => {
-    const c = countriesList.find(x => x.name === countryName);
+  tomatoesData.forEach(t => { if (!t.country) return; counts[t.country] = (counts[t.country]||0)+1; });
+  Object.keys(counts).forEach(cn => {
+    const c = countriesList.find(x => x.name === cn);
     if (!c || !COUNTRY_COORDS[c.code]) return;
-    const [lat, lon] = COUNTRY_COORDS[c.code];
-    const x = ((lon + 180) / 360) * 100;
-    const y = ((90 - lat) / 180) * 100;
-
+    const [lat,lon] = COUNTRY_COORDS[c.code];
+    const x = ((lon+180)/360)*100;
+    const y = ((90-lat)/180)*100;
     const pin = document.createElement('div');
     pin.className = 'map-pin';
-    pin.style.left = x + '%';
-    pin.style.top = y + '%';
-    pin.title = `${countryName} (${counts[countryName]})`;
-    pin.innerHTML = `
-      <img class="map-pin-flag" src="https://flagcdn.com/w40/${c.code}.png" alt="${countryName}">
-      <div class="map-dot"><span class="map-dot-count">${counts[countryName]}</span></div>
-    `;
+    pin.style.left = x+'%'; pin.style.top = y+'%';
+    pin.title = `${cn} (${counts[cn]})`;
+    pin.innerHTML = `<img class="map-pin-flag" src="https://flagcdn.com/w40/${c.code}.png" alt="${cn}"><div class="map-dot"><span class="map-dot-count">${counts[cn]}</span></div>`;
     pin.addEventListener('click', (e) => {
       e.stopPropagation();
-      currentCountry = countryName;
-      document.getElementById('country-filter-select').value = countryName;
+      currentCountry = cn;
+      document.getElementById('country-filter-select').value = cn;
       document.getElementById('map-modal').classList.remove('active');
-      renderGrid();
+      resetPageOnFilter(); renderGrid();
       document.getElementById('tomatoes-grid').scrollIntoView({ behavior: 'smooth' });
     });
     mapInner.appendChild(pin);
   });
-
-  // Appliquer le scale initial des pins
   applyMapTransform();
 }
-
 document.getElementById('btn-open-map').onclick = () => { renderMap(); resetMapView(); document.getElementById('map-modal').classList.add('active'); };
 document.getElementById('close-map-modal').onclick = () => document.getElementById('map-modal').classList.remove('active');
 document.getElementById('map-modal').addEventListener('click', (e) => { if (e.target.id === 'map-modal') document.getElementById('map-modal').classList.remove('active'); });
 
-// ─── PUBLICATION MULTI-IMAGES ─────────────────────────────────────────────────
+// ── Upload & Publication ───────────────────────────────────────────────────────
 const fileInput = document.getElementById('file-input');
 document.getElementById('btn-add-img').onclick = () => fileInput.click();
 fileInput.onchange = async (e) => {
-  const files = Array.from(e.target.files);
-  if (!files.length) return;
-  for (const file of files) { const base64 = await resizeImage(file); addImageToGallery(base64); }
+  for (const file of Array.from(e.target.files)) { const b64 = await resizeImage(file); addImageToGallery(b64); }
 };
 function addImageToGallery(value) {
   currentImagesData.push(value);
@@ -1503,28 +1583,20 @@ function addImageToGallery(value) {
   const div = document.createElement('div');
   div.className = 'upload-item';
   div.innerHTML = `<img src="${value}" alt=""><button class="del-btn"><i class="fa-solid fa-xmark"></i></button>`;
-  div.querySelector('.del-btn').onclick = () => {
-    const idx = currentImagesData.indexOf(value);
-    if (idx > -1) currentImagesData.splice(idx, 1);
-    div.remove();
-  };
+  div.querySelector('.del-btn').onclick = () => { const idx = currentImagesData.indexOf(value); if (idx > -1) currentImagesData.splice(idx, 1); div.remove(); };
   gallery.insertBefore(div, addBtn);
 }
 function resizeImage(file) {
-  return new Promise((resolve) => {
+  return new Promise(resolve => {
     const reader = new FileReader();
-    reader.onload = (ev) => {
+    reader.onload = ev => {
       const img = new Image();
       img.onload = () => {
         const canvas = document.createElement('canvas');
-        let width = img.width, height = img.height;
-        const MAX = 1600;
-        if (width > MAX || height > MAX) {
-          if (width > height) { height = Math.round((height * MAX) / width); width = MAX; }
-          else { width = Math.round((width * MAX) / height); height = MAX; }
-        }
-        canvas.width = width; canvas.height = height;
-        canvas.getContext('2d').drawImage(img, 0, 0, width, height);
+        let [w,h] = [img.width, img.height]; const MAX=1600;
+        if (w>MAX||h>MAX) { if (w>h) { h=Math.round(h*MAX/w); w=MAX; } else { w=Math.round(w*MAX/h); h=MAX; } }
+        canvas.width=w; canvas.height=h;
+        canvas.getContext('2d').drawImage(img,0,0,w,h);
         resolve(canvas.toDataURL('image/webp', 0.8));
       };
       img.src = ev.target.result;
@@ -1536,17 +1608,16 @@ function resizeImage(file) {
 document.getElementById('btn-submit').onclick = async () => {
   const name = document.getElementById('f-name').value.trim();
   const errBox = document.getElementById('form-error');
-  if (!name || currentImagesData.length === 0) {
-    errBox.textContent = 'Nom de la variété et au moins une photo requis.';
-    errBox.style.display = 'block'; return;
-  }
+  if (!name || !currentImagesData.length) { errBox.textContent = 'Nom de la variété et au moins une photo requis.'; errBox.style.display = 'block'; return; }
+
   const isOwnerEdit = editingTomatoId && currentUser && editOwnerUid && currentUser.uid === editOwnerUid;
   let contributorName = '';
   if (editingTomatoId && !isOwnerEdit) {
     contributorName = document.getElementById('f-contributor-name').value.trim();
-    if (!contributorName) { errBox.textContent = 'Merci d\'indiquer votre prénom et nom pour valider la modification.'; errBox.style.display = 'block'; return; }
+    if (!contributorName) { errBox.textContent = 'Merci d\'indiquer votre prénom et nom.'; errBox.style.display = 'block'; return; }
   }
   errBox.style.display = 'none';
+
   const fill = document.getElementById('progress-fill');
   const btn = document.getElementById('btn-submit');
   btn.disabled = true; fill.style.width = '20%';
@@ -1554,33 +1625,30 @@ document.getElementById('btn-submit').onclick = async () => {
   try {
     const urls = [];
     let i = 1;
+    const toUpload = currentImagesData.filter(v => v.startsWith('data:'));
     for (const value of currentImagesData) {
       if (value.startsWith('data:')) {
-        const res = await fetch(GAS_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ name: name.replace(/\s+/g, '_') + '_' + Date.now() + '_' + i + '.webp', image: value }) });
+        const res = await fetch(GAS_URL, { method:'POST', headers:{'Content-Type':'text/plain;charset=utf-8'}, body: JSON.stringify({ name: name.replace(/\s+/g,'_')+'_'+Date.now()+'_'+i+'.webp', image: value }) });
         const result = await res.json();
-        if (!result.success) throw new Error("Upload failed");
+        if (!result.success) throw new Error('Upload failed');
         urls.push(result.url);
-        fill.style.width = (20 + (80 * i / (currentImagesData.filter(v => v.startsWith('data:')).length || 1))) + '%';
+        fill.style.width = (20 + 80*i/(toUpload.length||1)) + '%';
         i++;
       } else { urls.push(value); }
     }
 
     if (editingTomatoId) {
-      const updates = { name, color: document.getElementById('f-color').value, imageURLs: urls, weight: parseInt(document.getElementById('f-weight').value) || null, averageSize: document.getElementById('f-size').value || null, description: document.getElementById('f-desc').value || "", country: document.getElementById('f-country-value').value || "" };
-      if (!isOwnerEdit) {
-        const newContribRef = push(ref(db, `tomatoes/${editingTomatoId}/contributors`));
-        updates[`contributors/${newContribRef.key}`] = { name: contributorName, uid: currentUser ? currentUser.uid : null, at: Date.now() };
-      }
+      const updates = { name, color: document.getElementById('f-color').value, imageURLs: urls, weight: parseInt(document.getElementById('f-weight').value)||null, averageSize: document.getElementById('f-size').value||null, description: document.getElementById('f-desc').value||'', country: document.getElementById('f-country-value').value||'' };
+      if (!isOwnerEdit) { const nr = push(ref(db,`tomatoes/${editingTomatoId}/contributors`)); updates[`contributors/${nr.key}`] = { name: contributorName, uid: currentUser?.uid||null, at: Date.now() }; }
       await update(ref(db, `tomatoes/${editingTomatoId}`), updates);
       fill.style.width = '100%';
-      setTimeout(() => { document.getElementById('add-modal').classList.remove('active'); resetForm(); showToast(tr('update_done'), 'fa-seedling'); }, 400);
+      setTimeout(() => { document.getElementById('add-modal').classList.remove('active'); resetForm(); showToast(tr('update_done')||'Mis à jour !', 'fa-seedling'); }, 400);
     } else {
-      let authorName = "Anonyme";
-      if (!isAnon && currentUser && currentProfile) authorName = `${currentProfile.firstname} ${currentProfile.lastname}`.trim();
-      const tomatoData = { name, color: document.getElementById('f-color').value, imageURLs: urls, weight: parseInt(document.getElementById('f-weight').value) || null, averageSize: document.getElementById('f-size').value || null, description: document.getElementById('f-desc').value || "", country: document.getElementById('f-country-value').value || "", author: authorName, uid: currentUser ? currentUser.uid : null, createdAt: Date.now() };
-      await push(ref(db, 'tomatoes'), tomatoData);
+      let authorName = 'Anonyme';
+      if (!isAnon && currentUser && currentProfile) authorName = `${currentProfile.firstname||''} ${currentProfile.lastname||''}`.trim();
+      await push(ref(db, 'tomatoes'), { name, color: document.getElementById('f-color').value, imageURLs: urls, weight: parseInt(document.getElementById('f-weight').value)||null, averageSize: document.getElementById('f-size').value||null, description: document.getElementById('f-desc').value||'', country: document.getElementById('f-country-value').value||'', author: authorName, uid: currentUser?.uid||null, createdAt: Date.now() });
       fill.style.width = '100%';
-      setTimeout(() => { document.getElementById('add-modal').classList.remove('active'); resetForm(); showToast(tr('publish_success'), 'fa-seedling'); }, 500);
+      setTimeout(() => { document.getElementById('add-modal').classList.remove('active'); resetForm(); showToast(tr('publish_success')||'Publié !', 'fa-seedling'); }, 500);
     }
   } catch(e) {
     errBox.textContent = "Erreur de connexion. L'image est-elle trop lourde ?";
@@ -1590,17 +1658,13 @@ document.getElementById('btn-submit').onclick = async () => {
 
 function resetForm() {
   editingTomatoId = null; editOwnerUid = null;
-  const contribBlock = document.getElementById('edit-contributor-note');
-  if (contribBlock) contribBlock.style.display = 'none';
-  const contribInput = document.getElementById('f-contributor-name');
-  if (contribInput) contribInput.value = '';
-  document.getElementById('add-modal-title').setAttribute('data-i18n', 'add_title');
+  const cb = document.getElementById('edit-contributor-note'); if (cb) cb.style.display = 'none';
+  const ci = document.getElementById('f-contributor-name'); if (ci) ci.value = '';
+  document.getElementById('add-modal-title').setAttribute('data-i18n','add_title');
   document.getElementById('add-modal-title').textContent = tr('add_title');
-  document.getElementById('btn-submit-label').setAttribute('data-i18n', 'submit');
+  document.getElementById('btn-submit-label').setAttribute('data-i18n','submit');
   document.getElementById('btn-submit-label').textContent = tr('submit');
-  document.getElementById('f-name').value = '';
-  document.getElementById('f-desc').value = '';
-  document.getElementById('f-weight').value = '';
+  ['f-name','f-desc','f-weight'].forEach(id => document.getElementById(id).value = '');
   document.getElementById('f-country-value').value = '';
   document.getElementById('f-country-btn').innerHTML = `<span>Sélectionner un pays...</span> <i class="fa-solid fa-chevron-down" style="color:var(--text-muted)"></i>`;
   document.getElementById('f-country-search').value = '';
@@ -1610,45 +1674,30 @@ function resetForm() {
   document.getElementById('progress-fill').style.width = '0%';
   document.getElementById('btn-submit').disabled = false;
   document.getElementById('form-error').style.display = 'none';
-  isAnon = true;
-  anonToggle.classList.add('on');
+  isAnon = true; anonToggle.classList.add('on');
   if (!currentUser) { anonToggle.style.opacity = '0.5'; anonToggle.style.cursor = 'not-allowed'; }
 }
-
-function isFormDirty() {
-  return !!document.getElementById('f-name').value.trim() || !!document.getElementById('f-desc').value.trim() || currentImagesData.length > 0;
-}
-function closeAddModalWithConfirm() {
-  if (isFormDirty() && !confirm(tr('leave_confirm'))) return;
-  document.getElementById('add-modal').classList.remove('active');
-  resetForm();
-}
+function isFormDirty() { return !!document.getElementById('f-name').value.trim() || !!document.getElementById('f-desc').value.trim() || currentImagesData.length > 0; }
+function closeAddModalWithConfirm() { if (isFormDirty() && !confirm(tr('leave_confirm'))) return; document.getElementById('add-modal').classList.remove('active'); resetForm(); }
 
 function openEditModal(t) {
-  editingTomatoId = t.id; editOwnerUid = t.uid || null;
+  editingTomatoId = t.id; editOwnerUid = t.uid||null;
   const isOwner = currentUser && editOwnerUid && currentUser.uid === editOwnerUid;
   document.getElementById('add-modal-title').removeAttribute('data-i18n');
   document.getElementById('add-modal-title').textContent = tr('edit_title');
   document.getElementById('btn-submit-label').removeAttribute('data-i18n');
   document.getElementById('btn-submit-label').textContent = tr('save');
-  document.getElementById('f-name').value = t.name || '';
-  document.getElementById('f-color').value = t.color || 'Rouge';
-  document.getElementById('f-weight').value = t.weight || '';
-  document.getElementById('f-size').value = t.averageSize || '';
-  document.getElementById('f-desc').value = t.description || '';
-  const contribBlock = document.getElementById('edit-contributor-note');
-  const contribInput = document.getElementById('f-contributor-name');
-  if (contribBlock) contribBlock.style.display = isOwner ? 'none' : 'block';
-  if (contribInput) contribInput.value = (!isOwner && currentProfile) ? `${currentProfile.firstname || ''} ${currentProfile.lastname || ''}`.trim() : '';
-  if (t.country) {
-    const c = countriesList.find(x => x.name === t.country);
-    document.getElementById('f-country-value').value = t.country;
-    if (c) document.getElementById('f-country-btn').innerHTML = `<div style="display:flex;align-items:center"><img src="https://flagcdn.com/w20/${c.code}.png" alt=""> <span>${t.country}</span></div> <i class="fa-solid fa-chevron-down" style="color:var(--text-muted)"></i>`;
-  }
+  document.getElementById('f-name').value = t.name||'';
+  document.getElementById('f-color').value = t.color||'Rouge';
+  document.getElementById('f-weight').value = t.weight||'';
+  document.getElementById('f-size').value = t.averageSize||'';
+  document.getElementById('f-desc').value = t.description||'';
+  const cb = document.getElementById('edit-contributor-note'); if (cb) cb.style.display = isOwner ? 'none' : 'block';
+  const ci = document.getElementById('f-contributor-name'); if (ci) ci.value = (!isOwner && currentProfile) ? `${currentProfile.firstname||''} ${currentProfile.lastname||''}`.trim() : '';
+  if (t.country) { const c = countriesList.find(x => x.name === t.country); document.getElementById('f-country-value').value = t.country; if (c) document.getElementById('f-country-btn').innerHTML = `<div style="display:flex;align-items:center"><img src="https://flagcdn.com/w20/${c.code}.png" alt=""> <span>${t.country}</span></div> <i class="fa-solid fa-chevron-down" style="color:var(--text-muted)"></i>`; }
   currentImagesData = [];
   document.getElementById('upload-gallery').querySelectorAll('.upload-item').forEach(el => el.remove());
-  const imgs = t.imageURLs || (t.imageURL ? [t.imageURL] : []);
-  imgs.forEach(url => addImageToGallery(url));
+  (t.imageURLs || (t.imageURL ? [t.imageURL] : [])).forEach(url => addImageToGallery(url));
   document.getElementById('detail-modal').classList.remove('active');
   document.getElementById('add-modal').classList.add('active');
 }
@@ -1660,20 +1709,15 @@ document.getElementById('detail-delete-btn').onclick = async () => {
   if (!t || !currentUser || currentUser.uid !== t.uid) { showToast(tr('not_owner'), 'fa-lock'); return; }
   if (!confirm(tr('delete_confirm'))) return;
   try { await remove(ref(db, `tomatoes/${detailCurrentId}`)); closeDetailModal(); showToast(tr('delete_done'), 'fa-check'); }
-  catch (e) { showToast("Erreur lors de la suppression.", 'fa-triangle-exclamation'); }
+  catch(e) { showToast('Erreur lors de la suppression.', 'fa-triangle-exclamation'); }
 };
 
 document.getElementById('btn-add-modal').onclick = () => { editingTomatoId = null; resetForm(); document.getElementById('add-modal').classList.add('active'); };
 document.getElementById('close-modal').onclick = closeAddModalWithConfirm;
 document.getElementById('add-modal').addEventListener('click', (e) => { if (e.target.id === 'add-modal') closeAddModalWithConfirm(); });
 
-loadTranslations();
-loadCountries();
-
-// ─── PWA ──────────────────────────────────────────────────────────────────────
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => { navigator.serviceWorker.register('sw.js').catch(() => {}); });
-}
+// ── PWA ────────────────────────────────────────────────────────────────────────
+if ('serviceWorker' in navigator) { window.addEventListener('load', () => { navigator.serviceWorker.register('sw.js').catch(()=>{}); }); }
 
 (function initInstallBanner() {
   const banner = document.getElementById('install-banner');
@@ -1681,40 +1725,28 @@ if ('serviceWorker' in navigator) {
   const btnInstall = document.getElementById('install-banner-btn');
   const btnClose = document.getElementById('install-banner-close');
   const DISMISS_KEY = 'tl_install_dismissed_at';
-  const DISMISS_DAYS = 7;
-
-  const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
-  if (isStandalone) return;
-
-  const dismissedAt = parseInt(localStorage.getItem(DISMISS_KEY) || '0', 10);
-  if (dismissedAt && (Date.now() - dismissedAt) / 86400000 < DISMISS_DAYS) return;
-
+  if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone) return;
+  const da = parseInt(localStorage.getItem(DISMISS_KEY)||'0',10);
+  if (da && (Date.now()-da)/86400000 < 7) return;
   const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
   let deferredPrompt = null;
-
   const showBanner = () => banner.classList.add('visible');
   const hideBanner = () => banner.classList.remove('visible');
-
   btnClose.onclick = () => { hideBanner(); localStorage.setItem(DISMISS_KEY, String(Date.now())); };
-
   if (isIOS) {
-    subEl.innerHTML = tr('install_sub_ios') || 'Appuyez sur <i class="fa-solid fa-arrow-up-from-bracket"></i> puis "Sur l\'écran d\'accueil".';
-    btnInstall.innerHTML = `<i class="fa-solid fa-arrow-up-from-bracket"></i> <span>${tr('install_ios_hint') || 'Voir comment'}</span>`;
-    btnInstall.onclick = () => { subEl.style.color = 'var(--primary)'; subEl.style.fontWeight = '600'; };
-    setTimeout(showBanner, 2500);
-    return;
+    subEl.innerHTML = 'Appuyez sur <i class="fa-solid fa-arrow-up-from-bracket"></i> puis "Sur l\'écran d\'accueil".';
+    btnInstall.innerHTML = `<i class="fa-solid fa-arrow-up-from-bracket"></i> <span>Voir comment</span>`;
+    btnInstall.onclick = () => { subEl.style.color='var(--primary)'; subEl.style.fontWeight='600'; };
+    setTimeout(showBanner, 2500); return;
   }
-
-  window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); deferredPrompt = e; setTimeout(showBanner, 2000); });
-  btnInstall.onclick = async () => {
-    if (!deferredPrompt) { hideBanner(); return; }
-    hideBanner(); deferredPrompt.prompt();
-    const { outcome } = await deferredPrompt.userChoice;
-    if (outcome !== 'accepted') localStorage.setItem(DISMISS_KEY, String(Date.now()));
-    deferredPrompt = null;
-  };
-  window.addEventListener('appinstalled', () => { hideBanner(); localStorage.setItem(DISMISS_KEY, String(Date.now())); showToast(tr('install_success') || 'TomatoList est installé !', 'fa-circle-check'); });
+  window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); deferredPrompt=e; setTimeout(showBanner, 2000); });
+  btnInstall.onclick = async () => { if (!deferredPrompt) { hideBanner(); return; } hideBanner(); deferredPrompt.prompt(); const {outcome} = await deferredPrompt.userChoice; if (outcome !== 'accepted') localStorage.setItem(DISMISS_KEY, String(Date.now())); deferredPrompt = null; };
+  window.addEventListener('appinstalled', () => { hideBanner(); localStorage.setItem(DISMISS_KEY, String(Date.now())); showToast('TomatoList est installé !', 'fa-circle-check'); });
 })();
+
+// ── Init ───────────────────────────────────────────────────────────────────────
+loadTranslations();
+loadCountries();
 </script>
 </body>
 </html>
