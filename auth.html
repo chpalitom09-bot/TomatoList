@@ -300,7 +300,7 @@
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.17.0/firebase-app.js";
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/12.17.0/firebase-auth.js";
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/12.17.0/firebase-auth.js";
 import { getDatabase, ref, set, get } from "https://www.gstatic.com/firebasejs/12.17.0/firebase-database.js";
 
 const firebaseConfig = {
@@ -462,31 +462,62 @@ document.getElementById('btn-magic-auth').onclick = async (e) => {
 };
 
 
-// ----------------- GOOGLE AUTH (POPUP) -----------------
+// ----------------- GOOGLE AUTH (POPUP sur desktop, REDIRECT sur mobile) -----------------
+// Sur mobile, les popups sont souvent bloqués/coupés par les navigateurs (règles COOP,
+// bloqueurs de popup, WebViews...), donc on utilise une redirection complète à la place.
+const isMobileDevice = /Android|iPhone|iPad|iPod|Mobile|Opera Mini/i.test(navigator.userAgent) || (window.innerWidth <= 768);
+
+async function processGoogleUser(user) {
+  // On vérifie si l'utilisateur a déjà un profil rempli
+  const snap = await get(ref(db, `users/${user.uid}/profile`));
+
+  if (snap.exists()) {
+    window.location.href = 'index.html';
+  } else {
+    state.pendingUser = user;
+    document.getElementById('q-firstname').value = (user.displayName || '').split(' ')[0];
+    document.getElementById('q-lastname').value = (user.displayName || '').split(' ').slice(1).join(' ');
+    showStep('step-identity');
+  }
+}
+
 document.getElementById('btn-google').onclick = async () => {
   setError('auth-error', '');
+  const btn = document.getElementById('btn-google');
   try {
-    const result = await signInWithPopup(auth, googleProvider);
-    const user = result.user;
-    
-    // On vérifie si l'utilisateur a déjà un profil rempli
-    const snap = await get(ref(db, `users/${user.uid}/profile`));
-    
-    if (snap.exists()) {
-      window.location.href = 'index.html';
-    } else {
-      state.pendingUser = user;
-      document.getElementById('q-firstname').value = (user.displayName || '').split(' ')[0];
-      document.getElementById('q-lastname').value = (user.displayName || '').split(' ').slice(1).join(' ');
-      showStep('step-identity');
+    if (isMobileDevice) {
+      // La page va être quittée puis on revient dessus : le traitement se fait
+      // au chargement via getRedirectResult() plus bas.
+      btn.classList.add('btn-loading');
+      btn.disabled = true;
+      await signInWithRedirect(auth, googleProvider);
+      return;
     }
+    const result = await signInWithPopup(auth, googleProvider);
+    await processGoogleUser(result.user);
   } catch (error) {
+    btn.classList.remove('btn-loading');
+    btn.disabled = false;
     // Ignore l'erreur si l'utilisateur ferme simplement le popup
     if (error.code !== 'auth/popup-closed-by-user' && error.code !== 'auth/cancelled-popup-request') {
       setError('auth-error', "Erreur lors de la connexion avec Google.");
     }
   }
 };
+
+// Au chargement de la page : on regarde si on revient d'une redirection Google
+(async () => {
+  try {
+    const result = await getRedirectResult(auth);
+    if (result && result.user) {
+      await processGoogleUser(result.user);
+    }
+  } catch (error) {
+    if (error.code !== 'auth/cancelled-popup-request') {
+      setError('auth-error', "Erreur lors de la connexion avec Google.");
+    }
+  }
+})();
 
 
 // ----------------- ETAPE 1 : PROFIL -----------------
