@@ -225,6 +225,60 @@
   .similar-card img { width: 100%; height: 90px; object-fit: cover; display: block; }
   .similar-card .similar-name { font-size: 12px; font-weight: 600; padding: 6px 8px; }
 
+  /* Bannière d'installation PWA */
+  .install-banner {
+    position: fixed;
+    left: 20px;
+    right: 20px;
+    bottom: -140px;
+    max-width: 420px;
+    margin: 0 auto;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 18px;
+    box-shadow: 0 12px 40px rgba(0,0,0,0.18);
+    padding: 16px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    z-index: 1500;
+    transition: bottom 0.45s cubic-bezier(.2,.9,.3,1.2), opacity 0.3s;
+    opacity: 0;
+  }
+  .install-banner.visible { bottom: 20px; opacity: 1; }
+  .install-banner-icon {
+    width: 52px; height: 52px; border-radius: 14px; flex-shrink: 0;
+    box-shadow: 0 4px 12px rgba(185,28,28,0.25);
+    background: #fff;
+  }
+  .install-banner-body { flex: 1; min-width: 0; }
+  .install-banner-title { font-size: 14.5px; font-weight: 700; color: var(--text-main); margin-bottom: 2px; }
+  .install-banner-sub { font-size: 12.5px; color: var(--text-muted); line-height: 1.35; }
+  .install-banner-actions { display: flex; flex-direction: column; gap: 6px; align-items: stretch; flex-shrink: 0; }
+  .install-banner-btn {
+    background: var(--primary); color: #fff; border: none; padding: 9px 16px;
+    border-radius: 10px; font-size: 13px; font-weight: 700; cursor: pointer;
+    white-space: nowrap; display: flex; align-items: center; gap: 6px; justify-content: center;
+    transition: background 0.15s, transform 0.1s;
+  }
+  .install-banner-btn:hover { background: var(--primary-dark, #991b1b); }
+  .install-banner-btn:active { transform: scale(0.96); }
+  .install-banner-close {
+    background: none; border: none; color: var(--text-muted); font-size: 12px;
+    cursor: pointer; padding: 4px; text-align: center;
+  }
+  .install-banner-close:hover { color: var(--text-main); text-decoration: underline; }
+  .install-banner-ios-steps {
+    display: flex; align-items: center; gap: 4px; font-size: 12px; color: var(--text-muted); margin-top: 4px;
+  }
+  .install-banner-ios-steps i { color: var(--primary); }
+
+  @media (max-width: 480px) {
+    .install-banner { left: 12px; right: 12px; padding: 14px; gap: 10px; }
+    .install-banner-icon { width: 44px; height: 44px; }
+    .install-banner-btn { padding: 8px 12px; font-size: 12.5px; }
+  }
+
   @media (max-width: 768px) {
     .hide-mobile { display: none !important; }
     .btn { padding: 10px; border-radius: 8px; }
@@ -305,6 +359,19 @@
 
 <div class="grid" id="tomatoes-grid">
   <!-- JavaScript -->
+</div>
+
+<!-- Bannière d'installation PWA -->
+<div class="install-banner" id="install-banner">
+  <img src="icon.svg" alt="TomatoList" class="install-banner-icon">
+  <div class="install-banner-body">
+    <div class="install-banner-title" data-i18n="install_title">Installer TomatoList</div>
+    <div class="install-banner-sub" id="install-banner-sub" data-i18n="install_sub">Accédez-y en un tap, même hors connexion.</div>
+  </div>
+  <div class="install-banner-actions">
+    <button class="install-banner-btn" id="install-banner-btn"><i class="fa-solid fa-download"></i> <span data-i18n="install_btn">Installer</span></button>
+    <button class="install-banner-close" id="install-banner-close" data-i18n="install_later">Plus tard</button>
+  </div>
 </div>
 
 <div class="toast-container" id="toast-container"></div>
@@ -1497,6 +1564,76 @@ if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('sw.js').catch(() => {});
   });
 }
+
+// ----------------- PWA : bannière d'installation -----------------
+(function initInstallBanner() {
+  const banner = document.getElementById('install-banner');
+  const subEl = document.getElementById('install-banner-sub');
+  const btnInstall = document.getElementById('install-banner-btn');
+  const btnClose = document.getElementById('install-banner-close');
+  const DISMISS_KEY = 'tl_install_dismissed_at';
+  const DISMISS_DAYS = 7;
+
+  const isStandalone = window.matchMedia('(display-mode: standalone)').matches
+    || window.navigator.standalone === true; // iOS Safari
+  if (isStandalone) return; // déjà installée, on ne montre rien
+
+  const dismissedAt = parseInt(localStorage.getItem(DISMISS_KEY) || '0', 10);
+  const daysSinceDismiss = (Date.now() - dismissedAt) / 86400000;
+  if (dismissedAt && daysSinceDismiss < DISMISS_DAYS) return;
+
+  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+  let deferredPrompt = null;
+
+  function showBanner() {
+    banner.classList.add('visible');
+  }
+  function hideBanner() {
+    banner.classList.remove('visible');
+  }
+
+  btnClose.onclick = () => {
+    hideBanner();
+    localStorage.setItem(DISMISS_KEY, String(Date.now()));
+  };
+
+  if (isIOS) {
+    // Safari iOS n'a pas d'API d'installation : on affiche les instructions manuelles
+    subEl.innerHTML = tr('install_sub_ios') || 'Appuyez sur <i class="fa-solid fa-arrow-up-from-bracket"></i> puis "Sur l\'écran d\'accueil".';
+    btnInstall.innerHTML = `<i class="fa-solid fa-arrow-up-from-bracket"></i> <span>${tr('install_ios_hint') || 'Voir comment'}</span>`;
+    btnInstall.onclick = () => {
+      // On ne peut pas déclencher l'installation en JS sur iOS : on met juste l'accent visuellement
+      subEl.style.color = 'var(--primary)';
+      subEl.style.fontWeight = '600';
+    };
+    setTimeout(showBanner, 2500);
+    return;
+  }
+
+  // Android / Chrome / Edge : on attend l'événement natif du navigateur
+  window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+    setTimeout(showBanner, 2000);
+  });
+
+  btnInstall.onclick = async () => {
+    if (!deferredPrompt) { hideBanner(); return; }
+    hideBanner();
+    deferredPrompt.prompt();
+    const { outcome } = await deferredPrompt.userChoice;
+    if (outcome !== 'accepted') {
+      localStorage.setItem(DISMISS_KEY, String(Date.now()));
+    }
+    deferredPrompt = null;
+  };
+
+  window.addEventListener('appinstalled', () => {
+    hideBanner();
+    localStorage.setItem(DISMISS_KEY, String(Date.now()));
+    showToast(tr('install_success') || 'TomatoList est installé !', 'fa-circle-check');
+  });
+})();
 </script>
 </body>
 </html>
