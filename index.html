@@ -1810,8 +1810,8 @@ if ('serviceWorker' in navigator) {
 // Verrouillé (local + base) pour ne s'exécuter qu'une seule fois et ne
 // jamais retoucher des fiches ajoutées après coup.
 
-const MERGE_LOCAL_KEY = 'tl_merge_by_name_v1_done';
-const MERGE_DB_FLAG = 'meta/mergeByNameV1Done';
+const MERGE_LOCAL_KEY = 'tl_merge_by_name_v2_done';
+const MERGE_DB_FLAG = 'meta/mergeByNameV2Done';
 
 function normalizeNameKey(name) {
   return (name || '')
@@ -1949,7 +1949,7 @@ async function mergeDuplicateTomatoesByName() {
   }
 
   try {
-    await update(ref(db, 'meta'), { mergeByNameV1Done: true });
+    await update(ref(db, 'meta'), { mergeByNameV2Done: true });
   } catch (e) {
     console.warn('[Merge] Impossible d\'écrire le verrou distant.', e);
   }
