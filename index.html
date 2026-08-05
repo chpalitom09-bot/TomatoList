@@ -35,7 +35,7 @@
     --sans: 'Inter', sans-serif; --display: 'Space Grotesk', sans-serif;
   }
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-  body { background: linear-gradient(120deg, #fef2f2 0%, #ffffff 50%, #fee2e2 100%); background-size: 200% 200%; animation: gradientBG 15s ease-in-out infinite; color: var(--text-main); font-family: var(--sans); -webkit-font-smoothing: antialiased; overflow-x: hidden; }
+  body { background: linear-gradient(120deg, #fecaca 0%, #ffffff 50%, #fca5a5 100%); background-size: 200% 200%; animation: gradientBG 15s ease-in-out infinite; color: var(--text-main); font-family: var(--sans); -webkit-font-smoothing: antialiased; overflow-x: hidden; }
   @keyframes gradientBG { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
   a { text-decoration: none; color: inherit; }
   button, input, select, textarea { font-family: inherit; }
@@ -393,7 +393,10 @@
 <body>
 
 <nav class="navbar">
-  <a href="#" class="brand">TomatoList</a>
+  <a href="#" class="brand" style="display:flex; align-items:center; gap:10px;">
+    <img src="icon.svg" alt="" style="width:28px; height:28px; flex-shrink:0;" onerror="this.style.display='none'">
+    TomatoList
+  </a>
   <div class="nav-actions">
     <div class="lang-dropdown">
       <button class="btn btn-outline" id="btn-lang-dropdown">
@@ -555,7 +558,7 @@
   <div class="brand" style="margin-bottom:16px; color:#fff">TomatoList</div>
   <p data-i18n="footer_desc">La plateforme collaborative de recensement des variétés de tomates.</p>
   <div class="credits">
-    <div><span data-i18n="dev_label">Développement :</span> Wikimind</div>
+    <div><span data-i18n="dev_label">Développement :</span> <a href="https://wikimindai.github.io/Wikimind/" target="_blank" rel="noopener" style="color:#fff; font-weight:600;">Wikimind</a></div>
     <div><span data-i18n="mod_label">Modération Facebook :</span> Pépin de Tomate</div>
   </div>
   <div style="margin-top:24px; font-size:12px; display:flex; justify-content:center; gap:16px;">
@@ -1196,7 +1199,7 @@ function renderGrid() {
   const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
   const pageItems = filtered.slice(startIndex, startIndex + ITEMS_PER_PAGE);
 
-  const BANNER_INTERVAL = 25; // Modifié à 25 comme demandé
+  const BANNER_INTERVAL = 21; // Modifié à 21 comme demandé
   let htmlParts = [];
   let bannerIndex = 0;
 
