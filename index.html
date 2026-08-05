@@ -485,6 +485,38 @@
         <button class="filter-pill" data-val="Rayée">
           <i class="color-dot" style="background:repeating-linear-gradient(135deg,#22c55e 0px,#22c55e 4px,#eab308 4px,#eab308 8px)"></i> <span data-i18n="color_striped">Rayée / Striée</span>
         </button>
+
+        <!-- 10 couleurs supplémentaires (texte en dur, pas de data-i18n tant que lang.json n'est pas mis à jour) -->
+        <button class="filter-pill" data-val="Bleue">
+          <i class="color-dot" style="background:#3b5bdb"></i> <span>Bleue</span>
+        </button>
+        <button class="filter-pill" data-val="Turquoise">
+          <i class="color-dot" style="background:#14b8a6"></i> <span>Turquoise</span>
+        </button>
+        <button class="filter-pill" data-val="Corail">
+          <i class="color-dot" style="background:#ff6f61"></i> <span>Corail</span>
+        </button>
+        <button class="filter-pill" data-val="Saumon">
+          <i class="color-dot" style="background:#fa8072"></i> <span>Saumon</span>
+        </button>
+        <button class="filter-pill" data-val="Chocolat">
+          <i class="color-dot" style="background:#5c3a21"></i> <span>Chocolat</span>
+        </button>
+        <button class="filter-pill" data-val="Ocre">
+          <i class="color-dot" style="background:#cc9a3a"></i> <span>Ocre</span>
+        </button>
+        <button class="filter-pill" data-val="Prune">
+          <i class="color-dot" style="background:#6b2545"></i> <span>Prune</span>
+        </button>
+        <button class="filter-pill" data-val="Grise">
+          <i class="color-dot" style="background:#9ca3af"></i> <span>Grise</span>
+        </button>
+        <button class="filter-pill" data-val="Dorée">
+          <i class="color-dot" style="background:#d4af37"></i> <span>Dorée</span>
+        </button>
+        <button class="filter-pill" data-val="Arc-en-ciel">
+          <i class="color-dot" style="background:linear-gradient(90deg,#ef4444,#f97316,#eab308,#22c55e,#3b5bdb,#7c3aed)"></i> <span>Arc-en-ciel</span>
+        </button>
       </div>
     </div>
 
@@ -704,6 +736,16 @@
             <option value="Bordeaux" data-i18n="color_bordeaux">Bordeaux / Brun</option>
             <option value="Crème" data-i18n="color_cream">Crème / Beige</option>
             <option value="Rayée" data-i18n="color_striped">Rayée / Striée</option>
+            <option value="Bleue">Bleue</option>
+            <option value="Turquoise">Turquoise</option>
+            <option value="Corail">Corail</option>
+            <option value="Saumon">Saumon</option>
+            <option value="Chocolat">Chocolat</option>
+            <option value="Ocre">Ocre</option>
+            <option value="Prune">Prune</option>
+            <option value="Grise">Grise</option>
+            <option value="Dorée">Dorée</option>
+            <option value="Arc-en-ciel">Arc-en-ciel</option>
           </select>
         </div>
         <div class="form-group">
@@ -814,6 +856,16 @@ const colorMap = {
   'Bordeaux': '#7f1d1d',
   'Crème':    '#d4a96a',
   'Rayée':    'repeating-linear-gradient(135deg,#22c55e 0px,#22c55e 6px,#eab308 6px,#eab308 12px)',
+  'Bleue':      '#3b5bdb',
+  'Turquoise':  '#14b8a6',
+  'Corail':     '#ff6f61',
+  'Saumon':     '#fa8072',
+  'Chocolat':   '#5c3a21',
+  'Ocre':       '#cc9a3a',
+  'Prune':      '#6b2545',
+  'Grise':      '#9ca3af',
+  'Dorée':      '#d4af37',
+  'Arc-en-ciel':'linear-gradient(90deg,#ef4444,#f97316,#eab308,#22c55e,#3b5bdb,#7c3aed)',
 };
 
 function showToast(msg, icon = 'fa-circle-info') {
@@ -1013,19 +1065,48 @@ function updateVarietyCounter(target) {
 }
 
 // ─── LECTURE DES DONNÉES ──────────────────────────────────────────────────────
-onValue(ref(db, 'tomatoes'), (snapshot) => {
-  tomatoesData = [];
-  snapshot.forEach(child => { tomatoesData.push({ id: child.key, ...child.val() }); });
-  hasFirstData = true;
-  updateVarietyCounter(tomatoesData.length);
-  renderGrid();
-  if (detailCurrentId) {
-    refreshDetailLikeBtn();
-    const t = tomatoesData.find(x => x.id === detailCurrentId);
-    if(t) renderComments(t); // Mise à jour en temps réel des commentaires
-  }
-  maybeOpenSharedTomato();
-});
+// Abonnement robuste : gère les erreurs de lecture (règles Firebase pas encore
+// prêtes, réseau lent, etc.) avec réessais automatiques, pour éviter qu'un
+// utilisateur se retrouve bloqué avec 0 tomate affichée sans explication.
+let tomatoesLoadError = false;
+let tomatoesRetryCount = 0;
+let tomatoesRetryTimer = null;
+
+function subscribeTomatoes() {
+  onValue(
+    ref(db, 'tomatoes'),
+    (snapshot) => {
+      tomatoesData = [];
+      snapshot.forEach(child => { tomatoesData.push({ id: child.key, ...child.val() }); });
+      hasFirstData = true;
+      tomatoesLoadError = false;
+      tomatoesRetryCount = 0;
+      if (tomatoesRetryTimer) { clearTimeout(tomatoesRetryTimer); tomatoesRetryTimer = null; }
+      updateVarietyCounter(tomatoesData.length);
+      renderGrid();
+      if (detailCurrentId) {
+        refreshDetailLikeBtn();
+        const t = tomatoesData.find(x => x.id === detailCurrentId);
+        if(t) renderComments(t); // Mise à jour en temps réel des commentaires
+      }
+      maybeOpenSharedTomato();
+    },
+    (error) => {
+      // La lecture a échoué (permissions, réseau...) : on ne laisse jamais
+      // l'utilisateur croire que la liste est simplement vide.
+      console.error('Erreur de chargement des tomates :', error);
+      hasFirstData = false;
+      tomatoesLoadError = true;
+      renderGrid();
+      tomatoesRetryCount++;
+      const delay = Math.min(2000 * tomatoesRetryCount, 15000);
+      if (tomatoesRetryTimer) clearTimeout(tomatoesRetryTimer);
+      tomatoesRetryTimer = setTimeout(() => subscribeTomatoes(), delay);
+    }
+  );
+}
+subscribeTomatoes();
+window.retryLoadTomatoes = () => { if (tomatoesRetryTimer) clearTimeout(tomatoesRetryTimer); subscribeTomatoes(); };
 
 // ─── BANDEAU DE PARTAGE ───────────────────────────────────────────────────────
 // Insère un bandeau dans la grille tous les 25 tomates
@@ -1098,7 +1179,13 @@ function renderGrid() {
   filtered = sortTomatoes(filtered, currentSort, currentProfile, currentUser ? currentUser.uid : null);
 
   if (filtered.length === 0) {
-    grid.innerHTML = `<div class="empty-state"><i class="fa-solid fa-leaf"></i><p>Aucune variété trouvée.</p></div>`;
+    if (tomatoesLoadError) {
+      grid.innerHTML = `<div class="empty-state"><i class="fa-solid fa-triangle-exclamation"></i><p>Le chargement de la liste a échoué.<br>Nouvelle tentative en cours…</p><button class="filter-pill active" style="margin-top:12px" onclick="window.retryLoadTomatoes()"><i class="fa-solid fa-rotate-right"></i> Réessayer maintenant</button></div>`;
+    } else if (!hasFirstData) {
+      grid.innerHTML = `<div class="empty-state"><i class="fa-solid fa-spinner fa-spin"></i><p>Chargement des tomates…</p></div>`;
+    } else {
+      grid.innerHTML = `<div class="empty-state"><i class="fa-solid fa-leaf"></i><p>Aucune variété trouvée.</p></div>`;
+    }
     document.getElementById('pagination-container').innerHTML = '';
     return;
   }
