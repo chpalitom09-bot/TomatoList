@@ -24,6 +24,13 @@
 <link rel="apple-touch-icon" href="icon.svg">
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#b91c1c">
+
+<!-- Optimisations de connexion -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://cdnjs.cloudflare.com">
+<link rel="preconnect" href="https://www.gstatic.com">
+
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
@@ -39,6 +46,14 @@
   @keyframes gradientBG { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
   a { text-decoration: none; color: inherit; }
   button, input, select, textarea { font-family: inherit; }
+
+  /* Loader Anim */
+  #page-loader { position: fixed; inset: 0; background: var(--surface); z-index: 10000; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: opacity 0.4s ease, visibility 0.4s ease; }
+  #page-loader.hidden { opacity: 0; visibility: hidden; }
+  .loader-svg-container { width: 120px; height: 120px; position: relative; margin-bottom: 24px; }
+  .loader-svg-bg { position: absolute; inset: 0; filter: grayscale(100%) opacity(0.2); }
+  .loader-svg-fill { position: absolute; inset: 0; clip-path: inset(100% 0 0 0); transition: clip-path 0.1s linear; }
+  .loader-text { font-family: var(--display); font-size: 28px; font-weight: 700; color: var(--primary); }
 
   /* Navbar */
   .navbar { background: var(--surface); border-bottom: 1px solid var(--line); padding: 16px 24px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; }
@@ -87,7 +102,7 @@
 
   /* CARDS & IMAGES CADRÉES */
   .grid { max-width: 1200px; margin: 0 auto 32px; padding: 0 24px; display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 24px; }
-  .card { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; overflow: hidden; transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s; display: flex; flex-direction: column; }
+  .card { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; overflow: hidden; transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s; display: flex; flex-direction: column; cursor: pointer; content-visibility: auto; contain-intrinsic-size: auto 420px; }
   .card:hover { transform: translateY(-6px); box-shadow: 0 20px 40px rgba(0,0,0,0.08); }
   
   .card-img-wrapper { position: relative; width: 100%; height: 260px; background: #f3f4f6; overflow: hidden; border-bottom: 1px solid var(--line); }
@@ -107,9 +122,6 @@
   .like-btn.liked { color: var(--primary); }
 
   .empty-state { grid-column: 1 / -1; text-align: center; padding: 64px 24px; color: var(--text-muted); }
-
-  /* Carte cliquable */
-  .card { cursor: pointer; }
 
   /* ──────────────────────────────────────────────────────────────────
      BANDEAU DE PARTAGE (inséré dans la grille tous les 25 tomates)
@@ -391,6 +403,57 @@
 </style>
 </head>
 <body>
+
+<div id="page-loader">
+  <div class="loader-svg-container">
+    <div class="loader-svg-bg">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+        <defs><radialGradient id="bodyBg" cx="35%" cy="30%" r="75%"><stop offset="0%" stop-color="#ff6b57"/><stop offset="55%" stop-color="#e8392a"/><stop offset="100%" stop-color="#b91c1c"/></radialGradient></defs>
+        <rect width="512" height="512" rx="112" fill="#fef2f2"/>
+        <path d="M256 168c-92 0-158 74-158 172 0 78 66 132 158 132s158-54 158-132c0-98-66-172-158-172z" fill="url(#bodyBg)"/>
+        <path d="M256 168c-92 0-158 74-158 172 0 20 4 39 12 56 24-108 90-176 146-176s122 68 146 176c8-17 12-36 12-56 0-98-66-172-158-172z" fill="#000" opacity="0.06"/>
+        <g fill="#3f8f3f"><path d="M256 120c-14 26-14 52 0 70 14-18 14-44 0-70z"/><path d="M256 130c-30 8-52 28-58 52 26-4 50-22 58-52z"/><path d="M256 130c30 8 52 28 58 52-26-4-50-22-58-52z"/><path d="M256 138c-42-4-76 10-94 36 30 8 66-2 94-36z"/><path d="M256 138c42-4 76 10 94 36-30 8-66-2-94-36z"/></g>
+        <ellipse cx="205" cy="235" rx="26" ry="18" fill="#fff" opacity="0.35"/>
+      </svg>
+    </div>
+    <div class="loader-svg-fill" id="loader-svg-fill">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+        <defs><radialGradient id="bodyFill" cx="35%" cy="30%" r="75%"><stop offset="0%" stop-color="#ff6b57"/><stop offset="55%" stop-color="#e8392a"/><stop offset="100%" stop-color="#b91c1c"/></radialGradient></defs>
+        <rect width="512" height="512" rx="112" fill="#fef2f2"/>
+        <path d="M256 168c-92 0-158 74-158 172 0 78 66 132 158 132s158-54 158-132c0-98-66-172-158-172z" fill="url(#bodyFill)"/>
+        <path d="M256 168c-92 0-158 74-158 172 0 20 4 39 12 56 24-108 90-176 146-176s122 68 146 176c8-17 12-36 12-56 0-98-66-172-158-172z" fill="#000" opacity="0.06"/>
+        <g fill="#3f8f3f"><path d="M256 120c-14 26-14 52 0 70 14-18 14-44 0-70z"/><path d="M256 130c-30 8-52 28-58 52 26-4 50-22 58-52z"/><path d="M256 130c30 8 52 28 58 52-26-4-50-22-58-52z"/><path d="M256 138c-42-4-76 10-94 36 30 8 66-2 94-36z"/><path d="M256 138c42-4 76 10 94 36-30 8-66-2-94-36z"/></g>
+        <ellipse cx="205" cy="235" rx="26" ry="18" fill="#fff" opacity="0.35"/>
+      </svg>
+    </div>
+  </div>
+  <div class="loader-text" id="loader-text">0%</div>
+</div>
+<script>
+(function(){
+  const loader = document.getElementById('page-loader');
+  const fill = document.getElementById('loader-svg-fill');
+  const text = document.getElementById('loader-text');
+  if(!loader || !fill || !text) return;
+  let progress = 0;
+  const duration = 2000;
+  const interval = 20;
+  const step = 100 / (duration / interval);
+  const timer = setInterval(() => {
+    progress += step;
+    if (progress >= 100) {
+      progress = 100;
+      clearInterval(timer);
+      setTimeout(() => {
+        loader.classList.add('hidden');
+        setTimeout(() => loader.remove(), 500);
+      }, 150);
+    }
+    fill.style.clipPath = `inset(${100 - progress}% 0 0 0)`;
+    text.textContent = `${Math.floor(progress)}%`;
+  }, interval);
+})();
+</script>
 
 <nav class="navbar">
   <a href="#" class="brand" style="display:flex; align-items:center; gap:10px;">
@@ -802,6 +865,49 @@ import { getDatabase, ref, onValue, push, get, update, remove } from "https://ww
 // Assurez-vous que le fichier algo.js est bien présent
 import { sortTomatoes, similarTomatoes, recordClick, getClickData } from "./algo.js";
 
+// --- FONCTIONS DE RECHERCHE FLOUES ---
+function removeAccents(str) {
+  return str ? str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase() : '';
+}
+
+function levenshtein(a, b) {
+  if (a.length === 0) return b.length;
+  if (b.length === 0) return a.length;
+  const matrix = Array(b.length + 1).fill(null).map(() => Array(a.length + 1).fill(null));
+  for (let i = 0; i <= a.length; i++) matrix[0][i] = i;
+  for (let j = 0; j <= b.length; j++) matrix[j][0] = j;
+  for (let j = 1; j <= b.length; j++) {
+    for (let i = 1; i <= a.length; i++) {
+      const indicator = a[i - 1] === b[j - 1] ? 0 : 1;
+      matrix[j][i] = Math.min(
+        matrix[j][i - 1] + 1,
+        matrix[j - 1][i] + 1,
+        matrix[j - 1][i - 1] + indicator
+      );
+    }
+  }
+  return matrix[b.length][a.length];
+}
+
+function fuzzyMatch(text, searchStr) {
+  if (!searchStr) return true;
+  const t = removeAccents(text);
+  const s = removeAccents(searchStr);
+  if (t.includes(s)) return true;
+  
+  // ~10% de tolérance + un peu de marge pour les mots très courts
+  const maxErrors = Math.ceil(s.length * 0.15); 
+  const words = t.split(/\s+/);
+  
+  for (let w of words) {
+    if (Math.abs(w.length - s.length) <= maxErrors) {
+      if (levenshtein(w, s) <= maxErrors) return true;
+    }
+  }
+  if (levenshtein(t, s) <= maxErrors) return true;
+  return false;
+}
+
 // Coordonnées approximatives (lat, lon) par code pays ISO
 const COUNTRY_COORDS = {
   af:[34,66], za:[-29,24], al:[41,20], dz:[28,3], de:[51,10], ad:[42.5,1.5], ao:[-12,18], ag:[17.1,-61.8], sa:[24,45], ar:[-34,-64], am:[40.1,45], au:[-25,133], at:[47.5,14], az:[40.4,47.6], bs:[24.3,-76], bh:[26,50.5], bd:[24,90], bb:[13.2,-59.6], be:[50.8,4.3], bz:[17.2,-88.5], bt:[27.5,90.4], mm:[21,96], by:[53.5,28], bo:[-17,-65], ba:[44,17.8], bw:[-22,24], bn:[4.5,114.7], br:[-10,-55], bg:[42.7,25], bf:[12.4,-1.5], bi:[-3.4,29.9], bj:[9.3,2.3], kh:[12.5,105], cm:[5.5,12.5], ca:[56,-106], cv:[16,-24], cl:[-35,-71], cn:[35,103], cy:[35,33], co:[4,-72], km:[-11.9,43.3], cg:[-0.5,15.8], cd:[-2.9,23.6], kp:[40,127], kr:[36.5,127.8], cr:[9.7,-83.8], hr:[45.1,15.2], cu:[21.5,-79.5], ci:[7.5,-5.5], dk:[56,10], dj:[11.8,42.6], dm:[15.4,-61.4], es:[40,-3.7], ee:[58.6,25], sz:[-26.5,31.5], fj:[-17.7,178], fi:[64,26], fr:[46.6,2.2], ga:[-0.8,11.6], gm:[13.4,-15.5], gh:[7.9,-1], gd:[12.1,-61.7], gr:[39,22], gt:[15.5,-90.2], gn:[10.6,-10.7], gq:[1.6,10.6], gw:[12,-15], gy:[5,-59], ge:[42.3,43.4], ht:[19,-72.3], hn:[15,-86.5], hu:[47.2,19.5], in:[21,78], id:[-2,118], iq:[33.2,43.7], ir:[32,53.7], ie:[53.4,-8], is:[65,-19], il:[31,34.8], it:[42.8,12.8], jm:[18.1,-77.3], jp:[36.2,138.3], jo:[31,36], kz:[48,66.9], ke:[0.5,37.9], kg:[41.2,74.8], ki:[1.4,173], kw:[29.3,47.5], la:[19.9,102.5], ls:[-29.6,28.2], lv:[56.9,24.6], lb:[33.9,35.9], lr:[6.4,-9.4], ly:[26.3,17.2], li:[47.2,9.5], lt:[55.2,23.9], lu:[49.8,6.1], mk:[41.6,21.7], mg:[-18.8,47], my:[4.2,101.9], mw:[-13.3,34.3], mv:[3.2,73], ml:[17,-4], mt:[35.9,14.4], ma:[31.8,-7.1], mu:[-20.3,57.6], mr:[20.3,-10.3], mx:[23,-102], fm:[6.9,158.2], md:[47.4,28.4], mc:[43.7,7.4], mn:[46.9,103.8], me:[42.7,19.4], mz:[-18.7,35.5], na:[-22.9,17], nr:[-0.5,166.9], ni:[12.9,-85.2], ne:[17.6,8], ng:[9.1,8.7], no:[61,8.5], nz:[-41,174], np:[28.2,84.2], om:[21,57], ug:[1.4,32.3], uz:[41.4,64.6], pk:[30,70], pw:[7.5,134.6], ps:[31.9,35.2], pa:[8.5,-80.8], pg:[-6.3,143.9], py:[-23.4,-58.4], nl:[52.2,5.3], ph:[13,122], pl:[52,19.4], pt:[39.4,-8.2], pe:[-9.2,-75], qa:[25.3,51.2], ro:[45.9,25], gb:[54,-2], ru:[61,105], rw:[-1.9,29.9], cf:[6.6,20.9], do:[18.7,-70.2], kn:[17.3,-62.7], sm:[43.9,12.5], vc:[13,-61.2], lc:[13.9,-61], sv:[13.8,-88.9], ws:[-13.8,-172], st:[0.2,6.6], rs:[44,21], sc:[-4.7,55.5], sl:[8.5,-11.8], sg:[1.35,103.8], sk:[48.7,19.5], si:[46.1,14.8], so:[5.2,46.2], sd:[15.6,32.5], ss:[7,30], lk:[7.9,80.8], ch:[46.8,8.2], sr:[4,-56], se:[62,15], sy:[35,38.5], sn:[14.5,-14.5], tj:[38.9,71.3], tz:[-6.4,34.9], tw:[23.7,121], td:[15.5,19], cz:[49.8,15.5], th:[15,101], tl:[-8.9,125.7], tg:[8.6,0.8], to:[-21.2,-175.2], tt:[10.7,-61.2], tn:[34,9], tm:[38.9,59.6], tr:[39,35], tv:[-7.5,178.7], ua:[49,32], uy:[-32.5,-56], vu:[-16,167.5], va:[41.9,12.45], ve:[8,-66], vn:[16,106], ye:[15.6,48], zm:[-13.1,27.9], zw:[-19,30], eg:[26.8,30.8], ae:[24,54], ec:[-1.8,-78.2], er:[15.2,39.8], us:[39,-98], et:[9.1,40.5], mh:[7.1,171.2], sb:[-9.6,160.2]
@@ -1068,9 +1174,6 @@ function updateVarietyCounter(target) {
 }
 
 // ─── LECTURE DES DONNÉES ──────────────────────────────────────────────────────
-// Abonnement robuste : gère les erreurs de lecture (règles Firebase pas encore
-// prêtes, réseau lent, etc.) avec réessais automatiques, pour éviter qu'un
-// utilisateur se retrouve bloqué avec 0 tomate affichée sans explication.
 let tomatoesLoadError = false;
 let tomatoesRetryCount = 0;
 let tomatoesRetryTimer = null;
@@ -1095,8 +1198,6 @@ function subscribeTomatoes() {
       maybeOpenSharedTomato();
     },
     (error) => {
-      // La lecture a échoué (permissions, réseau...) : on ne laisse jamais
-      // l'utilisateur croire que la liste est simplement vide.
       console.error('Erreur de chargement des tomates :', error);
       hasFirstData = false;
       tomatoesLoadError = true;
@@ -1112,7 +1213,6 @@ subscribeTomatoes();
 window.retryLoadTomatoes = () => { if (tomatoesRetryTimer) clearTimeout(tomatoesRetryTimer); subscribeTomatoes(); };
 
 // ─── BANDEAU DE PARTAGE ───────────────────────────────────────────────────────
-// Insère un bandeau dans la grille tous les 25 tomates
 function buildShareBannerHTML(index) {
   return `
     <div class="share-banner" role="complementary" aria-label="Partager TomatoList">
@@ -1170,10 +1270,10 @@ window.changePage = (p) => {
 
 function renderGrid() {
   const grid = document.getElementById('tomatoes-grid');
-  const search = document.getElementById('search-input').value.toLowerCase();
+  const search = document.getElementById('search-input').value; // Retrait du toLowerCase() pour fuzzyMatch
 
   let filtered = tomatoesData.filter(t => {
-    const matchSearch = (t.name || '').toLowerCase().includes(search) || (t.country || '').toLowerCase().includes(search);
+    const matchSearch = fuzzyMatch(t.name || '', search) || fuzzyMatch(t.country || '', search);
     const matchColor = currentColor === 'all' || t.color === currentColor;
     const matchCountry = currentCountry === 'all' || t.country === currentCountry;
     return matchSearch && matchColor && matchCountry;
@@ -1199,14 +1299,12 @@ function renderGrid() {
   const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
   const pageItems = filtered.slice(startIndex, startIndex + ITEMS_PER_PAGE);
 
-  const BANNER_INTERVAL = 21; // Modifié à 21 comme demandé
+  const BANNER_INTERVAL = 21; 
   let htmlParts = [];
   let bannerIndex = 0;
 
   pageItems.forEach((t, i) => {
-    // Calcul de l'index global pour placer le bandeau indépendamment de la page
     const globalIndex = startIndex + i;
-    // On ajoute un bandeau tous les BANNER_INTERVAL éléments
     if (globalIndex > 0 && globalIndex % BANNER_INTERVAL === 0) {
       htmlParts.push(buildShareBannerHTML(bannerIndex++));
     }
@@ -1319,15 +1417,11 @@ async function toggleLike(tomatoId) {
 }
 
 document.getElementById('tomatoes-grid').addEventListener('click', async (e) => {
-  // Ne pas propager depuis les bandeaux de partage
   if (e.target.closest('.share-banner')) return;
-
   const likeBtn = e.target.closest('.like-btn');
   if (likeBtn) { toggleLike(likeBtn.getAttribute('data-id')); return; }
-
   const authorLink = e.target.closest('.author-link');
   if (authorLink) { openAuthorModal(authorLink.getAttribute('data-author-uid'), authorLink.getAttribute('data-author-name')); return; }
-
   const card = e.target.closest('.card');
   if (card) { openDetailModal(card.getAttribute('data-id')); }
 });
@@ -1394,7 +1488,6 @@ function openDetailModal(tomatoId) {
   if (!t) return;
   detailCurrentId = tomatoId;
 
-  // ── Enregistrement du clic pour l'algorithme ──────────────────────────────
   if (typeof recordClick === 'function') recordClick(t);
 
   const imagesArray = t.imageURLs || (t.imageURL ? [t.imageURL] : []);
@@ -1621,8 +1714,6 @@ const mapState = { scale: 1, x: 0, y: 0, minScale: 1, maxScale: 8 };
 
 function applyMapTransform() {
   mapInner.style.transform = `translate(${mapState.x}px, ${mapState.y}px) scale(${mapState.scale})`;
-  // Counter-scale des pins : on inverse le zoom pour qu'ils restent visuellement constants
-  // On les réduit légèrement (facteur 0.75) pour qu'ils soient moins encombrants à fort zoom
   const pinScale = Math.min(1, 0.75 / mapState.scale);
   mapViewport.style.setProperty('--map-pin-scale', pinScale);
 }
@@ -1656,13 +1747,11 @@ function resetMapView() {
   applyMapTransform();
 }
 
-// Molette
 mapViewport.addEventListener('wheel', (e) => {
   e.preventDefault();
   zoomMapAt(e.deltaY < 0 ? 1.2 : 1 / 1.2, e.clientX, e.clientY);
 }, { passive: false });
 
-// Pointer events (drag + pinch)
 const activePointers = new Map();
 let dragStart = null;
 let pinchStartDist = null;
@@ -1743,7 +1832,6 @@ function renderMap() {
     mapInner.appendChild(pin);
   });
 
-  // Appliquer le scale initial des pins
   applyMapTransform();
 }
 
