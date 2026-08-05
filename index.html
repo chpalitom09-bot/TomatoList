@@ -2036,6 +2036,7 @@ document.getElementById('btn-submit').onclick = async () => {
         author: isAnon ? 'Anonyme' : (document.getElementById('f-author-name').value.trim() || 'Anonyme')
       };
       if (!isOwnerEdit) {
+        delete updates.author;
         const newContribRef = push(ref(db, `tomatoes/${editingTomatoId}/contributors`));
         updates[`contributors/${newContribRef.key}`] = { name: contributorName || 'Anonyme', uid: currentUser ? currentUser.uid : null, at: Date.now() };
       }
@@ -2127,10 +2128,15 @@ function openEditModal(t) {
     if (c) document.getElementById('f-country-btn').innerHTML = `<div style="display:flex;align-items:center"><img src="https://flagcdn.com/w20/${c.code}.png" alt=""> <span>${t.country}</span></div> <i class="fa-solid fa-chevron-down" style="color:var(--text-muted)"></i>`;
   }
   
-  isAnon = !t.author || t.author === 'Anonyme';
+  if (isOwner) {
+    isAnon = !t.author || t.author === 'Anonyme';
+    document.getElementById('f-author-name').value = isAnon ? '' : (t.author || '');
+  } else {
+    isAnon = false;
+    document.getElementById('f-author-name').value = currentProfile ? `${currentProfile.firstname || ''} ${currentProfile.lastname || ''}`.trim() : '';
+  }
   anonToggle.classList.toggle('on', isAnon);
   nameInputGroup.style.display = isAnon ? 'none' : 'block';
-  document.getElementById('f-author-name').value = isAnon ? '' : (t.author || '');
 
   isVerified = !!t.verified;
   verifiedToggle.classList.toggle('on', isVerified);
