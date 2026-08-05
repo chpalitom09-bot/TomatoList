@@ -780,7 +780,18 @@
           <div class="pref-block-title" data-i18n="anon_title">Publier en anonyme</div>
           <div class="pref-block-sub" data-i18n="anon_sub">Votre nom public ne sera pas affiché.</div>
         </div>
-        <button class="toggle on" id="toggle-anon" type="button"></button>
+        <button class="toggle" id="toggle-anon" type="button"></button>
+      </div>
+      <div class="form-group" id="name-input-group">
+        <label>Votre prénom et nom *</label>
+        <input type="text" class="form-control" id="f-author-name" placeholder="Ex: Jean Dupont">
+      </div>
+      <div class="pref-block">
+        <div class="pref-block-text">
+          <div class="pref-block-title">Firebase Verified</div>
+          <div class="pref-block-sub">Badge officiel pour cette variété.</div>
+        </div>
+        <button class="toggle" id="toggle-verified" type="button"></button>
       </div>
       <div class="form-group">
         <label data-i18n="t_name">Nom de la variété *</label>
@@ -943,7 +954,8 @@ const ITEMS_PER_PAGE = 51;
 let currentSort = 'date';
 let currentColor = 'all';
 let currentCountry = 'all';
-let isAnon = true;
+let isAnon = false;
+let isVerified = false;
 let editingTomatoId = null;
 let editOwnerUid = null;
 let hasFirstData = false;
@@ -1118,6 +1130,8 @@ document.getElementById('country-filter-select').onchange = (e) => {
 
 // ─── AUTHENTIFICATION & TOGGLE ANONYME ────────────────────────────────────────
 const anonToggle = document.getElementById('toggle-anon');
+const nameInputGroup = document.getElementById('name-input-group');
+const verifiedToggle = document.getElementById('toggle-verified');
 
 onAuthStateChanged(auth, async (user) => {
   currentUser = user;
@@ -1127,27 +1141,31 @@ onAuthStateChanged(auth, async (user) => {
     authLabel.textContent = tr('logout') || "Déconnexion";
     btnAuth.onclick = () => { signOut(auth); showToast('Déconnexion réussie', 'fa-check'); };
     const snap = await get(ref(db, `users/${user.uid}/profile`));
-    if (snap.exists()) currentProfile = snap.val();
-    isAnon = true;
-    anonToggle.classList.add('on');
+    if (snap.exists()) {
+      currentProfile = snap.val();
+      document.getElementById('f-author-name').value = `${currentProfile.firstname || ''} ${currentProfile.lastname || ''}`.trim();
+    }
     anonToggle.style.opacity = '1';
     anonToggle.style.cursor = 'pointer';
   } else {
     authLabel.textContent = tr('login') || "Connexion";
     btnAuth.onclick = () => window.location.href = 'auth.html';
     currentProfile = null;
-    isAnon = true;
-    anonToggle.classList.add('on');
-    anonToggle.style.opacity = '0.5';
-    anonToggle.style.cursor = 'not-allowed';
+    anonToggle.style.opacity = '1';
+    anonToggle.style.cursor = 'pointer';
   }
   renderGrid();
 });
 
 anonToggle.onclick = () => {
-  if (!currentUser) { showToast("Connectez-vous pour publier avec votre nom.", "fa-lock"); return; }
   isAnon = !isAnon;
   anonToggle.classList.toggle('on', isAnon);
+  nameInputGroup.style.display = isAnon ? 'none' : 'block';
+};
+
+verifiedToggle.onclick = () => {
+  isVerified = !isVerified;
+  verifiedToggle.classList.toggle('on', isVerified);
 };
 
 // ─── COMPTEUR ANIMÉ ───────────────────────────────────────────────────────────
@@ -1339,8 +1357,12 @@ function renderGrid() {
           ${imgCountBadge}
         </div>
         <div class="card-body">
-          <h3 class="card-title">${t.name}</h3>
+          <h3 class="card-title" style="display:flex; align-items:center; gap:6px;">
+            <span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${t.name}</span>
+            ${t.verified ? `<svg fill="#1d9bf0" version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="18px" height="18px" viewBox="0 0 910.288 910.287" xml:space="preserve" style="flex-shrink:0"><g><g><path d="M873.206,202.06l-1.212-28.51l-28.386-2.915c-109.036-11.198-202.773-51.887-262.21-84.049 c-65.099-35.226-104.56-68.274-104.922-68.579L455.165,0L433.84,17.981c-0.392,0.33-39.853,33.379-104.951,68.604 c-59.437,32.162-153.173,72.851-262.209,84.049l-28.387,2.915l-1.212,28.51c-0.217,5.104-4.777,126.698,42.059,273.937 c27.637,86.887,67.549,164.736,118.627,231.396c64.139,83.701,145.948,149.68,243.155,196.102l14.221,6.793l14.221-6.793 c97.207-46.422,179.017-112.398,243.155-196.102c51.079-66.658,90.991-144.51,118.628-231.395 C877.982,328.759,873.423,207.165,873.206,202.06z M455.143,836.93c-81.095-41.209-149.731-97.887-204.194-168.646 c-46.393-60.275-82.812-130.998-108.248-210.201c-31.088-96.808-38.06-183.144-39.471-225.538 c43.735-6.494,87.949-17.421,131.833-32.597c42.9-14.836,85.598-33.752,126.907-56.221c41.915-22.798,73.81-44.573,93.172-58.812 c19.362,14.238,51.258,36.014,93.173,58.812c41.309,22.47,84.007,41.385,126.907,56.221 c43.896,15.181,88.123,26.108,131.87,32.602c-1.359,41.978-8.194,127.098-38.842,223.443 c-25.317,79.594-61.694,150.672-108.12,211.258C605.537,738.494,536.632,795.52,455.143,836.93z"/><polygon points="635.013,305.016 588.969,351.06 417.368,522.662 330.399,435.693 318.573,423.867 295.239,447.201 295.239,447.202 271.904,470.537 417.368,616 681.682,351.686 "/></g></g></svg>` : ''}
+          </h3>
           <div class="card-meta">
+            ${t.probableError ? `<span class="badge" style="background:#fef2f2; color:#d92d20; border-color:#fecaca"><i class="fa-solid fa-triangle-exclamation"></i> Erreur probable</span>` : ''}
             <span class="badge"><i class="color-dot" style="background:${colorBg}"></i> ${trColor(t.color)}</span>
             ${t.weight ? `<span class="badge"><i class="fa-solid fa-scale-balanced"></i> ${t.weight}g</span>` : ''}
             ${countryBadge}
@@ -1524,7 +1546,12 @@ function openDetailModal(tomatoId) {
     dots.querySelectorAll('span').forEach((d, i) => d.classList.toggle('active', i === index));
   };
 
-  document.getElementById('detail-title').textContent = t.name;
+  document.getElementById('detail-title').innerHTML = `
+    <div style="display:flex; align-items:center; gap:8px;">
+      ${t.name}
+      ${t.verified ? `<svg fill="#1d9bf0" version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="22px" height="22px" viewBox="0 0 910.288 910.287" xml:space="preserve" style="flex-shrink:0"><g><g><path d="M873.206,202.06l-1.212-28.51l-28.386-2.915c-109.036-11.198-202.773-51.887-262.21-84.049 c-65.099-35.226-104.56-68.274-104.922-68.579L455.165,0L433.84,17.981c-0.392,0.33-39.853,33.379-104.951,68.604 c-59.437,32.162-153.173,72.851-262.209,84.049l-28.387,2.915l-1.212,28.51c-0.217,5.104-4.777,126.698,42.059,273.937 c27.637,86.887,67.549,164.736,118.627,231.396c64.139,83.701,145.948,149.68,243.155,196.102l14.221,6.793l14.221-6.793 c97.207-46.422,179.017-112.398,243.155-196.102c51.079-66.658,90.991-144.51,118.628-231.395 C877.982,328.759,873.423,207.165,873.206,202.06z M455.143,836.93c-81.095-41.209-149.731-97.887-204.194-168.646 c-46.393-60.275-82.812-130.998-108.248-210.201c-31.088-96.808-38.06-183.144-39.471-225.538 c43.735-6.494,87.949-17.421,131.833-32.597c42.9-14.836,85.598-33.752,126.907-56.221c41.915-22.798,73.81-44.573,93.172-58.812 c19.362,14.238,51.258,36.014,93.173,58.812c41.309,22.47,84.007,41.385,126.907,56.221 c43.896,15.181,88.123,26.108,131.87,32.602c-1.359,41.978-8.194,127.098-38.842,223.443 c-25.317,79.594-61.694,150.672-108.12,211.258C605.537,738.494,536.632,795.52,455.143,836.93z"/><polygon points="635.013,305.016 588.969,351.06 417.368,522.662 330.399,435.693 318.573,423.867 295.239,447.201 295.239,447.202 271.904,470.537 417.368,616 681.682,351.686 "/></g></g></svg>` : ''}
+    </div>
+  `;
 
   const colorBg = colorMap[t.color] || '#ccc';
   let countryBadge = '';
@@ -1534,6 +1561,7 @@ function openDetailModal(tomatoId) {
   }
   const sizeLabel = trSize(t.averageSize);
   document.getElementById('detail-meta').innerHTML = `
+    ${t.probableError ? `<span class="badge" style="background:#fef2f2; color:#d92d20; border-color:#fecaca"><i class="fa-solid fa-triangle-exclamation"></i> Erreur probable</span>` : ''}
     <span class="badge"><i class="color-dot" style="background:${colorBg}"></i> ${trColor(t.color)}</span>
     ${t.weight ? `<span class="badge"><i class="fa-solid fa-scale-balanced"></i> ${t.weight}g</span>` : ''}
     ${sizeLabel ? `<span class="badge"><i class="fa-solid fa-ruler"></i> ${sizeLabel}</span>` : ''}
@@ -1891,6 +1919,15 @@ document.getElementById('btn-submit').onclick = async () => {
     errBox.textContent = 'Nom de la variété et au moins une photo requis.';
     errBox.style.display = 'block'; return;
   }
+  
+  if (!isAnon) {
+    const authorNameValue = document.getElementById('f-author-name').value.trim();
+    if (!authorNameValue) {
+      errBox.textContent = 'Merci d\'indiquer votre prénom et nom pour valider la publication.';
+      errBox.style.display = 'block'; return;
+    }
+  }
+
   const isOwnerEdit = editingTomatoId && currentUser && editOwnerUid && currentUser.uid === editOwnerUid;
   let contributorName = '';
   if (editingTomatoId && !isOwnerEdit) {
@@ -1917,7 +1954,15 @@ document.getElementById('btn-submit').onclick = async () => {
     }
 
     if (editingTomatoId) {
-      const updates = { name, color: document.getElementById('f-color').value, imageURLs: urls, weight: parseInt(document.getElementById('f-weight').value) || null, averageSize: document.getElementById('f-size').value || null, description: document.getElementById('f-desc').value || "", country: document.getElementById('f-country-value').value || "" };
+      const updates = { 
+        name, color: document.getElementById('f-color').value, imageURLs: urls, 
+        weight: parseInt(document.getElementById('f-weight').value) || null, 
+        averageSize: document.getElementById('f-size').value || null, 
+        description: document.getElementById('f-desc').value || "", 
+        country: document.getElementById('f-country-value').value || "",
+        verified: isVerified,
+        author: isAnon ? 'Anonyme' : (document.getElementById('f-author-name').value.trim() || 'Anonyme')
+      };
       if (!isOwnerEdit) {
         const newContribRef = push(ref(db, `tomatoes/${editingTomatoId}/contributors`));
         updates[`contributors/${newContribRef.key}`] = { name: contributorName, uid: currentUser ? currentUser.uid : null, at: Date.now() };
@@ -1927,8 +1972,18 @@ document.getElementById('btn-submit').onclick = async () => {
       setTimeout(() => { document.getElementById('add-modal').classList.remove('active'); resetForm(); showToast(tr('update_done'), 'fa-seedling'); }, 400);
     } else {
       let authorName = "Anonyme";
-      if (!isAnon && currentUser && currentProfile) authorName = `${currentProfile.firstname} ${currentProfile.lastname}`.trim();
-      const tomatoData = { name, color: document.getElementById('f-color').value, imageURLs: urls, weight: parseInt(document.getElementById('f-weight').value) || null, averageSize: document.getElementById('f-size').value || null, description: document.getElementById('f-desc').value || "", country: document.getElementById('f-country-value').value || "", author: authorName, uid: currentUser ? currentUser.uid : null, createdAt: Date.now() };
+      if (!isAnon) authorName = document.getElementById('f-author-name').value.trim() || 'Anonyme';
+      
+      const tomatoData = { 
+        name, color: document.getElementById('f-color').value, imageURLs: urls, 
+        weight: parseInt(document.getElementById('f-weight').value) || null, 
+        averageSize: document.getElementById('f-size').value || null, 
+        description: document.getElementById('f-desc').value || "", 
+        country: document.getElementById('f-country-value').value || "", 
+        author: authorName, uid: currentUser ? currentUser.uid : null, 
+        createdAt: Date.now(),
+        verified: isVerified
+      };
       await push(ref(db, 'tomatoes'), tomatoData);
       fill.style.width = '100%';
       setTimeout(() => { document.getElementById('add-modal').classList.remove('active'); resetForm(); showToast(tr('publish_success'), 'fa-seedling'); }, 500);
@@ -1961,9 +2016,16 @@ function resetForm() {
   document.getElementById('progress-fill').style.width = '0%';
   document.getElementById('btn-submit').disabled = false;
   document.getElementById('form-error').style.display = 'none';
-  isAnon = true;
-  anonToggle.classList.add('on');
-  if (!currentUser) { anonToggle.style.opacity = '0.5'; anonToggle.style.cursor = 'not-allowed'; }
+  
+  isAnon = false;
+  anonToggle.classList.remove('on');
+  nameInputGroup.style.display = 'block';
+  document.getElementById('f-author-name').value = currentProfile ? `${currentProfile.firstname || ''} ${currentProfile.lastname || ''}`.trim() : '';
+  
+  isVerified = false;
+  verifiedToggle.classList.remove('on');
+  anonToggle.style.opacity = '1';
+  anonToggle.style.cursor = 'pointer';
 }
 
 function isFormDirty() {
@@ -1996,6 +2058,15 @@ function openEditModal(t) {
     document.getElementById('f-country-value').value = t.country;
     if (c) document.getElementById('f-country-btn').innerHTML = `<div style="display:flex;align-items:center"><img src="https://flagcdn.com/w20/${c.code}.png" alt=""> <span>${t.country}</span></div> <i class="fa-solid fa-chevron-down" style="color:var(--text-muted)"></i>`;
   }
+  
+  isAnon = !t.author || t.author === 'Anonyme';
+  anonToggle.classList.toggle('on', isAnon);
+  nameInputGroup.style.display = isAnon ? 'none' : 'block';
+  document.getElementById('f-author-name').value = isAnon ? '' : (t.author || '');
+
+  isVerified = !!t.verified;
+  verifiedToggle.classList.toggle('on', isVerified);
+  
   currentImagesData = [];
   document.getElementById('upload-gallery').querySelectorAll('.upload-item').forEach(el => el.remove());
   const imgs = t.imageURLs || (t.imageURL ? [t.imageURL] : []);
