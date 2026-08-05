@@ -400,6 +400,25 @@
 
   @media (max-width: 480px) { .install-banner { left: 12px; right: 12px; padding: 14px; gap: 10px; } .install-banner-icon { width: 44px; height: 44px; } .install-banner-btn { padding: 8px 12px; font-size: 12.5px; } }
   @media (max-width: 768px) { .hide-mobile { display: none !important; } .btn { padding: 10px; border-radius: 8px; } .btn i { margin: 0; font-size: 16px; } .grid { grid-template-columns: 1fr; } .form-row { flex-direction: column; gap: 0; } .share-banner { padding: 20px; } .share-banner-title { font-size: 16px; } }
+
+  /* Print Styles */
+  @media screen {
+    #print-area { display: none; }
+  }
+  @media print {
+    body > *:not(#print-area) { display: none !important; }
+    #print-area { display: block !important; padding: 20px; }
+    .print-img-container { position: relative; display: inline-block; margin-top: 15px; }
+    .print-img-container img { max-width: 100%; height: auto; max-height: 600px; border-radius: 8px; }
+    .print-watermark {
+      position: absolute; bottom: 20px; right: 20px;
+      background: rgba(255, 255, 255, 0.9) !important;
+      color: #b91c1c !important;
+      padding: 8px 16px; font-size: 16px; font-weight: bold;
+      border-radius: 8px; border: 2px solid #b91c1c;
+      -webkit-print-color-adjust: exact; print-color-adjust: exact;
+    }
+  }
 </style>
 </head>
 <body>
@@ -648,6 +667,7 @@
       <p class="detail-desc" id="detail-desc">-</p>
       <div class="detail-actions">
         <button class="btn btn-outline btn-sm" id="detail-share-btn"><i class="fa-solid fa-share-nodes"></i> <span data-i18n="share">Partager</span></button>
+        <button class="btn btn-outline btn-sm" id="detail-print-btn"><i class="fa-solid fa-print"></i> <span data-i18n="print">Imprimer</span></button>
         <button class="btn btn-outline btn-sm" id="detail-edit-btn" style="display:none"><i class="fa-solid fa-pen"></i> <span data-i18n="edit">Modifier</span></button>
         <button class="btn btn-danger btn-sm" id="detail-delete-btn" style="display:none"><i class="fa-solid fa-trash"></i> <span data-i18n="delete">Supprimer</span></button>
       </div>
@@ -752,6 +772,8 @@
   <img id="lightbox-img" src="" alt="">
 </div>
 
+<div id="print-area"></div>
+
 <!-- Add Modal -->
 <div class="modal-overlay" id="add-modal">
   <div class="modal">
@@ -762,10 +784,9 @@
     <div class="modal-body">
       <div class="error-msg" id="form-error"></div>
       <div id="edit-contributor-note" style="display:none; background:#fef2f2; border:1px solid #fca5a5; border-radius:10px; padding:14px; margin-bottom:16px;">
-        <div style="color:var(--primary); font-size:13px; font-weight:600; margin-bottom:8px;">
-          <i class="fa-solid fa-circle-info"></i> Vous modifiez la variété d'un autre contributeur. Indiquez votre nom pour qu'il apparaisse sur la fiche.
+        <div style="color:var(--primary); font-size:13px; font-weight:600;">
+          <i class="fa-solid fa-circle-info"></i> Vous modifiez la variété d'un autre contributeur. Votre nom s'ajoutera à la liste des contributeurs.
         </div>
-        <input type="text" class="form-control" id="f-contributor-name" placeholder="Votre prénom et nom">
       </div>
       <input type="file" id="file-input" accept="image/*" multiple style="display:none">
       <label class="field-label" style="margin-bottom:8px">Photos de la variété *</label>
@@ -788,8 +809,8 @@
       </div>
       <div class="pref-block">
         <div class="pref-block-text">
-          <div class="pref-block-title">Tomato Verified</div>
-          <div class="pref-block-sub">Lorque vous avez vérifié les informations de cette tomate.</div>
+          <div class="pref-block-title">Firebase Verified</div>
+          <div class="pref-block-sub">Badge officiel pour cette variété.</div>
         </div>
         <button class="toggle" id="toggle-verified" type="button"></button>
       </div>
@@ -1158,6 +1179,10 @@ onAuthStateChanged(auth, async (user) => {
 });
 
 anonToggle.onclick = () => {
+  if (isVerified) {
+    showToast('Le nom est obligatoire pour une variété vérifiée.', 'fa-circle-exclamation');
+    return;
+  }
   isAnon = !isAnon;
   anonToggle.classList.toggle('on', isAnon);
   nameInputGroup.style.display = isAnon ? 'none' : 'block';
@@ -1166,6 +1191,11 @@ anonToggle.onclick = () => {
 verifiedToggle.onclick = () => {
   isVerified = !isVerified;
   verifiedToggle.classList.toggle('on', isVerified);
+  if (isVerified && isAnon) {
+    isAnon = false;
+    anonToggle.classList.remove('on');
+    nameInputGroup.style.display = 'block';
+  }
 };
 
 // ─── COMPTEUR ANIMÉ ───────────────────────────────────────────────────────────
@@ -1570,8 +1600,9 @@ function openDetailModal(tomatoId) {
 
   document.getElementById('detail-desc').textContent = t.description || '-';
 
+  const verifiedBadgeSvg = `<svg fill="#1d9bf0" version="1.1" xmlns="http://www.w3.org/2000/svg" width="16px" height="16px" viewBox="0 0 910.288 910.287" style="flex-shrink:0; margin-left:4px;"><path d="M873.206,202.06l-1.212-28.51l-28.386-2.915c-109.036-11.198-202.773-51.887-262.21-84.049 c-65.099-35.226-104.56-68.274-104.922-68.579L455.165,0L433.84,17.981c-0.392,0.33-39.853,33.379-104.951,68.604 c-59.437,32.162-153.173,72.851-262.209,84.049l-28.387,2.915l-1.212,28.51c-0.217,5.104-4.777,126.698,42.059,273.937 c27.637,86.887,67.549,164.736,118.627,231.396c64.139,83.701,145.948,149.68,243.155,196.102l14.221,6.793l14.221-6.793 c97.207-46.422,179.017-112.398,243.155-196.102c51.079-66.658,90.991-144.51,118.628-231.395 C877.982,328.759,873.423,207.165,873.206,202.06z M455.143,836.93c-81.095-41.209-149.731-97.887-204.194-168.646 c-46.393-60.275-82.812-130.998-108.248-210.201c-31.088-96.808-38.06-183.144-39.471-225.538 c43.735-6.494,87.949-17.421,131.833-32.597c42.9-14.836,85.598-33.752,126.907-56.221c41.915-22.798,73.81-44.573,93.172-58.812 c19.362,14.238,51.258,36.014,93.173,58.812c41.309,22.47,84.007,41.385,126.907,56.221 c43.896,15.181,88.123,26.108,131.87,32.602c-1.359,41.978-8.194,127.098-38.842,223.443 c-25.317,79.594-61.694,150.672-108.12,211.258C605.537,738.494,536.632,795.52,455.143,836.93z"/></svg>`;
   const authorEl = document.getElementById('detail-author');
-  authorEl.innerHTML = `<i class="fa-solid fa-user" style="color:var(--text-muted)"></i> ${t.author || 'Anonyme'}`;
+  authorEl.innerHTML = `<i class="fa-solid fa-user" style="color:var(--text-muted)"></i> <span style="display:inline-flex;align-items:center">${t.author || 'Anonyme'} ${t.verified ? verifiedBadgeSvg : ''}</span>`;
   if (t.uid) {
     authorEl.classList.add('author-link');
     authorEl.onclick = () => openAuthorModal(t.uid, t.author || 'Anonyme');
@@ -1648,6 +1679,41 @@ document.getElementById('detail-share-btn').onclick = async () => {
     await navigator.clipboard.writeText(url);
     showToast(tr('share_copied') || 'Lien copié !', 'fa-link');
   } catch (e) { showToast(url, 'fa-link'); }
+};
+
+document.getElementById('detail-print-btn').onclick = () => {
+  if (!detailCurrentId) return;
+  const t = tomatoesData.find(x => x.id === detailCurrentId);
+  if (!t) return;
+  
+  const imagesArray = t.imageURLs || (t.imageURL ? [t.imageURL] : []);
+  const imgHtml = imagesArray.length > 0 ? `
+    <div class="print-img-container">
+      <img src="${imagesArray[0]}" alt="${t.name}">
+      <div class="print-watermark"><i class="fa-solid fa-user"></i> ${t.author || 'Anonyme'} ${t.verified ? '✓' : ''}</div>
+    </div>
+  ` : '';
+  
+  const printArea = document.getElementById('print-area');
+  printArea.innerHTML = `
+    <div style="display:flex; align-items:center; gap:15px; margin-bottom: 20px;">
+      <h1 style="color:#b91c1c; font-family:var(--display); font-size: 32px; margin:0;">🍅 TomatoList</h1>
+    </div>
+    <h2 style="font-size:28px; margin-bottom: 10px;">${t.name}</h2>
+    ${imgHtml}
+    <div style="margin-top: 20px; font-size: 16px;">
+      <p><strong>Couleur:</strong> ${trColor(t.color)}</p>
+      ${t.weight ? `<p><strong>Poids:</strong> ${t.weight}g</p>` : ''}
+      ${t.averageSize ? `<p><strong>Taille:</strong> ${trSize(t.averageSize)}</p>` : ''}
+      ${t.country ? `<p><strong>Pays:</strong> ${t.country}</p>` : ''}
+      <div style="margin-top: 20px;">
+        <strong>Description:</strong><br>
+        ${t.description || '-'}
+      </div>
+    </div>
+  `;
+  
+  window.print();
 };
 
 function maybeOpenSharedTomato() {
@@ -1929,10 +1995,16 @@ document.getElementById('btn-submit').onclick = async () => {
   }
 
   const isOwnerEdit = editingTomatoId && currentUser && editOwnerUid && currentUser.uid === editOwnerUid;
+  let authorNameValue = document.getElementById('f-author-name').value.trim();
+  
+  if (isVerified && !authorNameValue) {
+    errBox.textContent = 'Le prénom et nom sont obligatoires pour une variété vérifiée.';
+    errBox.style.display = 'block'; return;
+  }
+  
   let contributorName = '';
   if (editingTomatoId && !isOwnerEdit) {
-    contributorName = document.getElementById('f-contributor-name').value.trim();
-    if (!contributorName) { errBox.textContent = 'Merci d\'indiquer votre prénom et nom pour valider la modification.'; errBox.style.display = 'block'; return; }
+    contributorName = currentUser && currentProfile ? `${currentProfile.firstname || ''} ${currentProfile.lastname || ''}`.trim() : (authorNameValue || 'Anonyme');
   }
   errBox.style.display = 'none';
   const fill = document.getElementById('progress-fill');
@@ -1965,7 +2037,7 @@ document.getElementById('btn-submit').onclick = async () => {
       };
       if (!isOwnerEdit) {
         const newContribRef = push(ref(db, `tomatoes/${editingTomatoId}/contributors`));
-        updates[`contributors/${newContribRef.key}`] = { name: contributorName, uid: currentUser ? currentUser.uid : null, at: Date.now() };
+        updates[`contributors/${newContribRef.key}`] = { name: contributorName || 'Anonyme', uid: currentUser ? currentUser.uid : null, at: Date.now() };
       }
       await update(ref(db, `tomatoes/${editingTomatoId}`), updates);
       fill.style.width = '100%';
@@ -1998,8 +2070,6 @@ function resetForm() {
   editingTomatoId = null; editOwnerUid = null;
   const contribBlock = document.getElementById('edit-contributor-note');
   if (contribBlock) contribBlock.style.display = 'none';
-  const contribInput = document.getElementById('f-contributor-name');
-  if (contribInput) contribInput.value = '';
   document.getElementById('add-modal-title').setAttribute('data-i18n', 'add_title');
   document.getElementById('add-modal-title').textContent = tr('add_title');
   document.getElementById('btn-submit-label').setAttribute('data-i18n', 'submit');
@@ -2050,9 +2120,7 @@ function openEditModal(t) {
   document.getElementById('f-size').value = t.averageSize || '';
   document.getElementById('f-desc').value = t.description || '';
   const contribBlock = document.getElementById('edit-contributor-note');
-  const contribInput = document.getElementById('f-contributor-name');
   if (contribBlock) contribBlock.style.display = isOwner ? 'none' : 'block';
-  if (contribInput) contribInput.value = (!isOwner && currentProfile) ? `${currentProfile.firstname || ''} ${currentProfile.lastname || ''}`.trim() : '';
   if (t.country) {
     const c = countriesList.find(x => x.name === t.country);
     document.getElementById('f-country-value').value = t.country;
