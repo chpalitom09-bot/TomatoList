@@ -401,23 +401,62 @@
   @media (max-width: 480px) { .install-banner { left: 12px; right: 12px; padding: 14px; gap: 10px; } .install-banner-icon { width: 44px; height: 44px; } .install-banner-btn { padding: 8px 12px; font-size: 12.5px; } }
   @media (max-width: 768px) { .hide-mobile { display: none !important; } .btn { padding: 10px; border-radius: 8px; } .btn i { margin: 0; font-size: 16px; } .grid { grid-template-columns: 1fr; } .form-row { flex-direction: column; gap: 0; } .share-banner { padding: 20px; } .share-banner-title { font-size: 16px; } }
 
-  /* Print Styles */
+  /* Print Styles — rendu premium TomatoList */
   @media screen {
     #print-area { display: none; }
   }
   @media print {
+    @page { margin: 14mm 12mm; }
+    * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
     body > *:not(#print-area) { display: none !important; }
-    #print-area { display: block !important; padding: 20px; }
-    .print-img-container { position: relative; display: inline-block; margin-top: 15px; }
-    .print-img-container img { max-width: 100%; height: auto; max-height: 600px; border-radius: 8px; }
-    .print-watermark {
-      position: absolute; bottom: 20px; right: 20px;
-      background: rgba(255, 255, 255, 0.9) !important;
-      color: #b91c1c !important;
-      padding: 8px 16px; font-size: 16px; font-weight: bold;
-      border-radius: 8px; border: 2px solid #b91c1c;
-      -webkit-print-color-adjust: exact; print-color-adjust: exact;
-    }
+    body { background: #fff !important; }
+    #print-area { display: block !important; }
+
+    .pp-page { font-family: var(--sans); color: #1f2430; position: relative; padding-bottom: 30px; }
+
+    /* En-tête */
+    .pp-header { display: flex; align-items: center; justify-content: space-between; padding-bottom: 14px; border-bottom: 3px solid #b91c1c; margin-bottom: 22px; }
+    .pp-brand { display: flex; align-items: center; gap: 12px; }
+    .pp-logo { width: 46px; height: 46px; flex-shrink: 0; }
+    .pp-brand-text { display: flex; flex-direction: column; line-height: 1.15; }
+    .pp-brand-name { font-family: var(--display); font-weight: 700; font-size: 22px; color: #b91c1c; letter-spacing: -0.02em; }
+    .pp-brand-tag { font-size: 10.5px; color: #8b8f99; letter-spacing: 0.04em; text-transform: uppercase; }
+    .pp-meta { text-align: right; font-size: 10.5px; color: #8b8f99; line-height: 1.5; }
+    .pp-meta b { color: #4b4f58; }
+
+    /* Titre variété */
+    .pp-title-row { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; margin-bottom: 18px; }
+    .pp-name { font-family: var(--display); font-size: 30px; font-weight: 700; color: #1f2430; letter-spacing: -0.02em; margin: 0; }
+    .pp-badges { display: flex; gap: 6px; flex-wrap: wrap; justify-content: flex-end; }
+    .pp-badge { display: inline-flex; align-items: center; gap: 5px; font-size: 10.5px; font-weight: 600; padding: 4px 10px; border-radius: 20px; background: #fef2f2; color: #b91c1c; border: 1px solid #fecaca; white-space: nowrap; }
+    .pp-badge.verified { background: #ecfdf5; color: #059669; border-color: #a7f3d0; }
+
+    /* Galerie */
+    .pp-gallery { display: grid; gap: 10px; margin-bottom: 22px; break-inside: avoid; }
+    .pp-gallery.n1 { grid-template-columns: 1fr; }
+    .pp-gallery.n2 { grid-template-columns: 1fr 1fr; }
+    .pp-gallery.n3, .pp-gallery.n4 { grid-template-columns: 1fr 1fr; }
+    .pp-img-wrap { position: relative; border-radius: 14px; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.12); border: 1px solid #eee; break-inside: avoid; }
+    .pp-gallery.n1 .pp-img-wrap img { max-height: 420px; }
+    .pp-img-wrap img { width: 100%; height: 260px; object-fit: cover; display: block; }
+    .pp-watermark { position: absolute; bottom: 10px; right: 10px; display: flex; align-items: center; gap: 6px; background: rgba(255,255,255,0.92); color: #b91c1c; padding: 6px 12px; font-size: 11.5px; font-weight: 700; border-radius: 20px; border: 1.5px solid #b91c1c; }
+    .pp-watermark i { font-size: 10px; }
+
+    /* Infos */
+    .pp-info { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 20px; break-inside: avoid; }
+    .pp-info-card { background: #fafafa; border: 1px solid #eee; border-left: 3px solid #b91c1c; border-radius: 8px; padding: 10px 12px; }
+    .pp-info-label { font-size: 9.5px; text-transform: uppercase; letter-spacing: 0.05em; color: #9ca0aa; font-weight: 600; margin-bottom: 3px; }
+    .pp-info-value { font-size: 14px; font-weight: 700; color: #1f2430; }
+
+    /* Description */
+    .pp-section-title { font-family: var(--display); font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: #b91c1c; margin: 0 0 8px; display: flex; align-items: center; gap: 8px; }
+    .pp-section-title::after { content: ""; flex: 1; height: 1px; background: #f0d5d5; }
+    .pp-desc { font-size: 13.5px; line-height: 1.65; color: #3a3f4a; white-space: pre-line; margin-bottom: 22px; }
+
+    /* Pied de page */
+    .pp-footer { display: flex; align-items: center; justify-content: space-between; padding-top: 10px; margin-top: 10px; border-top: 1px solid #eee; font-size: 9.5px; color: #a0a4ad; }
+    .pp-footer-brand { display: flex; align-items: center; gap: 6px; font-weight: 600; color: #b91c1c; }
+    .pp-footer-brand svg { width: 14px; height: 14px; }
   }
 </style>
 </head>
@@ -667,7 +706,7 @@
       <p class="detail-desc" id="detail-desc">-</p>
       <div class="detail-actions">
         <button class="btn btn-outline btn-sm" id="detail-share-btn"><i class="fa-solid fa-share-nodes"></i> <span data-i18n="share">Partager</span></button>
-        <button class="btn btn-outline btn-sm" id="detail-print-btn"><i class="fa-solid fa-print"></i> <span data-i18n="print">Imprimer</span></button>
+        <button class="btn btn-outline btn-sm" id="detail-print-btn"><i class="fa-solid fa-print"></i> <span>Imprimer</span></button>
         <button class="btn btn-outline btn-sm" id="detail-edit-btn" style="display:none"><i class="fa-solid fa-pen"></i> <span data-i18n="edit">Modifier</span></button>
         <button class="btn btn-danger btn-sm" id="detail-delete-btn" style="display:none"><i class="fa-solid fa-trash"></i> <span data-i18n="delete">Supprimer</span></button>
       </div>
@@ -1681,38 +1720,112 @@ document.getElementById('detail-share-btn').onclick = async () => {
   } catch (e) { showToast(url, 'fa-link'); }
 };
 
+const TOMATOLIST_LOGO_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <defs>
+    <radialGradient id="ppBody" cx="35%" cy="30%" r="75%">
+      <stop offset="0%" stop-color="#ff6b57"/>
+      <stop offset="55%" stop-color="#e8392a"/>
+      <stop offset="100%" stop-color="#b91c1c"/>
+    </radialGradient>
+  </defs>
+  <rect width="512" height="512" rx="112" fill="#fef2f2"/>
+  <path d="M256 168c-92 0-158 74-158 172 0 78 66 132 158 132s158-54 158-132c0-98-66-172-158-172z" fill="url(#ppBody)"/>
+  <path d="M256 168c-92 0-158 74-158 172 0 20 4 39 12 56 24-108 90-176 146-176s122 68 146 176c8-17 12-36 12-56 0-98-66-172-158-172z" fill="#000" opacity="0.06"/>
+  <g fill="#3f8f3f">
+    <path d="M256 120c-14 26-14 52 0 70 14-18 14-44 0-70z"/>
+    <path d="M256 130c-30 8-52 28-58 52 26-4 50-22 58-52z"/>
+    <path d="M256 130c30 8 52 28 58 52-26-4-50-22-58-52z"/>
+    <path d="M256 138c-42-4-76 10-94 36 30 8 66-2 94-36z"/>
+    <path d="M256 138c42-4 76 10 94 36-30 8-66-2-94-36z"/>
+  </g>
+  <ellipse cx="205" cy="235" rx="26" ry="18" fill="#fff" opacity="0.35"/>
+</svg>`;
+
+function ppEscape(str) {
+  return String(str ?? '').replace(/[&<>"']/g, (c) => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c]));
+}
+
 document.getElementById('detail-print-btn').onclick = () => {
   if (!detailCurrentId) return;
   const t = tomatoesData.find(x => x.id === detailCurrentId);
   if (!t) return;
-  
+
   const imagesArray = t.imageURLs || (t.imageURL ? [t.imageURL] : []);
-  const imgHtml = imagesArray.length > 0 ? `
-    <div class="print-img-container">
-      <img src="${imagesArray[0]}" alt="${t.name}">
-      <div class="print-watermark"><i class="fa-solid fa-user"></i> ${t.author || 'Anonyme'} ${t.verified ? '✓' : ''}</div>
+  const galleryCount = Math.min(imagesArray.length, 4);
+  const galleryClass = 'n' + Math.max(galleryCount, 1);
+
+  const galleryHtml = imagesArray.length > 0 ? `
+    <div class="pp-gallery ${galleryClass}">
+      ${imagesArray.slice(0, 4).map((src, i) => `
+        <div class="pp-img-wrap">
+          <img src="${ppEscape(src)}" alt="${ppEscape(t.name)}">
+          ${i === 0 ? `<div class="pp-watermark"><i class="fa-solid fa-user"></i> ${ppEscape(t.author || 'Anonyme')} ${t.verified ? '<i class="fa-solid fa-circle-check"></i>' : ''}</div>` : ''}
+        </div>
+      `).join('')}
     </div>
   ` : '';
-  
+
+  const likesCount = t.likes ? Object.keys(t.likes).length : 0;
+  const dateStr = t.createdAt ? new Date(t.createdAt).toLocaleDateString(currentLang || 'fr-FR', { year: 'numeric', month: 'long', day: 'numeric' }) : '';
+
+  const infoCards = [
+    { label: 'Couleur', value: trColor(t.color) },
+    t.weight ? { label: 'Poids', value: `${t.weight} g` } : null,
+    t.averageSize ? { label: 'Taille', value: trSize(t.averageSize) } : null,
+    t.country ? { label: 'Pays d\'origine', value: t.country } : null,
+    { label: 'Auteur', value: `${t.author || 'Anonyme'}${t.verified ? ' ✓' : ''}` },
+    dateStr ? { label: 'Ajouté le', value: dateStr } : null,
+    { label: 'Likes', value: `${likesCount} ♥` },
+  ].filter(Boolean);
+
+  const printedOn = new Date().toLocaleDateString('fr-FR', { year: 'numeric', month: 'long', day: 'numeric' });
+
   const printArea = document.getElementById('print-area');
   printArea.innerHTML = `
-    <div style="display:flex; align-items:center; gap:15px; margin-bottom: 20px;">
-      <h1 style="color:#b91c1c; font-family:var(--display); font-size: 32px; margin:0;">🍅 TomatoList</h1>
-    </div>
-    <h2 style="font-size:28px; margin-bottom: 10px;">${t.name}</h2>
-    ${imgHtml}
-    <div style="margin-top: 20px; font-size: 16px;">
-      <p><strong>Couleur:</strong> ${trColor(t.color)}</p>
-      ${t.weight ? `<p><strong>Poids:</strong> ${t.weight}g</p>` : ''}
-      ${t.averageSize ? `<p><strong>Taille:</strong> ${trSize(t.averageSize)}</p>` : ''}
-      ${t.country ? `<p><strong>Pays:</strong> ${t.country}</p>` : ''}
-      <div style="margin-top: 20px;">
-        <strong>Description:</strong><br>
-        ${t.description || '-'}
+    <div class="pp-page">
+      <div class="pp-header">
+        <div class="pp-brand">
+          <div class="pp-logo">${TOMATOLIST_LOGO_SVG}</div>
+          <div class="pp-brand-text">
+            <span class="pp-brand-name">TomatoList</span>
+            <span class="pp-brand-tag">Fiche variété</span>
+          </div>
+        </div>
+        <div class="pp-meta">
+          <div>Document généré le<br><b>${printedOn}</b></div>
+        </div>
+      </div>
+
+      <div class="pp-title-row">
+        <h1 class="pp-name">${ppEscape(t.name)}</h1>
+        <div class="pp-badges">
+          <span class="pp-badge">${ppEscape(trColor(t.color))}</span>
+          ${t.verified ? `<span class="pp-badge verified"><i class="fa-solid fa-circle-check"></i> Vérifié</span>` : ''}
+        </div>
+      </div>
+
+      ${galleryHtml}
+
+      <div class="pp-section-title">Caractéristiques</div>
+      <div class="pp-info">
+        ${infoCards.map(c => `
+          <div class="pp-info-card">
+            <div class="pp-info-label">${ppEscape(c.label)}</div>
+            <div class="pp-info-value">${ppEscape(c.value)}</div>
+          </div>
+        `).join('')}
+      </div>
+
+      <div class="pp-section-title">Description</div>
+      <div class="pp-desc">${ppEscape(t.description || '—')}</div>
+
+      <div class="pp-footer">
+        <div class="pp-footer-brand">${TOMATOLIST_LOGO_SVG} TomatoList</div>
+        <div>wikimindai.github.io/Wikimind/TomatoList</div>
       </div>
     </div>
   `;
-  
+
   window.print();
 };
 
