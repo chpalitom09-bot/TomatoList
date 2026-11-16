@@ -116,6 +116,31 @@
       ".read": "auth != null",
       ".write": "false"
     },
+    "quest": {
+      "$uid": {
+        ".read": "auth != null && auth.uid === $uid",
+        ".write": "auth != null && auth.uid === $uid",
+        "total": { ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= (data.exists() ? data.val() : 0) + 300" },
+        "days": { "$d": { ".validate": "newData.hasChildren()" } },
+        "liked": { "$t": { ".validate": "newData.val() === true" } },
+        "week": {
+          "k": { ".validate": "newData.isString() && newData.val().length <= 12" },
+          "xp": { ".validate": "newData.isNumber() && newData.val() >= 0" },
+          "$other": { ".validate": false }
+        },
+        "$other": { ".validate": false }
+      }
+    },
+    "lb": {
+      ".read": "true",
+      "$uid": {
+        ".write": "auth != null && auth.uid === $uid",
+        "name": { ".validate": "newData.isString() && newData.val().length <= 40" },
+        "total": { ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= (data.exists() ? data.val() : 0) + 300" },
+        "weeks": { "$w": { ".validate": "newData.isNumber() && newData.val() >= 0" } },
+        "$other": { ".validate": false }
+      }
+    },
     "users": {
       "$uid": {
         ".read": "true",

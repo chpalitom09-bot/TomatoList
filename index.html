@@ -146,6 +146,13 @@
   .sw { display: inline-flex; align-items: center; gap: 8px; padding: 6px 12px 6px 6px; border-radius: 99px; border: 1.5px solid var(--line); background: #fff; color: var(--text-main); font-size: 13.5px; font-weight: 500; cursor: pointer; transition: border-color .15s, transform .15s, box-shadow .15s, background .15s; }
   .sw:hover { border-color: #fca5a5; transform: translateY(-1px); box-shadow: 0 4px 10px rgba(0,0,0,.06); }
   .sw-dot { position: relative; width: 24px; height: 24px; border-radius: 50%; flex-shrink: 0; display: flex; align-items: center; justify-content: center; box-shadow: inset 0 -3px 5px rgba(0,0,0,.18), inset 0 2px 3px rgba(255,255,255,.35), 0 0 0 1px rgba(0,0,0,.08); font-style: normal; }
+  .sw-tm { position: relative; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; min-width: 24px; height: 25px; }
+  .sw-tm .fv-tomato { display: block; }
+  .sw-tm .sw-ck { position: absolute; right: -4px; bottom: -3px; width: 14px; height: 14px; border-radius: 50%; background: var(--text-main); color: #fff; font-size: 8px; text-shadow: none; display: flex; align-items: center; justify-content: center; }
+  .sw-multi { min-width: 40px; }
+  .sw-multi .fv-tomato + .fv-tomato { margin-left: -9px; }
+  .sw-multi .fv-tomato:nth-child(2) { position: relative; z-index: 1; }
+  .sw-multi .fv-tomato:nth-child(3) { position: relative; z-index: 2; }
   .sw-rainbow { background: conic-gradient(#ef4444, #f97316, #eab308, #22c55e, #3b5bdb, #7c3aed, #ef4444); }
   .sw-ck { font-size: 11px; color: #fff; opacity: 0; transform: scale(.4); transition: opacity .15s, transform .2s cubic-bezier(.3,1.6,.5,1); text-shadow: 0 1px 2px rgba(0,0,0,.45); }
   .sw-dot[data-light="1"] .sw-ck { color: #374151; text-shadow: none; }
@@ -1529,11 +1536,11 @@ function renderColorFilters() {
   if (!box) return;
   const counts = {};
   tomatoesData.forEach(t => { if (t.color) counts[t.color] = (counts[t.color] || 0) + 1; });
-  const dot = (bg) => `<i class="sw-dot" style="background:${bg}" data-light="${isLightColor(bg) ? 1 : 0}"><i class="fa-solid fa-check sw-ck"></i></i>`;
-  let html = `<button type="button" class="sw${currentColor === 'all' ? ' active' : ''}" data-val="all"><i class="sw-dot sw-rainbow"><i class="fa-solid fa-check sw-ck"></i></i><span>${escHtml(tr('color_all'))}</span></button>`;
+  const dot = (name) => `<span class="sw-tm">${FV.tomato(name, 24)}<i class="fa-solid fa-check sw-ck"></i></span>`;
+  let html = `<button type="button" class="sw${currentColor === 'all' ? ' active' : ''}" data-val="all"><span class="sw-tm sw-multi">${FV.tomato('Rouge', 17)}${FV.tomato('Jaune', 17)}${FV.tomato('Vert', 17)}</span><span>${escHtml(tr('color_all'))}</span></button>`;
   allColorNames().forEach(name => {
     const n = counts[name] || 0;
-    html += `<button type="button" class="sw${currentColor === name ? ' active' : ''}${n ? '' : ' sw-empty'}" data-val="${escHtml(name)}">${dot(colorMap[name] || '#ccc')}<span>${escHtml(trColor(name))}</span>${n ? `<small>${n}</small>` : ''}</button>`;
+    html += `<button type="button" class="sw${currentColor === name ? ' active' : ''}${n ? '' : ' sw-empty'}" data-val="${escHtml(name)}">${dot(name)}<span>${escHtml(trColor(name))}</span>${n ? `<small>${n}</small>` : ''}</button>`;
   });
   box.innerHTML = html;
   const add = document.getElementById('btn-add-color');
@@ -1591,7 +1598,7 @@ function updateFilterUI(count) {
   const row = document.getElementById('active-filters');
   if (!row) return;
   let h = '';
-  if (currentColor !== 'all') h += `<span class="af-chip"><i class="sw-dot" style="background:${colorMap[currentColor] || '#ccc'}"></i>${escHtml(trColor(currentColor))}<button type="button" data-clear="color" aria-label="Retirer"><i class="fa-solid fa-xmark"></i></button></span>`;
+  if (currentColor !== 'all') h += `<span class="af-chip"><span class="sw-tm">${FV.tomato(currentColor, 16)}</span>${escHtml(trColor(currentColor))}<button type="button" data-clear="color" aria-label="Retirer"><i class="fa-solid fa-xmark"></i></button></span>`;
   if (currentCountry !== 'all') h += `<span class="af-chip"><i class="fa-solid fa-earth-europe" style="color:#f87171"></i>${escHtml(currentCountry)}<button type="button" data-clear="country" aria-label="Retirer"><i class="fa-solid fa-xmark"></i></button></span>`;
   row.innerHTML = h;
   row.classList.toggle('show', !!h);
@@ -1650,7 +1657,7 @@ function renderColorModalList() {
   const list = Object.values(customColors).sort((x, y) => x.name.localeCompare(y.name, 'fr'));
   const counts = {}; tomatoesData.forEach(t => { if (t.color) counts[t.color] = (counts[t.color] || 0) + 1; });
   document.getElementById('cm-list').innerHTML = list.length
-    ? `<div class="filter-title" style="margin-bottom:6px">Couleurs ajoutées</div>` + list.map(c => `<div class="cm-item"><i class="sw-dot" style="background:${colorMap[c.name] || c.hex}"></i><span>${escHtml(c.name)}</span><small>${counts[c.name] || 0} variété${(counts[c.name] || 0) > 1 ? 's' : ''}</small><button type="button" data-del="${escHtml(c.key)}" title="Supprimer" aria-label="Supprimer ${escHtml(c.name)}"><i class="fa-solid fa-trash-can"></i></button></div>`).join('')
+    ? `<div class="filter-title" style="margin-bottom:6px">Couleurs ajoutées</div>` + list.map(c => `<div class="cm-item"><span class="sw-tm">${FV.tomato(c.name, 22)}</span><span>${escHtml(c.name)}</span><small>${counts[c.name] || 0} variété${(counts[c.name] || 0) > 1 ? 's' : ''}</small><button type="button" data-del="${escHtml(c.key)}" title="Supprimer" aria-label="Supprimer ${escHtml(c.name)}"><i class="fa-solid fa-trash-can"></i></button></div>`).join('')
     : '';
 }
 function openColorModal() {
@@ -1717,7 +1724,7 @@ document.addEventListener('keydown', e => { if (e.key === 'Escape') closeColorMo
 // Affiche une tomate, détecte sa couleur sur la photo (color-detect.js) et laisse le modérateur valider ou changer.
 let ccQueue = [], ccIndex = 0, ccDone = 0, ccChoice = null, ccRun = 0, ccPhoto = 0, ccBusy = false;
 const ccEl = id => document.getElementById(id);
-const ccDot = n => `<i class="sw-dot" style="background:${colorMap[n] || '#ccc'}"></i>`;
+const ccDot = n => `<span class="sw-tm">${FV.tomato(n, 18)}</span>`;
 const ccImgs = t => (t.imageURLs || (t.imageURL ? [t.imageURL] : [])).filter(u => /^https?:\/\//i.test(u));
 const ccExtra = () => { const o = {}; Object.values(customColors).forEach(c => { o[c.name] = c.hex2 ? { hex: c.hex, hex2: c.hex2 } : c.hex; }); return o; };
 let ccAI = false, ccManual = false;
@@ -2149,7 +2156,7 @@ function renderGrid() {
       e.stopPropagation();
       const url = window.location.origin + window.location.pathname;
       try {
-        await navigator.clipboard.writeText(url);
+        await navigator.clipboard.writeText(url); window.QX && QX.award('share');
         showToast('Lien copié dans le presse-papier !', 'fa-link');
       } catch (_) {
         showToast(url, 'fa-link');
@@ -2162,11 +2169,11 @@ function renderGrid() {
       const url = window.location.origin + window.location.pathname;
       if (navigator.share) {
         try {
-          await navigator.share({ title: 'TomatoList', text: 'Découvrez des centaines de variétés de tomates 🍅', url });
+          await navigator.share({ title: 'TomatoList', text: 'Découvrez des centaines de variétés de tomates 🍅', url }); window.QX && QX.award('share');
         } catch (_) {}
       } else {
         try {
-          await navigator.clipboard.writeText(url);
+          await navigator.clipboard.writeText(url); window.QX && QX.award('share');
           showToast('Lien copié !', 'fa-link');
         } catch (_) {
           showToast(url, 'fa-link');
@@ -2190,7 +2197,7 @@ async function toggleLike(tomatoId) {
   const updates = {};
   updates[`tomatoes/${tomatoId}/likes/${currentUser.uid}`] = isLiked ? null : true;
   updates[`users/${currentUser.uid}/likes/${tomatoId}`] = isLiked ? null : true;
-  try { await update(ref(db), updates); } catch(err) { showToast("Erreur lors de l'action.", 'fa-triangle-exclamation'); }
+  try { await update(ref(db), updates); if (!isLiked && window.QX) QX.award('like', tomatoId); } catch(err) { showToast("Erreur lors de l'action.", 'fa-triangle-exclamation'); }
 }
 
 document.getElementById('tomatoes-grid').addEventListener('click', async (e) => {
@@ -2251,6 +2258,7 @@ document.getElementById('btn-submit-comment').onclick = async () => {
       at: Date.now()
     });
     input.value = '';
+    if (text.length >= 5 && window.QX) QX.award('comment');
     showToast('Commentaire ajouté !', 'fa-check');
   } catch(e) {
     showToast('Erreur lors de l\'envoi du commentaire.', 'fa-triangle-exclamation');
@@ -2445,10 +2453,10 @@ document.getElementById('detail-share-btn').onclick = async () => {
   if (!detailCurrentId) return;
   const url = `${window.location.origin}${window.location.pathname}?tomato=${detailCurrentId}`;
   if (navigator.share) {
-    try { await navigator.share({ title: 'TomatoList', text: document.getElementById('detail-title').textContent, url }); return; } catch(_) {}
+    try { await navigator.share({ title: 'TomatoList', text: document.getElementById('detail-title').textContent, url }); window.QX && QX.award('share'); return; } catch(_) {}
   }
   try {
-    await navigator.clipboard.writeText(url);
+    await navigator.clipboard.writeText(url); window.QX && QX.award('share');
     showToast(tr('share_copied') || 'Lien copié !', 'fa-link');
   } catch (e) { showToast(url, 'fa-link'); }
 };
@@ -2909,6 +2917,7 @@ document.getElementById('btn-submit').onclick = async () => {
         ...extraFields(false)
       };
       await push(ref(db, 'tomatoes'), tomatoData);
+      if (currentUser && window.QX) QX.award('pub');
       fill.style.width = '100%';
       setTimeout(() => { closeEditor(); showToast(tr('publish_success'), 'fa-seedling'); }, 500);
     }
@@ -3234,5 +3243,6 @@ if ('serviceWorker' in navigator) {
   window.addEventListener('appinstalled', () => { hideBanner(); localStorage.removeItem(DISMISS_KEY); showToast(tr('install_success') || 'TomatoList est installé !', 'fa-circle-check'); });
 })();
 </script>
+<script type="module" src="quetes.js"></script>
 </body>
 </html>
