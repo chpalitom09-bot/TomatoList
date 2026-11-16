@@ -42,23 +42,29 @@
     --sans: 'Inter', sans-serif; --display: 'Space Grotesk', sans-serif;
   }
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-  body { background: linear-gradient(120deg, #fecaca 0%, #ffffff 50%, #fca5a5 100%); background-size: 200% 200%; animation: gradientBG 15s ease-in-out infinite; color: var(--text-main); font-family: var(--sans); -webkit-font-smoothing: antialiased; overflow-x: hidden; }
-  @keyframes gradientBG { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+  body { background: linear-gradient(120deg, #fecaca 0%, #ffffff 50%, #fca5a5 100%); color: var(--text-main); font-family: var(--sans); -webkit-font-smoothing: antialiased; overflow-x: hidden; }
+  @media (min-width: 769px) and (prefers-reduced-motion: no-preference) {
+    body::before { content: ''; position: fixed; top: 0; left: 0; width: 200vw; height: 100%; z-index: -1; pointer-events: none; background: linear-gradient(120deg, #fecaca 0%, #ffffff 25%, #fca5a5 50%, #ffffff 75%, #fecaca 100%); animation: bgDrift 24s ease-in-out infinite alternate; will-change: transform; }
+    @keyframes bgDrift { to { transform: translateX(-100vw); } }
+  }
+  html { -webkit-tap-highlight-color: transparent; }
+  button, .card, a { touch-action: manipulation; }
+  @media (hover: none) { .card:hover { transform: none; box-shadow: none; } }
   a { text-decoration: none; color: inherit; }
   button, input, select, textarea { font-family: inherit; }
 
   /* Loader Anim */
-  #page-loader { position: fixed; inset: 0; background: var(--surface); z-index: 10000; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: opacity 0.4s ease, visibility 0.4s ease; }
-  #page-loader.hidden { opacity: 0; visibility: hidden; }
-  .loader-svg-container { width: 120px; height: 120px; position: relative; margin-bottom: 24px; }
-  .loader-svg-bg { position: absolute; inset: 0; filter: grayscale(100%) opacity(0.2); }
-  .loader-svg-fill { position: absolute; inset: 0; clip-path: inset(100% 0 0 0); transition: clip-path 0.1s linear; }
-  .loader-text { font-family: var(--display); font-size: 28px; font-weight: 700; color: var(--primary); }
 
   /* Navbar */
-  .navbar { background: var(--surface); border-bottom: 1px solid var(--line); padding: 16px 24px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; }
+  .navbar { background: #fef2f2; border-bottom: 1px solid #fecaca; padding: 16px 24px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; }
   .brand { font-family: var(--display); font-size: 24px; font-weight: 700; color: var(--primary); letter-spacing: -0.03em; }
-  .nav-actions { display: flex; align-items: center; gap: 12px; }
+  .nav-actions { display: flex; align-items: center; gap: 12px; flex: none; }
+  .brand { min-width: 0; }
+  .brand-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  @media (max-width: 350px) { .brand-name { display: none; } }
+  .navbar .btn-outline { background: rgba(255,255,255,.75); border-color: rgba(185,28,28,.2); }
+  .navbar .btn-outline:hover { background: #fff; border-color: rgba(185,28,28,.4); }
+  .lang-menu button { text-align: left; }
   .btn { padding: 10px 16px; border-radius: 9px; font-weight: 600; font-size: 14px; cursor: pointer; transition: all 0.2s; border: none; display: flex; align-items: center; justify-content: center; gap: 8px; }
   .btn-primary { background: var(--primary); color: #fff; }
   .btn-primary:hover { background: var(--primary-hover); transform: translateY(-1px); }
@@ -73,8 +79,17 @@
   .lang-menu button:hover { background: var(--bg); }
   .lang-menu button.active { font-weight: 700; background: var(--bg); color: var(--primary); }
 
+
+  /* ── Hero : tomate dessinée à l'encre ── */
+  .hero { position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: clamp(10px, 2vh, 22px); min-height: clamp(330px, calc((100svh - 72px) / 2 - 30px), 560px); padding: 26px 24px 4px; text-align: center; }
+  .hero-title { font-family: var(--display); font-weight: 700; font-size: clamp(28px, 4.2vw, 52px); line-height: 1.05; letter-spacing: -.045em; color: var(--text-main); max-width: 19ch; text-wrap: balance; }
+  .hero-title .w { display: inline-block; padding: .06em .04em; }
+  .hero-img { display: block; width: clamp(210px, 25vw, 320px); height: auto; mix-blend-mode: multiply; margin: -14px 0 -24px; }
+  @media (max-width: 640px) { .hero-img { width: clamp(200px, 62vw, 290px); } .hero { padding-top: 18px; } }
+  #tomatoes-grid { scroll-margin-top: 96px; }
+
   /* Toolbar */
-  .toolbar-wrap { max-width: 1200px; margin: 32px auto 24px; }
+  .toolbar-wrap { max-width: 1200px; margin: 0 auto 24px; }
   .variety-counter { display: flex; align-items: center; justify-content: center; gap: 8px; padding: 0 24px; margin-bottom: 20px; font-family: var(--display); font-size: 14px; font-weight: 600; color: var(--text-muted); letter-spacing: 0.02em; }
   .variety-counter i { color: var(--primary); font-size: 13px; }
   .variety-counter #variety-counter-num { font-size: 20px; font-weight: 700; color: var(--text-main); letter-spacing: -0.01em; }
@@ -99,6 +114,154 @@
   .filter-pill.active { background: var(--surface); color: var(--text-main); font-weight: 600; box-shadow: 0 0 0 1.5px var(--text-main); border-color: transparent; }
   .filter-pill .color-dot { width: 16px; height: 16px; border-radius: 50%; display: inline-block; box-shadow: inset 0 2px 4px rgba(0,0,0,0.2), 0 0 0 1px rgba(0,0,0,0.05); flex-shrink: 0; }
   .foryou-pill { background: linear-gradient(135deg, #fef2f2, #fff); border-color: #fca5a5 !important; color: var(--primary) !important; }
+
+  /* ═══ PANNEAU DE FILTRES (refonte) ═══ */
+  #btn-toggle-filters { position: relative; }
+  .fbadge { position: absolute; top: -6px; right: -6px; min-width: 19px; height: 19px; padding: 0 5px; border-radius: 99px; background: var(--primary); color: #fff; font-size: 11px; font-weight: 700; display: flex; align-items: center; justify-content: center; border: 2px solid #fff; box-sizing: content-box; line-height: 1; }
+  .fbadge[hidden] { display: none; }
+  .filters-panel { padding: 0; overflow: hidden; border-radius: 18px; border-color: #fecaca; box-shadow: 0 18px 40px rgba(185,28,28,.08), 0 2px 6px rgba(0,0,0,.04); }
+  .fp-head { display: flex; align-items: center; gap: 10px; padding: 14px 18px; background: linear-gradient(180deg, #fef2f2, #fff); border-bottom: 1px solid #fee2e2; }
+  .fp-title { flex: 1; display: flex; align-items: center; gap: 10px; font-family: var(--display); font-size: 17px; font-weight: 700; letter-spacing: -.01em; }
+  .fp-ico { width: 32px; height: 32px; border-radius: 10px; background: var(--primary); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 14px; }
+  .fp-reset { border: none; background: transparent; color: var(--primary); font-size: 13px; font-weight: 600; cursor: pointer; padding: 8px 10px; border-radius: 8px; display: flex; align-items: center; gap: 6px; transition: background .15s, opacity .15s; }
+  .fp-reset:hover { background: #fee2e2; }
+  .fp-reset[disabled] { opacity: .35; pointer-events: none; }
+  .fp-x { width: 34px; height: 34px; border: none; border-radius: 50%; background: transparent; color: var(--text-muted); font-size: 16px; cursor: pointer; }
+  .fp-x:hover { background: #fee2e2; color: var(--text-main); }
+  .fp-body { padding: 6px 18px 4px; max-height: min(62vh, 560px); overflow-y: auto; overscroll-behavior: contain; }
+  .fp-sec { padding: 16px 0; border-bottom: 1px dashed var(--line); }
+  .fp-sec:last-child { border-bottom: none; }
+  .fp-lab { display: flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: .06em; margin-bottom: 12px; }
+  .fp-lab > i { color: #f87171; font-size: 13px; width: 16px; text-align: center; }
+  .fp-add { margin-left: auto; border: 1px dashed #f87171; background: #fff; color: var(--primary); border-radius: 99px; padding: 5px 12px; font-size: 12px; font-weight: 600; cursor: pointer; text-transform: none; letter-spacing: 0; display: inline-flex; align-items: center; gap: 6px; transition: background .15s; }
+  .fp-add:hover { background: #fef2f2; }
+  .fp-sort { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 8px; }
+  .fp-sort .filter-pill { border-radius: 12px; padding: 11px 14px; justify-content: flex-start; box-shadow: none; background: #fafafa; border: 1.5px solid transparent; color: var(--text-main); font-weight: 500; }
+  .fp-sort .filter-pill > i { width: 16px; text-align: center; color: var(--text-muted); font-size: 13px; }
+  .fp-sort .filter-pill:hover { background: #fff; border-color: #fecaca; transform: none; box-shadow: none; }
+  .fp-sort .filter-pill.active { background: #fef2f2; border-color: var(--primary); box-shadow: none; color: var(--primary); font-weight: 600; }
+  .fp-sort .filter-pill.active > i { color: var(--primary); }
+  .fp-sort .foryou-pill { background: linear-gradient(135deg, #fef2f2, #fff) !important; }
+  .fp-colors { display: flex; flex-wrap: wrap; gap: 8px; }
+  .sw { display: inline-flex; align-items: center; gap: 8px; padding: 6px 12px 6px 6px; border-radius: 99px; border: 1.5px solid var(--line); background: #fff; color: var(--text-main); font-size: 13.5px; font-weight: 500; cursor: pointer; transition: border-color .15s, transform .15s, box-shadow .15s, background .15s; }
+  .sw:hover { border-color: #fca5a5; transform: translateY(-1px); box-shadow: 0 4px 10px rgba(0,0,0,.06); }
+  .sw-dot { position: relative; width: 24px; height: 24px; border-radius: 50%; flex-shrink: 0; display: flex; align-items: center; justify-content: center; box-shadow: inset 0 -3px 5px rgba(0,0,0,.18), inset 0 2px 3px rgba(255,255,255,.35), 0 0 0 1px rgba(0,0,0,.08); font-style: normal; }
+  .sw-rainbow { background: conic-gradient(#ef4444, #f97316, #eab308, #22c55e, #3b5bdb, #7c3aed, #ef4444); }
+  .sw-ck { font-size: 11px; color: #fff; opacity: 0; transform: scale(.4); transition: opacity .15s, transform .2s cubic-bezier(.3,1.6,.5,1); text-shadow: 0 1px 2px rgba(0,0,0,.45); }
+  .sw-dot[data-light="1"] .sw-ck { color: #374151; text-shadow: none; }
+  .sw.active { border-color: var(--text-main); background: #fff; box-shadow: 0 0 0 3px rgba(17,24,39,.07); font-weight: 600; }
+  .sw.active .sw-ck { opacity: 1; transform: none; }
+  .sw small { font-size: 11px; font-weight: 600; color: var(--text-muted); background: #f3f4f6; border-radius: 99px; padding: 1px 7px; }
+  .sw-empty { opacity: .55; }
+  .fp-select { position: relative; }
+  .fp-select .country-select { appearance: none; -webkit-appearance: none; padding: 13px 40px 13px 14px; border-radius: 12px; background: #fafafa; border: 1.5px solid transparent; cursor: pointer; font-weight: 500; transition: border-color .15s, background .15s; }
+  .fp-select .country-select:hover { background: #fff; border-color: #fecaca; }
+  .fp-select .country-select:focus { background: #fff; border-color: var(--primary); }
+  .fp-select > i { position: absolute; right: 16px; top: 50%; transform: translateY(-50%); color: var(--text-muted); font-size: 12px; pointer-events: none; }
+  .fp-foot { padding: 12px 18px 16px; border-top: 1px solid #fee2e2; background: #fffafa; }
+  .fp-foot .btn { width: 100%; padding: 13px; border-radius: 12px; font-size: 14.5px; }
+  .af-row { display: none; flex-wrap: wrap; gap: 8px; padding: 0 24px; margin: -4px 0 14px; }
+  .af-row.show { display: flex; }
+  .af-chip { display: inline-flex; align-items: center; gap: 7px; padding: 5px 8px 5px 10px; border-radius: 99px; background: #fff; border: 1px solid #fecaca; font-size: 13px; font-weight: 500; }
+  .af-chip .sw-dot { width: 16px; height: 16px; box-shadow: inset 0 -2px 3px rgba(0,0,0,.18), 0 0 0 1px rgba(0,0,0,.08); }
+  .af-chip button { border: none; background: #fee2e2; color: var(--primary); width: 20px; height: 20px; border-radius: 50%; font-size: 10px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+  .af-chip button:hover { background: #fecaca; }
+  @media (max-width: 768px) {
+    .filters-panel { margin: 0 12px; }
+    .af-row, .toolbar { padding-left: 12px; padding-right: 12px; }
+    .af-row { padding: 0 12px; }
+    .fp-body { max-height: 58vh; padding: 4px 14px; }
+    .fp-sort { grid-template-columns: 1fr 1fr; }
+    .fbadge { top: -5px; right: -5px; }
+  }
+
+  /* ═══ ÉDITEUR PLEINE PAGE ═══ */
+  body.editor-open { overflow: hidden; }
+  body.editor-open #ai-fab { display: none; }
+  .editor-page { padding: 0; align-items: stretch; justify-content: stretch; background: var(--bg); z-index: 950; backdrop-filter: none !important; }
+  .editor-page .ed-shell { max-width: none; width: 100%; max-height: none; height: 100%; border-radius: 0; box-shadow: none; background: var(--bg); overflow-y: auto; overscroll-behavior: contain; transform: translateY(18px); }
+  .editor-page.active .ed-shell { transform: none; }
+  .ed-bar { position: sticky; top: 0; z-index: 20; display: flex; align-items: center; gap: 14px; padding: 12px 24px; background: rgba(255,255,255,.93); backdrop-filter: blur(10px); border-bottom: 1px solid var(--line); }
+  .ed-back { display: flex; align-items: center; gap: 8px; height: 40px; padding: 0 14px; border: 1px solid var(--line); border-radius: 10px; background: #fff; font-weight: 600; font-size: 14px; cursor: pointer; color: var(--text-main); }
+  .ed-back:hover { background: var(--bg); }
+  .ed-bar-title { flex: 1; min-width: 0; display: flex; flex-direction: column; line-height: 1.2; }
+  .ed-kicker { font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--primary); }
+  .ed-bar #btn-submit { position: relative; overflow: hidden; padding: 11px 20px; border-radius: 10px; white-space: nowrap; }
+  .ed-layout { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 28px; max-width: 1160px; margin: 0 auto; padding: 26px 24px 90px; align-items: start; }
+  .ed-side { position: sticky; top: 90px; }
+  .ed-card { background: #fff; border: 1px solid var(--line); border-radius: 18px; padding: 22px; margin-bottom: 18px; box-shadow: 0 1px 2px rgba(0,0,0,.03); }
+  .ed-card > h3 { display: flex; align-items: center; gap: 10px; font-family: var(--display); font-size: 16px; font-weight: 700; margin-bottom: 18px; }
+  .ed-ico { width: 30px; height: 30px; border-radius: 9px; background: #fef2f2; color: var(--primary); display: flex; align-items: center; justify-content: center; font-size: 13px; flex-shrink: 0; }
+  .ed-hint { font-size: 12.5px; color: var(--text-muted); line-height: 1.5; margin-top: 8px; }
+  .cp-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(92px, 1fr)); gap: 10px; }
+  .cp-item { position: relative; display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 12px 6px 9px; border: 1.5px solid var(--line); border-radius: 14px; background: #fff; cursor: pointer; transition: border-color .15s, transform .15s, box-shadow .15s, background .15s; }
+  .cp-item:hover { border-color: #fca5a5; transform: translateY(-2px); box-shadow: 0 6px 14px rgba(0,0,0,.07); }
+  .cp-item.sel { border-color: var(--primary); background: #fef2f2; box-shadow: 0 0 0 3px rgba(185,28,28,.12); }
+  .cp-item.sel::after { content: '\f00c'; font-family: 'Font Awesome 6 Free'; font-weight: 900; position: absolute; top: 6px; right: 6px; width: 18px; height: 18px; border-radius: 50%; background: var(--primary); color: #fff; font-size: 9px; display: flex; align-items: center; justify-content: center; }
+  .cp-t { display: flex; height: 48px; align-items: center; justify-content: center; }
+  .cp-n { font-size: 12px; font-weight: 600; text-align: center; line-height: 1.2; }
+  .ar-import { display: flex; gap: 10px; margin-bottom: 12px; }
+  .ar-import .form-control { flex: 1; min-width: 0; }
+  .ar-import .btn { white-space: nowrap; flex-shrink: 0; }
+  .ar-src { display: flex; align-items: center; gap: 10px; padding: 8px 12px; margin-bottom: 12px; border-radius: 10px; background: #f0f9ff; border: 1px solid #bae6fd; font-size: 12.5px; color: #075985; }
+  .ar-src[hidden] { display: none; }
+  .ar-src span { flex: 1; }
+  .ar-src button { border: none; background: transparent; color: #075985; text-decoration: underline; cursor: pointer; font-size: 12.5px; }
+  .ar-tabs { display: flex; align-items: center; gap: 4px; border-bottom: 1px solid var(--line); margin-bottom: 10px; }
+  .ar-tabs button { border: none; background: transparent; padding: 9px 14px; font-size: 13.5px; font-weight: 600; color: var(--text-muted); cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -1px; }
+  .ar-tabs button.on { color: var(--primary); border-bottom-color: var(--primary); }
+  .ar-count { margin-left: auto; font-size: 12px; color: var(--text-muted); font-variant-numeric: tabular-nums; }
+  .ar-tools { display: flex; align-items: center; gap: 2px; padding: 5px; border: 1px solid var(--line); border-bottom: none; border-radius: 10px 10px 0 0; background: #f9fafb; flex-wrap: wrap; }
+  .ar-tools button { width: 34px; height: 32px; border: none; border-radius: 7px; background: transparent; color: var(--text-main); cursor: pointer; font-size: 13px; }
+  .ar-tools button:hover { background: #e5e7eb; }
+  .ar-sep { width: 1px; height: 18px; background: var(--line-h); margin: 0 5px; }
+  .ar-ta { border-radius: 0 0 10px 10px !important; min-height: 340px; resize: vertical; line-height: 1.65; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 13.5px !important; background: #fff !important; }
+  .ar-prev { min-height: 340px; padding: 18px 22px; border: 1px solid var(--line); border-radius: 10px; background: #fff; }
+  .ar-prev[hidden], .ar-ta[hidden] { display: none; }
+  .ar-empty { color: var(--text-muted); font-style: italic; }
+  .ed-pcard { background: #fff; border: 1px solid var(--line); border-radius: 16px; overflow: hidden; box-shadow: 0 8px 24px rgba(0,0,0,.06); }
+  .ed-pimg { aspect-ratio: 4/3; background: #f3f4f6; display: flex; align-items: center; justify-content: center; color: #cbd5e1; font-size: 34px; overflow: hidden; }
+  .ed-pimg img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .ed-pbody { padding: 14px 16px 16px; }
+  .ed-pbody b { font-family: var(--display); font-size: 17px; display: block; margin-bottom: 6px; word-break: break-word; }
+  .ed-pmeta { display: flex; align-items: center; gap: 7px; font-size: 13px; color: var(--text-muted); }
+  .ed-pmeta2 { font-size: 12.5px; color: var(--text-muted); margin-top: 4px; min-height: 16px; }
+  .ed-cap { font-size: 11.5px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--text-muted); margin: 0 4px 8px; }
+  .ed-prog { margin-top: 16px; padding: 16px; background: #fff; border: 1px solid var(--line); border-radius: 16px; }
+  .ed-prog-h { font-size: 13.5px; margin-bottom: 8px; }
+  .ed-meter { height: 8px; border-radius: 99px; background: #f3f4f6; overflow: hidden; margin-bottom: 12px; }
+  .ed-meter i { display: block; height: 100%; background: linear-gradient(90deg, #f87171, #b91c1c); border-radius: 99px; transition: width .35s cubic-bezier(.22,.8,.2,1); }
+  .ed-prog ul { list-style: none; display: grid; grid-template-columns: 1fr 1fr; gap: 6px 10px; }
+  .ed-prog li { font-size: 12.5px; color: var(--text-muted); display: flex; align-items: center; gap: 7px; }
+  .ed-prog li i { font-size: 12px; color: #d1d5db; }
+  .ed-prog li.ok { color: var(--text-main); }.ed-prog li.ok i { color: #16a34a; }
+  @media (max-width: 1000px) { .ed-layout { grid-template-columns: 1fr; } .ed-side { display: none; } }
+  @media (max-width: 768px) {
+    .ed-bar { padding: 10px 12px; gap: 10px; }
+    .ed-back { width: 40px; padding: 0; justify-content: center; }
+    .ed-bar #btn-submit { padding: 11px 14px; }
+    .ed-layout { padding: 16px 12px 90px; }
+    .ed-card { padding: 16px; border-radius: 16px; }
+    .ar-import { flex-direction: column; }
+    .cp-grid { grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); }
+  }
+  /* Modale « Ajouter une couleur » */
+  .cm-pal { display: grid; grid-template-columns: repeat(auto-fill, minmax(34px, 1fr)); gap: 8px; }
+  .cm-sw { aspect-ratio: 1; border-radius: 50%; border: none; cursor: pointer; position: relative; box-shadow: inset 0 -3px 5px rgba(0,0,0,.18), inset 0 2px 3px rgba(255,255,255,.3), 0 0 0 1px rgba(0,0,0,.1); transition: transform .15s; }
+  .cm-sw:hover { transform: scale(1.12); }
+  .cm-sw.sel { box-shadow: 0 0 0 2px #fff, 0 0 0 4px var(--text-main); transform: scale(1.05); }
+  .cm-top { display: flex; gap: 18px; align-items: center; margin-bottom: 18px; }
+  .cm-prev { width: 84px; height: 84px; flex-shrink: 0; border-radius: 20px; background: #fef2f2; display: flex; align-items: center; justify-content: center; }
+  .cm-exact { display: flex; align-items: center; gap: 10px; margin-top: 14px; font-size: 13px; color: var(--text-muted); }
+  .cm-exact input[type=color] { width: 44px; height: 34px; border: 1px solid var(--line); border-radius: 8px; padding: 2px; background: #fff; cursor: pointer; }
+  .cm-exact code { font-size: 13px; color: var(--text-main); background: #f3f4f6; padding: 3px 8px; border-radius: 6px; }
+  .cm-list { margin-top: 22px; border-top: 1px dashed var(--line); padding-top: 14px; }
+  .cm-item { display: flex; align-items: center; gap: 10px; padding: 7px 0; font-size: 14px; }
+  .cm-item .sw-dot { width: 22px; height: 22px; }
+  .cm-item span { flex: 1; }
+  .cm-item small { color: var(--text-muted); }
+  .cm-item button { border: none; background: transparent; color: var(--text-muted); width: 30px; height: 30px; border-radius: 8px; cursor: pointer; }
+  .cm-item button:hover { background: #fee2e2; color: var(--primary); }
 
   /* CARDS & IMAGES CADRÉES */
   .grid { max-width: 1200px; margin: 0 auto 32px; padding: 0 24px; display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 24px; }
@@ -229,6 +392,66 @@
   .page-btn:disabled { opacity: 0.5; cursor: not-allowed; }
   .page-dots { font-size: 14px; color: var(--text-muted); font-weight: 600; padding: 0 4px; }
 
+
+  body.introing { overflow: hidden; }
+  #intro { --fs: clamp(28px, 5.2vw, 54px); --ease: cubic-bezier(.22,.8,.2,1); position: fixed; inset: 0; z-index: 10000; display: grid; place-items: center; overflow: hidden; color: var(--text-main); cursor: pointer; user-select: none; }
+  .in-bg { position: absolute; inset: 0; background: var(--surface); transition: opacity .8s ease .1s; }
+  #intro.land { pointer-events: none; }
+  #intro.land .in-bg { opacity: 0; }
+  .in-lock { position: relative; display: flex; align-items: center; margin-top: -3vh; }
+  .in-logo { position: relative; z-index: 2; flex: none; width: calc(var(--fs) * 2.35); height: calc(var(--fs) * 2.35); }
+  .in-tile { width: 100%; height: 100%; border-radius: calc(var(--fs) * .55); overflow: hidden; opacity: 0; transform: scale(.92); will-change: transform; box-shadow: 0 18px 50px -14px rgba(0,0,0,.35), 0 0 0 1px rgba(17,24,39,.08); animation: tileIn .9s var(--ease) .15s forwards; }
+  @keyframes tileIn { to { opacity: 1; transform: none; } }
+  .in-tile img { display: block; width: 100%; height: 100%; }
+  .in-word { position: relative; z-index: 1; flex: none; width: 0; overflow: hidden; animation: wordOpen 1s var(--ease) 1.2s forwards; }
+  @keyframes wordOpen { to { width: var(--w, 420px); } }
+  .in-name { display: block; width: max-content; margin: 0; padding: 0 0 .06em 26px; white-space: nowrap; font-family: var(--display); font-size: var(--fs); font-weight: 700; letter-spacing: -.04em; line-height: 1.1; color: var(--primary); opacity: 0; transform: translateX(-40%); animation: wordIn 1s var(--ease) 1.2s forwards; }
+  @keyframes wordIn { to { opacity: 1; transform: none; } }
+  #intro.out .in-name { animation: outRight .45s cubic-bezier(.5,0,.75,0) forwards; }
+  @keyframes outRight { to { opacity: 0; transform: translateX(20px); } }
+  @media (max-width: 640px) { #intro { --fs: clamp(24px, 7.4vw, 34px); } .in-name { padding-left: 14px; } }
+  @media (prefers-reduced-motion: reduce) { #intro { display: none; } }
+
+  @media screen {
+    body.detail-open { overflow: hidden; }
+    #detail-modal { align-items: flex-start; justify-content: center; overflow-y: auto; padding: 0; background: var(--bg); backdrop-filter: none; z-index: 900; transform: translateY(14px); transition: opacity .25s, transform .3s; }
+    #detail-modal.active { transform: none; }
+    #detail-modal .detail-modal { max-width: 1200px; width: 100%; max-height: none; overflow: visible; border-radius: 0; box-shadow: none; background: transparent; transform: none; display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); column-gap: 44px; align-content: start; padding: 0 24px 70px; margin: 0 auto; }
+    #detail-modal .modal-header { display: none; }
+    #detail-modal .modal-body { display: contents; }
+    #detail-modal .detail-info { grid-column: 2; grid-row: 2; min-width: 0; }
+    #detail-modal #similar-block, #detail-modal #comments-block { grid-column: 1 / -1; grid-row: auto; position: relative; z-index: 1; background: var(--bg); }
+    .detail-topbar { grid-column: 1 / -1; position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 14px; background: var(--surface); border-bottom: 1px solid var(--line); padding: 12px 24px; margin: 0 -24px; }
+    .detail-crumb { font-size: 13.5px; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .detail-crumb b { color: var(--text-main); font-weight: 600; }
+    .detail-gallery-col { grid-column: 1; grid-row: 2; align-self: stretch; margin-top: 26px; }
+    .detail-gallery-sticky { position: sticky; top: 78px; display: flex; gap: 14px; }
+    .detail-thumbs { display: flex; flex-direction: column; gap: 10px; max-height: min(560px, 70vh); overflow-y: auto; scrollbar-width: none; flex: none; }
+    .detail-thumbs::-webkit-scrollbar { display: none; }
+    .detail-thumbs img { width: 60px; height: 60px; object-fit: cover; border-radius: 10px; border: 2px solid var(--line); cursor: pointer; opacity: .75; transition: .15s; }
+    .detail-thumbs img:hover { opacity: 1; }
+    .detail-thumbs img.active { border-color: var(--primary); opacity: 1; }
+    #detail-modal .detail-gallery-wrap { flex: 1; min-width: 0; height: min(560px, 70vh); border-radius: 18px; box-shadow: var(--shadow, 0 6px 24px rgba(17,24,39,.1)); }
+    #detail-modal #detail-title { font-size: 32px; letter-spacing: -.02em; margin-top: 28px; line-height: 1.2; }
+    #detail-modal #detail-meta { padding-bottom: 18px; border-bottom: 1px solid var(--line); }
+    .specs-table { width: 100%; border-collapse: collapse; margin-bottom: 24px; font-size: 14px; }
+    .specs-table td { padding: 9px 0; border-bottom: 1px solid var(--line); vertical-align: top; }
+    .specs-table td:first-child { width: 38%; color: var(--text-muted); font-weight: 600; }
+    #detail-modal .detail-actions .btn { padding: 10px 16px; }
+    #detail-modal #similar-block { margin-top: 36px; padding-top: 24px; border-top: 1px solid var(--line); }
+    #detail-modal .similar-grid { grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 16px; }
+    #detail-modal #comments-block { max-width: 760px; }
+    @media (max-width: 900px) {
+      #detail-modal .detail-modal { grid-template-columns: minmax(0, 1fr); }
+      #detail-modal .detail-info { grid-column: 1; grid-row: auto; }
+      .detail-gallery-col { grid-column: 1; grid-row: auto; margin-top: 16px; }
+      .detail-gallery-sticky { position: static; flex-direction: column-reverse; }
+      .detail-thumbs { flex-direction: row; max-height: none; overflow-x: auto; }
+      #detail-modal .detail-gallery-wrap { height: 340px; }
+      #detail-modal #detail-title { font-size: 26px; margin-top: 20px; }
+    }
+  }
+
   /* Modal Détail */
   .detail-modal { max-width: 640px; }
   .detail-gallery-wrap { position: relative; width: 100%; height: 380px; background: #000; overflow: hidden; border-radius: 20px 20px 0 0; }
@@ -249,8 +472,9 @@
   .detail-stats { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 22px; }
 
   /* Modal & Form Upload Multi-images */
-  .modal-overlay { position: fixed; inset: 0; background: rgba(17, 24, 39, 0.6); backdrop-filter: blur(4px); display: flex; align-items: center; justify-content: center; z-index: 1000; opacity: 0; pointer-events: none; transition: opacity 0.25s; padding: 16px; }
+  .modal-overlay { position: fixed; inset: 0; background: rgba(17, 24, 39, 0.6); display: flex; align-items: center; justify-content: center; z-index: 1000; opacity: 0; pointer-events: none; transition: opacity 0.25s; padding: 16px; }
   .modal-overlay.active { opacity: 1; pointer-events: all; }
+  @media (min-width: 769px) { .modal-overlay.active { backdrop-filter: blur(4px); } }
   .modal { background: var(--surface); width: 100%; max-width: 600px; border-radius: 20px; max-height: 90vh; overflow-y: auto; box-shadow: 0 24px 48px rgba(0,0,0,0.2); transform: scale(0.95) translateY(20px); transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1); }
   .modal-overlay.active .modal { transform: scale(1) translateY(0); }
   .modal-header { padding: 20px 24px; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; background: var(--surface); z-index: 10; }
@@ -399,7 +623,18 @@
   .install-banner-close:hover { color: var(--text-main); text-decoration: underline; }
 
   @media (max-width: 480px) { .install-banner { left: 12px; right: 12px; padding: 14px; gap: 10px; } .install-banner-icon { width: 44px; height: 44px; } .install-banner-btn { padding: 8px 12px; font-size: 12.5px; } }
-  @media (max-width: 768px) { .hide-mobile { display: none !important; } .btn { padding: 10px; border-radius: 8px; } .btn i { margin: 0; font-size: 16px; } .grid { grid-template-columns: 1fr; } .form-row { flex-direction: column; gap: 0; } .share-banner { padding: 20px; } .share-banner-title { font-size: 16px; } }
+  @media (max-width: 768px) {
+    .hide-mobile { display: none !important; }
+    .navbar { padding: 8px 12px; gap: 8px; }
+    .navbar .brand { font-size: 19px; gap: 8px !important; flex: 1 1 auto; }
+    .nav-actions { gap: 6px; }
+    .navbar .btn { width: 42px; height: 42px; min-width: 42px; padding: 0; border-radius: 12px; position: relative; }
+    .navbar .btn i { font-size: 17px; }
+    .navbar .btn .fa-chevron-down { display: none; }
+    .navbar .pl-count { position: absolute; top: -5px; right: -5px; font-size: 10.5px; padding: 1px 5px; min-width: 17px; border: 2px solid #fef2f2; box-sizing: content-box; line-height: 1.2; }
+    .lang-menu { right: -4px; }
+
+    .btn { padding: 10px; border-radius: 8px; } .btn i { margin: 0; font-size: 16px; } .grid { grid-template-columns: 1fr; } .form-row { flex-direction: column; gap: 0; } .share-banner { padding: 20px; } .share-banner-title { font-size: 16px; } }
 
   /* Print Styles — rendu premium TomatoList */
   @media screen {
@@ -462,61 +697,52 @@
 </head>
 <body>
 
-<div id="page-loader">
-  <div class="loader-svg-container">
-    <div class="loader-svg-bg">
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-        <defs><radialGradient id="bodyBg" cx="35%" cy="30%" r="75%"><stop offset="0%" stop-color="#ff6b57"/><stop offset="55%" stop-color="#e8392a"/><stop offset="100%" stop-color="#b91c1c"/></radialGradient></defs>
-        <rect width="512" height="512" rx="112" fill="#fef2f2"/>
-        <path d="M256 168c-92 0-158 74-158 172 0 78 66 132 158 132s158-54 158-132c0-98-66-172-158-172z" fill="url(#bodyBg)"/>
-        <path d="M256 168c-92 0-158 74-158 172 0 20 4 39 12 56 24-108 90-176 146-176s122 68 146 176c8-17 12-36 12-56 0-98-66-172-158-172z" fill="#000" opacity="0.06"/>
-        <g fill="#3f8f3f"><path d="M256 120c-14 26-14 52 0 70 14-18 14-44 0-70z"/><path d="M256 130c-30 8-52 28-58 52 26-4 50-22 58-52z"/><path d="M256 130c30 8 52 28 58 52-26-4-50-22-58-52z"/><path d="M256 138c-42-4-76 10-94 36 30 8 66-2 94-36z"/><path d="M256 138c42-4 76 10 94 36-30 8-66-2-94-36z"/></g>
-        <ellipse cx="205" cy="235" rx="26" ry="18" fill="#fff" opacity="0.35"/>
-      </svg>
-    </div>
-    <div class="loader-svg-fill" id="loader-svg-fill">
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-        <defs><radialGradient id="bodyFill" cx="35%" cy="30%" r="75%"><stop offset="0%" stop-color="#ff6b57"/><stop offset="55%" stop-color="#e8392a"/><stop offset="100%" stop-color="#b91c1c"/></radialGradient></defs>
-        <rect width="512" height="512" rx="112" fill="#fef2f2"/>
-        <path d="M256 168c-92 0-158 74-158 172 0 78 66 132 158 132s158-54 158-132c0-98-66-172-158-172z" fill="url(#bodyFill)"/>
-        <path d="M256 168c-92 0-158 74-158 172 0 20 4 39 12 56 24-108 90-176 146-176s122 68 146 176c8-17 12-36 12-56 0-98-66-172-158-172z" fill="#000" opacity="0.06"/>
-        <g fill="#3f8f3f"><path d="M256 120c-14 26-14 52 0 70 14-18 14-44 0-70z"/><path d="M256 130c-30 8-52 28-58 52 26-4 50-22 58-52z"/><path d="M256 130c30 8 52 28 58 52-26-4-50-22-58-52z"/><path d="M256 138c-42-4-76 10-94 36 30 8 66-2 94-36z"/><path d="M256 138c42-4 76 10 94 36-30 8-66-2-94-36z"/></g>
-        <ellipse cx="205" cy="235" rx="26" ry="18" fill="#fff" opacity="0.35"/>
-      </svg>
-    </div>
+<div id="intro">
+  <div class="in-bg"></div>
+  <div class="in-lock">
+    <div class="in-logo"><div class="in-tile"><img src="icon.svg" alt=""></div></div>
+    <div class="in-word"><h1 class="in-name">TomatoList</h1></div>
   </div>
-  <div class="loader-text" id="loader-text">0%</div>
 </div>
 <script>
-(function(){
-  const loader = document.getElementById('page-loader');
-  const fill = document.getElementById('loader-svg-fill');
-  const text = document.getElementById('loader-text');
-  if(!loader || !fill || !text) return;
-  let progress = 0;
-  const duration = 2000;
-  const interval = 20;
-  const step = 100 / (duration / interval);
-  const timer = setInterval(() => {
-    progress += step;
-    if (progress >= 100) {
-      progress = 100;
-      clearInterval(timer);
-      setTimeout(() => {
-        loader.classList.add('hidden');
-        setTimeout(() => loader.remove(), 500);
-      }, 150);
-    }
-    fill.style.clipPath = `inset(${100 - progress}% 0 0 0)`;
-    text.textContent = `${Math.floor(progress)}%`;
-  }, interval);
+(function () {
+  var root = document.getElementById('intro');
+  if (!root) return;
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) { root.remove(); return; }
+  document.body.classList.add('introing');
+  var wait = function (ms) { return new Promise(function (r) { setTimeout(r, ms); }); };
+  root.style.setProperty('--w', Math.ceil(root.querySelector('.in-name').getBoundingClientRect().width) + 'px');
+  var finished = false;
+  async function land() {
+    if (finished) return;
+    finished = true;
+    root.classList.add('out');
+    await wait(420);
+    var target = document.querySelector('.navbar .brand img');
+    if (target) target.style.visibility = 'hidden';
+    document.body.classList.remove('introing');
+    var to = target ? target.getBoundingClientRect() : null;
+    root.classList.add('land');
+    var tile = root.querySelector('.in-tile');
+    var from = tile.getBoundingClientRect();
+    var o = { transformOrigin: '0 0' };
+    var frames = to && to.width > 0
+      ? [Object.assign({ transform: 'none' }, o), Object.assign({ transform: 'translate(' + (to.left - from.left) + 'px,' + (to.top - from.top) + 'px) scale(' + (to.width / from.width) + ')' }, o)]
+      : [{ opacity: 1 }, { opacity: 0 }];
+    await tile.animate(frames, { duration: 950, easing: 'cubic-bezier(.65,0,.25,1)', fill: 'forwards' }).finished.catch(function () {});
+    if (target) target.style.visibility = '';
+    await root.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 220, fill: 'forwards' }).finished.catch(function () {});
+    root.remove();
+  }
+  var timer = setTimeout(land, 3300);
+  root.addEventListener('click', function () { clearTimeout(timer); land(); });
 })();
 </script>
 
 <nav class="navbar">
   <a href="#" class="brand" style="display:flex; align-items:center; gap:10px;">
     <img src="icon.svg" alt="" style="width:28px; height:28px; flex-shrink:0;" onerror="this.style.display='none'">
-    TomatoList
+    <span class="brand-name">TomatoList</span>
   </a>
   <div class="nav-actions">
     <div class="lang-dropdown">
@@ -535,19 +761,33 @@
   </div>
 </nav>
 
+<section class="hero" id="hero" aria-label="TomatoList">
+  <h2 class="hero-title"><span class="w" data-i18n="hero_title">Chaque pépin raconte une variété.</span></h2>
+  <img class="hero-img" src="tomates.webp" alt="Dessin à l'encre de trois tomates sur la vigne" width="720" height="720" decoding="async">
+</section>
+<script>
+(function () {
+  var hero = document.getElementById('hero'); if (!hero) return;
+  function go() { hero.classList.add('go'); }
+  var intro = document.getElementById('intro');
+  if (!intro) { go(); return; }
+  new MutationObserver(function (m, o) { if (!document.getElementById('intro')) { o.disconnect(); go(); } }).observe(document.body, { childList: true });
+})();
+</script>
+
 <div class="toolbar-wrap">
   <div class="variety-counter" id="variety-counter">
     <i class="fa-solid fa-seedling"></i>
     <span id="variety-counter-num">0</span>
-    <span id="variety-counter-label">variétés référencées</span>
+    <span id="variety-counter-label">variétés recensées</span>
   </div>
   <div class="toolbar">
     <div class="search-box">
       <i class="fa-solid fa-magnifying-glass"></i>
-      <input type="text" id="search-input" data-i18n-ph="search_ph" placeholder="Rechercher une variété...">
+      <input type="search" id="search-input" name="variety-search" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" readonly onfocus="this.removeAttribute('readonly')" data-i18n-ph="search_ph" placeholder="Rechercher une variété...">
     </div>
     <button class="btn btn-outline" id="btn-toggle-filters">
-      <i class="fa-solid fa-sliders"></i> <span class="hide-mobile" data-i18n="filters">Filtres</span>
+      <i class="fa-solid fa-sliders"></i> <span class="hide-mobile" data-i18n="filters">Filtres</span><span class="fbadge" id="fbadge" hidden></span>
     </button>
     <button class="btn btn-outline" id="btn-open-map">
       <i class="fa-solid fa-map-location-dot"></i> <span class="hide-mobile" data-i18n="map_btn">Carte</span>
@@ -555,102 +795,38 @@
   </div>
 
   <div class="filters-panel" id="filters-panel">
-    <div class="filter-group">
-      <div class="filter-title" data-i18n="sort_by">Trier par</div>
-      <div class="pill-group" id="sort-group">
-        <button class="filter-pill foryou-pill" data-val="foryou"><i class="fa-solid fa-sparkles"></i> <span data-i18n="sort_foryou">Pour vous</span></button>
-        <button class="filter-pill active" data-val="date" data-i18n="sort_date">Les plus récentes</button>
-        <button class="filter-pill" data-val="alpha" data-i18n="sort_alpha">Ordre alphabétique</button>
-        <button class="filter-pill" data-val="likes"><i class="fa-solid fa-heart" style="color:var(--primary); font-size:12px"></i> Plus populaires</button>
-      </div>
+    <div class="fp-head">
+      <div class="fp-title"><span class="fp-ico"><i class="fa-solid fa-sliders"></i></span><span data-i18n="filters">Filtres</span></div>
+      <button class="fp-reset" id="fp-reset" type="button"><i class="fa-solid fa-rotate-left"></i> <span>Réinitialiser</span></button>
+      <button class="fp-x" id="fp-close" type="button" aria-label="Fermer"><i class="fa-solid fa-xmark"></i></button>
     </div>
-
-    <div class="filter-group">
-      <div class="filter-title" data-i18n="color">Couleur</div>
-      <div class="pill-group" id="color-group">
-        <button class="filter-pill active" data-val="all" data-i18n="color_all">Toutes les couleurs</button>
-
-        <!-- Couleurs existantes -->
-        <button class="filter-pill" data-val="Rouge">
-          <i class="color-dot" style="background:#ef4444"></i> <span data-i18n="color_red">Rouge</span>
-        </button>
-        <button class="filter-pill" data-val="Jaune">
-          <i class="color-dot" style="background:#eab308"></i> <span data-i18n="color_yellow">Jaune</span>
-        </button>
-        <button class="filter-pill" data-val="Noire">
-          <i class="color-dot" style="background:#4b5563"></i> <span data-i18n="color_black">Noire</span>
-        </button>
-        <button class="filter-pill" data-val="Verte">
-          <i class="color-dot" style="background:#22c55e"></i> <span data-i18n="color_green">Verte</span>
-        </button>
-        <button class="filter-pill" data-val="Orange">
-          <i class="color-dot" style="background:#f97316"></i> <span data-i18n="color_orange">Orange</span>
-        </button>
-        <button class="filter-pill" data-val="Rose">
-          <i class="color-dot" style="background:#ec4899"></i> <span data-i18n="color_pink">Rose</span>
-        </button>
-        <button class="filter-pill" data-val="Blanche">
-          <i class="color-dot" style="background:#f9fafb; border:1px solid #d1d5db"></i> <span data-i18n="color_white">Blanche</span>
-        </button>
-        <button class="filter-pill" data-val="Bicolore">
-          <i class="color-dot" style="background:linear-gradient(135deg,#ef4444 50%,#eab308 50%)"></i> <span data-i18n="color_bicolor">Bicolore</span>
-        </button>
-
-        <!-- Nouvelles couleurs -->
-        <button class="filter-pill" data-val="Violette">
-          <i class="color-dot" style="background:#7c3aed"></i> <span data-i18n="color_purple">Violette</span>
-        </button>
-        <button class="filter-pill" data-val="Bordeaux">
-          <i class="color-dot" style="background:#7f1d1d"></i> <span data-i18n="color_bordeaux">Bordeaux</span>
-        </button>
-        <button class="filter-pill" data-val="Crème">
-          <i class="color-dot" style="background:#d4a96a; border:1px solid #c9955a"></i> <span data-i18n="color_cream">Crème</span>
-        </button>
-        <button class="filter-pill" data-val="Rayée">
-          <i class="color-dot" style="background:repeating-linear-gradient(135deg,#22c55e 0px,#22c55e 4px,#eab308 4px,#eab308 8px)"></i> <span data-i18n="color_striped">Rayée / Striée</span>
-        </button>
-
-        <!-- 10 couleurs supplémentaires (texte en dur, pas de data-i18n tant que lang.json n'est pas mis à jour) -->
-        <button class="filter-pill" data-val="Bleue">
-          <i class="color-dot" style="background:#3b5bdb"></i> <span>Bleue</span>
-        </button>
-        <button class="filter-pill" data-val="Turquoise">
-          <i class="color-dot" style="background:#14b8a6"></i> <span>Turquoise</span>
-        </button>
-        <button class="filter-pill" data-val="Corail">
-          <i class="color-dot" style="background:#ff6f61"></i> <span>Corail</span>
-        </button>
-        <button class="filter-pill" data-val="Saumon">
-          <i class="color-dot" style="background:#fa8072"></i> <span>Saumon</span>
-        </button>
-        <button class="filter-pill" data-val="Chocolat">
-          <i class="color-dot" style="background:#5c3a21"></i> <span>Chocolat</span>
-        </button>
-        <button class="filter-pill" data-val="Ocre">
-          <i class="color-dot" style="background:#cc9a3a"></i> <span>Ocre</span>
-        </button>
-        <button class="filter-pill" data-val="Prune">
-          <i class="color-dot" style="background:#6b2545"></i> <span>Prune</span>
-        </button>
-        <button class="filter-pill" data-val="Grise">
-          <i class="color-dot" style="background:#9ca3af"></i> <span>Grise</span>
-        </button>
-        <button class="filter-pill" data-val="Dorée">
-          <i class="color-dot" style="background:#d4af37"></i> <span>Dorée</span>
-        </button>
-        <button class="filter-pill" data-val="Arc-en-ciel">
-          <i class="color-dot" style="background:linear-gradient(90deg,#ef4444,#f97316,#eab308,#22c55e,#3b5bdb,#7c3aed)"></i> <span>Arc-en-ciel</span>
-        </button>
-      </div>
+    <div class="fp-body">
+      <section class="fp-sec">
+        <div class="fp-lab"><i class="fa-solid fa-arrow-down-wide-short"></i><span data-i18n="sort_by">Trier par</span></div>
+        <div class="fp-sort" id="sort-group">
+          <button class="filter-pill foryou-pill" data-val="foryou" type="button"><i class="fa-solid fa-wand-magic-sparkles"></i><span data-i18n="sort_foryou">Pour vous</span></button>
+          <button class="filter-pill active" data-val="date" type="button"><i class="fa-regular fa-clock"></i><span data-i18n="sort_date">Les plus récentes</span></button>
+          <button class="filter-pill" data-val="alpha" type="button"><i class="fa-solid fa-arrow-down-a-z"></i><span data-i18n="sort_alpha">Ordre alphabétique</span></button>
+          <button class="filter-pill" data-val="likes" type="button"><i class="fa-solid fa-heart" style="color:var(--primary)"></i><span data-i18n="sort_likes">Plus populaires</span></button>
+        </div>
+      </section>
+      <section class="fp-sec">
+        <div class="fp-lab"><i class="fa-solid fa-palette"></i><span data-i18n="color">Couleur</span><button class="fp-add" id="btn-add-color" type="button" style="display:none"><i class="fa-solid fa-plus"></i> Ajouter une couleur</button></div>
+        <div class="fp-colors" id="color-group"></div>
+      </section>
+      <section class="fp-sec">
+        <div class="fp-lab"><i class="fa-solid fa-earth-europe"></i><span data-i18n="country_filter">Pays</span></div>
+        <div class="fp-select">
+          <select class="country-select" id="country-filter-select">
+            <option value="all" data-i18n="country_all">Tous les pays</option>
+          </select>
+          <i class="fa-solid fa-chevron-down"></i>
+        </div>
+      </section>
     </div>
-
-    <div class="filter-group">
-      <div class="filter-title" data-i18n="country_filter">Pays</div>
-      <select class="country-select" id="country-filter-select">
-        <option value="all" data-i18n="country_all">Tous les pays</option>
-      </select>
-    </div>
+    <div class="fp-foot"><button class="btn btn-primary" id="fp-apply" type="button">Voir les variétés</button></div>
   </div>
+  <div class="af-row" id="active-filters"></div>
 </div>
 
 <div class="grid" id="tomatoes-grid">
@@ -690,24 +866,36 @@
 <!-- Detail Modal -->
 <div class="modal-overlay" id="detail-modal">
   <div class="modal detail-modal">
+    <div class="detail-topbar">
+      <button class="btn btn-outline btn-sm" id="detail-back"><i class="fa-solid fa-arrow-left"></i> <span data-i18n="back_catalog">Retour aux variétés</span></button>
+      <div class="detail-crumb" id="detail-crumb"></div>
+    </div>
     <div class="modal-header" style="position:absolute; top:12px; right:12px; left:auto; border:none; padding:0; background:transparent; z-index:20;">
       <button class="modal-close" id="close-detail-modal" style="background:rgba(17,24,39,0.55); color:#fff; border:none;"><i class="fa-solid fa-xmark"></i></button>
     </div>
+    <div class="detail-gallery-col">
+    <div class="detail-gallery-sticky">
+    <div class="detail-thumbs" id="detail-thumbs"></div>
     <div class="detail-gallery-wrap">
       <div class="detail-carousel" id="detail-carousel"></div>
       <button class="detail-nav-btn detail-nav-prev" id="detail-nav-prev" aria-label="Image précédente"><i class="fa-solid fa-chevron-left"></i></button>
       <button class="detail-nav-btn detail-nav-next" id="detail-nav-next" aria-label="Image suivante"><i class="fa-solid fa-chevron-right"></i></button>
       <div class="detail-dots" id="detail-dots"></div>
     </div>
+    </div><!-- /detail-gallery-sticky -->
+    </div>
     <div class="modal-body">
+      <div class="detail-info">
       <div class="modal-title" id="detail-title" style="margin-bottom:12px;"></div>
       <div class="card-meta" id="detail-meta" style="margin-bottom:20px;"></div>
+      <div id="detail-specs"></div>
       <div class="detail-section-title" data-i18n="t_desc">Description / Histoire</div>
       <p class="detail-desc" id="detail-desc">-</p>
+      <div id="detail-article"></div>
       <div class="detail-actions">
         <button class="btn btn-outline btn-sm" id="detail-share-btn"><i class="fa-solid fa-share-nodes"></i> <span data-i18n="share">Partager</span></button>
-        <button class="btn btn-outline btn-sm" id="detail-print-btn"><i class="fa-solid fa-print"></i> <span>Imprimer</span></button>
-        <button class="btn btn-outline btn-sm" id="detail-edit-btn" style="display:none"><i class="fa-solid fa-pen"></i> <span data-i18n="edit">Modifier</span></button>
+        <button class="btn btn-outline btn-sm" id="detail-print-btn"><i class="fa-solid fa-print"></i> <span data-i18n="print">Imprimer</span></button>
+        <button class="btn btn-outline btn-sm" id="detail-edit-btn" style="display:flex"><i class="fa-solid fa-pen"></i> <span data-i18n="edit">Modifier</span></button>
         <button class="btn btn-danger btn-sm" id="detail-delete-btn" style="display:none"><i class="fa-solid fa-trash"></i> <span data-i18n="delete">Supprimer</span></button>
       </div>
       <div class="card-footer">
@@ -721,9 +909,10 @@
         </div>
       </div>
       <div id="detail-contributors" style="display:none; margin-top:14px; padding-top:14px; border-top:1px solid var(--line);">
-        <div class="detail-section-title" style="margin-bottom:10px;">Contributeurs</div>
+        <div class="detail-section-title" style="margin-bottom:10px;" data-i18n="contributors">Contributeurs</div>
         <div id="detail-contributors-list" style="display:flex; flex-wrap:wrap; gap:8px;"></div>
       </div>
+      </div><!-- /detail-info -->
       <div id="similar-block" style="margin-top:22px; display:none;">
         <div class="detail-section-title" data-i18n="similar_title">Tomates similaires</div>
         <div class="similar-grid" id="similar-grid"></div>
@@ -734,7 +923,7 @@
         <div class="detail-section-title" data-i18n="comments_title">Commentaires</div>
         <div id="comments-list" style="display:flex; flex-direction:column; gap:12px; margin-bottom:16px;"></div>
         <div class="comment-form" style="display:flex; flex-direction:column; gap:8px;">
-          <textarea id="comment-input" class="form-control" rows="2" placeholder="Ajouter un commentaire..."></textarea>
+          <textarea id="comment-input" class="form-control" rows="2" data-i18n-ph="comment_ph" placeholder="Ajouter un commentaire..."></textarea>
           <button class="btn btn-primary btn-sm" id="btn-submit-comment" style="align-self:flex-end;"><i class="fa-solid fa-paper-plane"></i> <span data-i18n="send">Envoyer</span></button>
         </div>
       </div>
@@ -813,54 +1002,98 @@
 
 <div id="print-area"></div>
 
-<!-- Add Modal -->
-<div class="modal-overlay" id="add-modal">
-  <div class="modal">
+<!-- Modale couleurs (modérateurs) -->
+<div class="modal-overlay" id="color-modal">
+  <div class="modal" style="max-width:480px">
     <div class="modal-header">
-      <div class="modal-title" id="add-modal-title" data-i18n="add_title">Nouvelle variété</div>
-      <button class="modal-close" id="close-modal"><i class="fa-solid fa-xmark"></i></button>
+      <div class="modal-title">Ajouter une couleur</div>
+      <button class="modal-close" id="close-color-modal" type="button"><i class="fa-solid fa-xmark"></i></button>
     </div>
     <div class="modal-body">
-      <div class="error-msg" id="form-error"></div>
-      <div id="edit-contributor-note" style="display:none; background:#fef2f2; border:1px solid #fca5a5; border-radius:10px; padding:14px; margin-bottom:16px;">
-        <div style="color:var(--primary); font-size:13px; font-weight:600;">
-          <i class="fa-solid fa-circle-info"></i> Vous modifiez la variété d'un autre contributeur. Votre nom s'ajoutera à la liste des contributeurs.
+      <div class="error-msg" id="color-error"></div>
+      <div class="cm-top">
+        <div class="cm-prev" id="cm-prev"></div>
+        <div class="form-group" style="flex:1;margin:0">
+          <label>Nom de la couleur *</label>
+          <input type="text" class="form-control" id="cm-name" maxlength="24" placeholder="Ex : Mauve, Ambre, Pêche…" autocomplete="off">
         </div>
       </div>
-      <input type="file" id="file-input" accept="image/*" multiple style="display:none">
-      <label class="field-label" style="margin-bottom:8px">Photos de la variété *</label>
-      <div class="upload-gallery" id="upload-gallery">
-        <div class="add-img-btn" id="btn-add-img">
-          <i class="fa-solid fa-camera"></i>
-          <span>Ajouter</span>
+      <div class="form-group" style="margin-bottom:0">
+        <label>Palette</label>
+        <div class="cm-pal" id="cm-pal"></div>
+        <div class="cm-exact"><input type="color" id="cm-hex" value="#ef4444" aria-label="Couleur exacte"> <span>Couleur exacte</span> <code id="cm-hex-txt">#ef4444</code></div>
+      </div>
+      <div class="cm-list" id="cm-list"></div>
+      <button class="btn btn-primary" id="cm-save" type="button" style="width:100%;margin-top:18px;padding:13px"><i class="fa-solid fa-plus"></i> Ajouter la couleur</button>
+    </div>
+  </div>
+</div>
+
+<!-- Éditeur de variété (page complète) -->
+<div class="modal-overlay editor-page" id="add-modal">
+  <div class="modal ed-shell">
+    <header class="ed-bar">
+      <button class="ed-back" id="close-modal" type="button" aria-label="Retour"><i class="fa-solid fa-arrow-left"></i><span class="hide-mobile">Retour</span></button>
+      <div class="ed-bar-title"><span class="ed-kicker">Éditeur de variété</span><div class="modal-title" id="add-modal-title" data-i18n="add_title">Nouvelle variété</div></div>
+      <button class="btn btn-primary" id="btn-submit" type="button"><div class="btn-progress-fill" id="progress-fill"></div><i class="fa-solid fa-check" style="position:relative"></i><span id="btn-submit-label" data-i18n="submit" style="position:relative">Publier la variété</span></button>
+    </header>
+    <div class="ed-layout">
+      <div class="ed-main">
+        <div class="error-msg" id="form-error"></div>
+        <div id="edit-contributor-note" style="display:none; background:#fef2f2; border:1px solid #fca5a5; border-radius:10px; padding:14px; margin-bottom:16px;">
+          <div style="color:var(--primary); font-size:13px; font-weight:600;"><i class="fa-solid fa-circle-info"></i> Vous modifiez la variété d'un autre contributeur. Votre nom s'ajoutera à la liste des contributeurs.</div>
         </div>
-      </div>
-      <div class="pref-block">
-        <div class="pref-block-text">
-          <div class="pref-block-title" data-i18n="anon_title">Publier en anonyme</div>
-          <div class="pref-block-sub" data-i18n="anon_sub">Votre nom public ne sera pas affiché.</div>
+
+        <section class="ed-card">
+          <h3><span class="ed-ico"><i class="fa-solid fa-camera"></i></span>Photos de la variété *</h3>
+          <input type="file" id="file-input" accept="image/*" multiple style="display:none">
+          <div class="upload-gallery" id="upload-gallery" style="margin-bottom:0">
+            <div class="add-img-btn" id="btn-add-img"><i class="fa-solid fa-camera"></i><span>Ajouter</span></div>
+          </div>
+        </section>
+
+        <section class="ed-card">
+          <h3><span class="ed-ico"><i class="fa-solid fa-id-card"></i></span>Identité</h3>
+          <div class="form-group">
+            <label data-i18n="t_name">Nom de la variété *</label>
+            <input type="text" class="form-control" id="f-name" required>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+          <label data-i18n="t_country">Pays d'origine</label>
+          <div class="custom-select-wrapper">
+            <button class="custom-select-btn" id="f-country-btn" type="button">
+              <span>Sélectionner un pays...</span>
+              <i class="fa-solid fa-chevron-down" style="color:var(--text-muted)"></i>
+            </button>
+            <div class="custom-select-menu" id="f-country-menu">
+              <input type="text" class="custom-search-input" id="f-country-search" placeholder="Rechercher..." autocomplete="off">
+              <div id="f-country-list"></div>
+            </div>
+            <input type="hidden" id="f-country-value" value="">
+          </div>
         </div>
-        <button class="toggle" id="toggle-anon" type="button"></button>
-      </div>
-      <div class="form-group" id="name-input-group">
-        <label>Votre prénom et nom *</label>
-        <input type="text" class="form-control" id="f-author-name" placeholder="Ex: Jean Dupont">
-      </div>
-      <div class="pref-block">
-        <div class="pref-block-text">
-          <div class="pref-block-title">Firebase Verified</div>
-          <div class="pref-block-sub">Badge officiel pour cette variété.</div>
-        </div>
-        <button class="toggle" id="toggle-verified" type="button"></button>
-      </div>
-      <div class="form-group">
-        <label data-i18n="t_name">Nom de la variété *</label>
-        <input type="text" class="form-control" id="f-name" required>
-      </div>
-      <div class="form-row">
-        <div class="form-group">
-          <label data-i18n="t_color">Couleur dominante *</label>
-          <select class="form-control" id="f-color">
+            <div class="form-group">
+              <label data-i18n="t_weight">Poids moyen (g)</label>
+              <input type="number" class="form-control" id="f-weight" min="0">
+            </div>
+          </div>
+          <div class="form-group" style="margin-bottom:0">
+            <label data-i18n="t_size">Taille</label>
+            <select class="form-control" id="f-size">
+              <option value="" data-i18n="size_any">-</option>
+              <option value="Cerise" data-i18n="size_cherry">Cerise</option>
+              <option value="Petite" data-i18n="size_small">Petite</option>
+              <option value="Moyenne" data-i18n="size_medium">Moyenne</option>
+              <option value="Grosse" data-i18n="size_large">Grosse</option>
+              <option value="Très grosse" data-i18n="size_xl">Très grosse</option>
+            </select>
+          </div>
+        </section>
+
+        <section class="ed-card">
+          <h3><span class="ed-ico"><i class="fa-solid fa-palette"></i></span><span data-i18n="t_color">Couleur dominante *</span><button class="fp-add" id="cp-add" type="button"><i class="fa-solid fa-plus"></i> Nouvelle couleur</button></h3>
+          <select class="form-control" id="f-color" style="display:none" tabindex="-1" aria-hidden="true">
             <option value="Rouge" data-i18n="color_red">Rouge</option>
             <option value="Jaune" data-i18n="color_yellow">Jaune</option>
             <option value="Noire" data-i18n="color_black">Noire / Pourpre</option>
@@ -884,51 +1117,93 @@
             <option value="Dorée">Dorée</option>
             <option value="Arc-en-ciel">Arc-en-ciel</option>
           </select>
-        </div>
-        <div class="form-group">
-          <label data-i18n="t_country">Pays d'origine</label>
-          <div class="custom-select-wrapper">
-            <button class="custom-select-btn" id="f-country-btn" type="button">
-              <span>Sélectionner un pays...</span>
-              <i class="fa-solid fa-chevron-down" style="color:var(--text-muted)"></i>
-            </button>
-            <div class="custom-select-menu" id="f-country-menu">
-              <input type="text" class="custom-search-input" id="f-country-search" placeholder="Rechercher..." autocomplete="off">
-              <div id="f-country-list"></div>
+          <div class="cp-grid" id="cp-grid" role="radiogroup" aria-label="Couleur dominante"></div>
+        </section>
+
+        <section class="ed-card">
+          <h3><span class="ed-ico"><i class="fa-solid fa-seedling"></i></span>Culture</h3>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="f-cycle-min">Cycle : de (jours)</label>
+              <input type="number" class="form-control" id="f-cycle-min" min="1" max="400" placeholder="Ex : 70">
             </div>
-            <input type="hidden" id="f-country-value" value="">
+            <div class="form-group">
+              <label for="f-cycle-max">à (jours, facultatif)</label>
+              <input type="number" class="form-control" id="f-cycle-max" min="1" max="400" placeholder="Ex : 85">
+            </div>
           </div>
-        </div>
+          <div class="form-group" style="margin-bottom:0">
+            <label for="f-semis">Période de semis</label>
+            <input type="text" class="form-control" id="f-semis" maxlength="120" placeholder="Ex : mars-avril sous abri">
+            <div class="ed-hint">Le cycle va du semis à la première récolte. Il alimente le schéma « cycle de culture » de la fiche.</div>
+          </div>
+        </section>
+
+        <section class="ed-card">
+          <h3><span class="ed-ico"><i class="fa-solid fa-align-left"></i></span><span data-i18n="t_desc">Description / Histoire</span></h3>
+          <textarea class="form-control" id="f-desc" rows="4" placeholder="Quelques lignes pour présenter la variété."></textarea>
+        </section>
+
+        <section class="ed-card">
+          <h3><span class="ed-ico"><i class="fa-solid fa-book-open"></i></span>Article complet</h3>
+          <div class="ar-import">
+            <input type="text" class="form-control" id="f-wiki-title" placeholder="Titre de la page Wikipédia (vide = recherche d’après le nom)" autocomplete="off">
+            <button class="btn btn-outline btn-sm" id="btn-wiki-import" type="button"><i class="fa-brands fa-wikipedia-w"></i> <span>Importer depuis Wikipédia</span></button>
+          </div>
+          <div class="ar-src" id="ar-src" hidden></div>
+          <div class="ar-tabs">
+            <button type="button" class="on" data-tab="write">Écrire</button>
+            <button type="button" data-tab="preview">Aperçu</button>
+            <span class="ar-count" id="ar-count">0 / 30000</span>
+          </div>
+          <div class="ar-tools" id="ar-tools">
+            <button type="button" data-act="h2" title="Titre de section"><i class="fa-solid fa-heading"></i></button>
+            <button type="button" data-act="h3" title="Sous-titre"><i class="fa-solid fa-heading" style="font-size:11px"></i></button>
+            <i class="ar-sep"></i>
+            <button type="button" data-act="b" title="Gras"><i class="fa-solid fa-bold"></i></button>
+            <button type="button" data-act="i" title="Italique"><i class="fa-solid fa-italic"></i></button>
+            <button type="button" data-act="a" title="Lien"><i class="fa-solid fa-link"></i></button>
+            <i class="ar-sep"></i>
+            <button type="button" data-act="ul" title="Liste à puces"><i class="fa-solid fa-list-ul"></i></button>
+            <button type="button" data-act="ol" title="Liste numérotée"><i class="fa-solid fa-list-ol"></i></button>
+            <button type="button" data-act="q" title="Citation"><i class="fa-solid fa-quote-left"></i></button>
+          </div>
+          <textarea class="form-control ar-ta" id="f-article" rows="16" maxlength="30000" placeholder="## Histoire&#10;Raconte l’origine de la variété…&#10;&#10;## Culture&#10;Conseils de semis, d’arrosage, de tuteurage…&#10;&#10;## Dans l’assiette&#10;Saveur, usages en cuisine…"></textarea>
+          <div class="art ar-prev" id="ar-prev" hidden></div>
+          <div class="ed-hint">## Titre · ### Sous-titre · **gras** · *italique* · - liste · [texte](https://lien). Un sommaire est créé automatiquement à partir de 3 titres.</div>
+        </section>
+
+        <section class="ed-card">
+          <h3><span class="ed-ico"><i class="fa-solid fa-user-pen"></i></span>Publication</h3>
+          <div class="pref-block" style="margin-top:0">
+            <div class="pref-block-text">
+              <div class="pref-block-title" data-i18n="anon_title">Publier en anonyme</div>
+              <div class="pref-block-sub" data-i18n="anon_sub">Votre nom public ne sera pas affiché.</div>
+            </div>
+            <button class="toggle" id="toggle-anon" type="button"></button>
+          </div>
+          <div class="form-group" id="name-input-group">
+            <label>Votre prénom et nom *</label>
+            <input type="text" class="form-control" id="f-author-name" placeholder="Ex: Jean Dupont">
+          </div>
+          <div class="pref-block" id="verified-block" style="margin-bottom:0;display:none">
+            <div class="pref-block-text">
+              <div class="pref-block-title">Firebase Verified</div>
+              <div class="pref-block-sub">Badge officiel pour cette variété.</div>
+            </div>
+            <button class="toggle" id="toggle-verified" type="button"></button>
+          </div>
+        </section>
       </div>
-      <div class="form-row">
-        <div class="form-group">
-          <label data-i18n="t_weight">Poids moyen (g)</label>
-          <input type="number" class="form-control" id="f-weight">
-        </div>
-        <div class="form-group">
-          <label data-i18n="t_size">Taille</label>
-          <select class="form-control" id="f-size">
-            <option value="" data-i18n="size_any">-</option>
-            <option value="Cerise" data-i18n="size_cherry">Cerise</option>
-            <option value="Petite" data-i18n="size_small">Petite</option>
-            <option value="Moyenne" data-i18n="size_medium">Moyenne</option>
-            <option value="Grosse" data-i18n="size_large">Grosse</option>
-            <option value="Très grosse" data-i18n="size_xl">Très grosse</option>
-          </select>
-        </div>
-      </div>
-      <div class="form-group">
-        <label data-i18n="t_desc">Description / Histoire</label>
-        <textarea class="form-control" id="f-desc" rows="4"></textarea>
-      </div>
-      <button class="btn btn-primary" style="width:100%; justify-content:center; padding:16px; font-size:16px;" id="btn-submit">
-        <div class="btn-progress-fill" id="progress-fill"></div>
-        <span id="btn-submit-label" data-i18n="submit">Publier la variété</span>
-      </button>
+      <aside class="ed-side"><div id="ed-prev"></div></aside>
     </div>
   </div>
 </div>
 
+<script src="fiche-visuals.js"></script>
+<script src="article.js"></script>
+<script src="wiki.js"></script>
+<script src="ai.js"></script>
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.17.0/firebase-app.js";
 import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.17.0/firebase-auth.js";
@@ -1004,6 +1279,21 @@ const db = getDatabase(app);
 let tomatoesData = [];
 let countriesList = [];
 let currentUser = null;
+const OWNERS = ["C2FrKuBXBzRYcqCG7pW8eEzm5RI3", "1uKGbtsFGOYKTwge7lT88yAfnx92", "ptNpn0JJF1Serl8Ej7yAJLtpPti2", "pJVYaoxxs2UReJ2bcp5VWSLvl6x2"];
+let isAdmin = false;
+async function resolveAdmin(user) {
+  let ok = false;
+  if (user) {
+    if (OWNERS.includes(user.uid)) ok = true;
+    else {
+      try { const snap = await get(ref(db, 'admins/' + user.uid)); ok = snap.val() === true; } catch (e) {}
+    }
+  }
+  isAdmin = ok;
+  const vb = document.getElementById('verified-block'); if (vb) vb.style.display = ok ? '' : 'none';
+  if (typeof renderColorFilters === 'function') renderColorFilters();
+    if (typeof renderColorFilters === 'function') renderColorFilters();
+}
 let currentProfile = null;
 let currentImagesData = [];
 
@@ -1090,10 +1380,19 @@ function trSize(size) {
   return key ? tr(key) : size;
 }
 function applyI18n() {
+  // Si une clé manque, tr() renvoie la clé elle-même : on garde alors le texte déjà écrit dans le HTML.
   document.querySelectorAll('[data-i18n]').forEach(el => {
-    el.textContent = tr(el.getAttribute('data-i18n'));
+    const key = el.getAttribute('data-i18n');
+    const val = tr(key);
+    if (val && val !== key) el.textContent = val;
+  });
+  document.querySelectorAll('[data-i18n-ph]').forEach(el => {
+    const key = el.getAttribute('data-i18n-ph');
+    const val = tr(key);
+    if (val && val !== key) el.placeholder = val;
   });
   document.getElementById('lang-label').textContent = currentLang.toUpperCase();
+  if (window.heroSetLabels) window.heroSetLabels(tr);
 }
 document.getElementById('btn-lang-dropdown').onclick = (e) => {
   e.stopPropagation(); document.getElementById('lang-menu').classList.toggle('active');
@@ -1102,7 +1401,7 @@ document.querySelectorAll('#lang-menu button').forEach(btn => {
   btn.onclick = (e) => {
     currentLang = e.currentTarget.dataset.lang;
     localStorage.setItem('tl_lang', currentLang);
-    applyI18n(); currentPage = 1; renderGrid();
+    applyI18n(); currentPage = 1; renderColorFilters(); renderGrid();
     document.getElementById('lang-menu').classList.remove('active');
   };
 });
@@ -1163,30 +1462,174 @@ document.getElementById('f-country-btn').onclick = (e) => {
 document.getElementById('f-country-search').oninput = (e) => renderCountryList(e.target.value);
 
 // ─── FILTRES ──────────────────────────────────────────────────────────────────
-document.getElementById('btn-toggle-filters').onclick = () => document.getElementById('filters-panel').classList.toggle('active');
-document.querySelectorAll('#sort-group .filter-pill').forEach(btn => {
-  btn.onclick = (e) => {
-    document.querySelectorAll('#sort-group .filter-pill').forEach(b => b.classList.remove('active'));
-    e.currentTarget.classList.add('active');
-    currentSort = e.currentTarget.getAttribute('data-val');
-    currentPage = 1;
-    renderGrid();
-  };
-});
-document.querySelectorAll('#color-group .filter-pill').forEach(btn => {
-  btn.onclick = (e) => {
-    document.querySelectorAll('#color-group .filter-pill').forEach(b => b.classList.remove('active'));
-    e.currentTarget.classList.add('active');
-    currentColor = e.currentTarget.getAttribute('data-val');
-    currentPage = 1;
-    renderGrid();
-  };
-});
-document.getElementById('country-filter-select').onchange = (e) => {
-  currentCountry = e.target.value;
-  currentPage = 1;
+const escHtml = v => String(v == null ? '' : v).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const BASE_COLOR_NAMES = Object.keys(colorMap);
+let customColors = {};
+const normName = v => String(v || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
+const slugColor = v => normName(v).replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 30);
+const isLightColor = bg => { const m = /^#([0-9a-f]{6})$/i.exec(bg || ''); if (!m) return false; const n = parseInt(m[1], 16); return (0.299 * (n >> 16 & 255) + 0.587 * (n >> 8 & 255) + 0.114 * (n & 255)) > 186; };
+const allColorNames = () => BASE_COLOR_NAMES.concat(Object.values(customColors).map(c => c.name).sort((x, y) => x.localeCompare(y, 'fr')));
+
+function renderColorFilters() {
+  const box = document.getElementById('color-group');
+  if (!box) return;
+  const counts = {};
+  tomatoesData.forEach(t => { if (t.color) counts[t.color] = (counts[t.color] || 0) + 1; });
+  const dot = (bg) => `<i class="sw-dot" style="background:${bg}" data-light="${isLightColor(bg) ? 1 : 0}"><i class="fa-solid fa-check sw-ck"></i></i>`;
+  let html = `<button type="button" class="sw${currentColor === 'all' ? ' active' : ''}" data-val="all"><i class="sw-dot sw-rainbow"><i class="fa-solid fa-check sw-ck"></i></i><span>${escHtml(tr('color_all'))}</span></button>`;
+  allColorNames().forEach(name => {
+    const n = counts[name] || 0;
+    html += `<button type="button" class="sw${currentColor === name ? ' active' : ''}${n ? '' : ' sw-empty'}" data-val="${escHtml(name)}">${dot(colorMap[name] || '#ccc')}<span>${escHtml(trColor(name))}</span>${n ? `<small>${n}</small>` : ''}</button>`;
+  });
+  box.innerHTML = html;
+  const add = document.getElementById('btn-add-color');
+  if (add) add.style.display = isAdmin ? '' : 'none';
+  const cpAdd = document.getElementById('cp-add'); if (cpAdd) cpAdd.style.display = isAdmin ? '' : 'none';
+  syncColorSelect();
+  renderColorPicker();
+}
+function syncColorSelect() {
+  const sel = document.getElementById('f-color');
+  if (!sel) return;
+  const keep = sel.value;
+  sel.querySelectorAll('option[data-custom]').forEach(o => o.remove());
+  Object.values(customColors).sort((x, y) => x.name.localeCompare(y.name, 'fr')).forEach(c => {
+    const o = document.createElement('option');
+    o.value = c.name; o.textContent = c.name; o.setAttribute('data-custom', '1');
+    sel.appendChild(o);
+  });
+  if (keep) sel.value = keep;
+}
+function applyCustomColors(raw) {
+  Object.values(customColors).forEach(c => { delete colorMap[c.name]; });
+  customColors = {};
+  Object.keys(raw || {}).forEach(k => {
+    const c = raw[k];
+    if (c && typeof c.name === 'string' && /^#[0-9a-fA-F]{6}$/.test(c.hex || '')) {
+      customColors[k] = { key: k, name: c.name, hex: c.hex };
+      colorMap[c.name] = c.hex;
+      if (window.FV && FV.registerColor) FV.registerColor(c.name, c.hex);
+    }
+  });
+  renderColorFilters();
   renderGrid();
+  if (document.getElementById('color-modal').classList.contains('active')) renderColorModalList();
+}
+onValue(ref(db, 'colors'), snap => applyCustomColors(snap.val()), err => console.warn('Couleurs :', err && err.message));
+
+function setSort(v) {
+  currentSort = v;
+  document.querySelectorAll('#sort-group .filter-pill').forEach(b => b.classList.toggle('active', b.getAttribute('data-val') === v));
+}
+function setColor(v) { currentColor = v; currentPage = 1; renderColorFilters(); renderGrid(); }
+function setCountry(v) { currentCountry = v; document.getElementById('country-filter-select').value = v; currentPage = 1; renderGrid(); }
+
+function updateFilterUI(count) {
+  const n = (currentColor !== 'all' ? 1 : 0) + (currentCountry !== 'all' ? 1 : 0);
+  const badge = document.getElementById('fbadge');
+  if (badge) { badge.hidden = !n; badge.textContent = n; }
+  const reset = document.getElementById('fp-reset');
+  if (reset) reset.disabled = !(n || currentSort !== 'date');
+  const apply = document.getElementById('fp-apply');
+  if (apply && hasFirstData) apply.textContent = count === 0 ? 'Aucune variété' : (count === 1 ? 'Voir 1 variété' : 'Voir ' + count + ' variétés');
+  const row = document.getElementById('active-filters');
+  if (!row) return;
+  let h = '';
+  if (currentColor !== 'all') h += `<span class="af-chip"><i class="sw-dot" style="background:${colorMap[currentColor] || '#ccc'}"></i>${escHtml(trColor(currentColor))}<button type="button" data-clear="color" aria-label="Retirer"><i class="fa-solid fa-xmark"></i></button></span>`;
+  if (currentCountry !== 'all') h += `<span class="af-chip"><i class="fa-solid fa-earth-europe" style="color:#f87171"></i>${escHtml(currentCountry)}<button type="button" data-clear="country" aria-label="Retirer"><i class="fa-solid fa-xmark"></i></button></span>`;
+  row.innerHTML = h;
+  row.classList.toggle('show', !!h);
+}
+
+document.getElementById('btn-toggle-filters').onclick = () => document.getElementById('filters-panel').classList.toggle('active');
+document.getElementById('fp-close').onclick = () => document.getElementById('filters-panel').classList.remove('active');
+document.getElementById('fp-apply').onclick = () => {
+  document.getElementById('filters-panel').classList.remove('active');
+  document.getElementById('tomatoes-grid').scrollIntoView({ behavior: 'smooth', block: 'start' });
 };
+document.getElementById('fp-reset').onclick = () => { setSort('date'); currentColor = 'all'; currentCountry = 'all'; document.getElementById('country-filter-select').value = 'all'; currentPage = 1; renderColorFilters(); renderGrid(); };
+document.getElementById('active-filters').addEventListener('click', e => {
+  const b = e.target.closest('[data-clear]');
+  if (!b) return;
+  if (b.dataset.clear === 'color') setColor('all'); else setCountry('all');
+});
+document.querySelectorAll('#sort-group .filter-pill').forEach(btn => {
+  btn.onclick = (e) => { setSort(e.currentTarget.getAttribute('data-val')); currentPage = 1; renderGrid(); };
+});
+document.getElementById('color-group').addEventListener('click', e => {
+  const b = e.target.closest('.sw');
+  if (b) setColor(b.getAttribute('data-val'));
+});
+document.getElementById('country-filter-select').onchange = (e) => { setCountry(e.target.value); };
+
+// ─── COULEURS AJOUTÉES PAR LES MODÉRATEURS ────────────────────────────────────
+const PALETTE = ['#ef4444','#dc2626','#b91c1c','#7f1d1d','#f97316','#ea580c','#fb923c','#f59e0b','#eab308','#facc15','#fde047','#d4af37','#a3e635','#84cc16','#22c55e','#15803d','#166534','#14b8a6','#06b6d4','#0ea5e9','#3b82f6','#3b5bdb','#4338ca','#6366f1','#7c3aed','#a855f7','#c026d3','#ec4899','#f43f5e','#ff6f61','#fa8072','#fda4af','#a16207','#92400e','#5c3a21','#78350f','#6b2545','#4b5563','#9ca3af','#f3efdc'];
+let cmHex = '#ef4444';
+function cmSetHex(h) {
+  cmHex = h.toLowerCase();
+  document.getElementById('cm-hex').value = cmHex;
+  document.getElementById('cm-hex-txt').textContent = cmHex;
+  document.querySelectorAll('#cm-pal .cm-sw').forEach(b => b.classList.toggle('sel', b.dataset.hex === cmHex));
+  if (window.FV && FV.registerColor) { FV.registerColor('__preview', cmHex); document.getElementById('cm-prev').innerHTML = FV.tomato('__preview', 62); }
+}
+function renderColorModalList() {
+  const list = Object.values(customColors).sort((x, y) => x.name.localeCompare(y.name, 'fr'));
+  const counts = {}; tomatoesData.forEach(t => { if (t.color) counts[t.color] = (counts[t.color] || 0) + 1; });
+  document.getElementById('cm-list').innerHTML = list.length
+    ? `<div class="filter-title" style="margin-bottom:6px">Couleurs ajoutées</div>` + list.map(c => `<div class="cm-item"><i class="sw-dot" style="background:${c.hex}"></i><span>${escHtml(c.name)}</span><small>${counts[c.name] || 0} variété${(counts[c.name] || 0) > 1 ? 's' : ''}</small><button type="button" data-del="${escHtml(c.key)}" title="Supprimer" aria-label="Supprimer ${escHtml(c.name)}"><i class="fa-solid fa-trash-can"></i></button></div>`).join('')
+    : '';
+}
+function openColorModal() {
+  if (!isAdmin) return;
+  const pal = document.getElementById('cm-pal');
+  if (!pal.children.length) pal.innerHTML = PALETTE.map(h => `<button type="button" class="cm-sw" data-hex="${h}" style="background:${h}" aria-label="${h}"></button>`).join('');
+  document.getElementById('color-error').style.display = 'none';
+  document.getElementById('cm-name').value = '';
+  cmSetHex(cmHex);
+  renderColorModalList();
+  document.getElementById('color-modal').classList.add('active');
+  setTimeout(() => document.getElementById('cm-name').focus(), 250);
+}
+const closeColorModal = () => document.getElementById('color-modal').classList.remove('active');
+function colorError(msg) { const e = document.getElementById('color-error'); e.textContent = msg; e.style.display = 'block'; }
+document.getElementById('btn-add-color').onclick = openColorModal;
+document.getElementById('close-color-modal').onclick = closeColorModal;
+document.getElementById('color-modal').addEventListener('click', e => { if (e.target.id === 'color-modal') closeColorModal(); });
+document.getElementById('cm-pal').addEventListener('click', e => { const b = e.target.closest('.cm-sw'); if (b) cmSetHex(b.dataset.hex); });
+document.getElementById('cm-hex').oninput = e => cmSetHex(e.target.value);
+document.getElementById('cm-name').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); document.getElementById('cm-save').click(); } });
+document.getElementById('cm-save').onclick = async () => {
+  if (!isAdmin || !currentUser) return;
+  const name = document.getElementById('cm-name').value.replace(/\s+/g, ' ').trim();
+  if (name.length < 2) return colorError('Donne un nom à la couleur (2 caractères minimum).');
+  if (/[<>&"]/.test(name)) return colorError('Le nom ne peut pas contenir < > & ou ".');
+  const slug = slugColor(name);
+  if (!slug) return colorError('Ce nom n’est pas valide.');
+  const existing = allColorNames().some(n => normName(n) === normName(name) || slugColor(n) === slug);
+  if (existing) return colorError('Cette couleur existe déjà.');
+  const btn = document.getElementById('cm-save');
+  btn.disabled = true;
+  try {
+    await update(ref(db, 'colors/' + slug), { name, hex: cmHex, by: currentUser.uid, at: Date.now() });
+    document.getElementById('cm-name').value = '';
+    document.getElementById('color-error').style.display = 'none';
+    showToast('Couleur « ' + name + ' » ajoutée', 'fa-palette');
+  } catch (e) {
+    colorError('Impossible d’ajouter la couleur (droits insuffisants ou règles Firebase pas encore mises à jour).');
+  }
+  btn.disabled = false;
+};
+document.getElementById('cm-list').addEventListener('click', async e => {
+  const b = e.target.closest('[data-del]');
+  if (!b || !isAdmin) return;
+  const c = customColors[b.dataset.del];
+  if (!c) return;
+  const used = tomatoesData.filter(t => t.color === c.name).length;
+  if (used) { colorError('« ' + c.name + ' » est utilisée par ' + used + ' variété' + (used > 1 ? 's' : '') + ' : change d’abord leur couleur.'); return; }
+  if (!confirm('Supprimer la couleur « ' + c.name + ' » ?')) return;
+  try { await remove(ref(db, 'colors/' + c.key)); } catch (err) { colorError('Suppression refusée.'); }
+});
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeColorModal(); });
 
 // ─── AUTHENTIFICATION & TOGGLE ANONYME ────────────────────────────────────────
 const anonToggle = document.getElementById('toggle-anon');
@@ -1195,6 +1638,7 @@ const verifiedToggle = document.getElementById('toggle-verified');
 
 onAuthStateChanged(auth, async (user) => {
   currentUser = user;
+  resolveAdmin(user);
   const authLabel = document.getElementById('auth-label');
   const btnAuth = document.getElementById('btn-auth');
   if (user) {
@@ -1276,6 +1720,7 @@ function subscribeTomatoes() {
       tomatoesRetryCount = 0;
       if (tomatoesRetryTimer) { clearTimeout(tomatoesRetryTimer); tomatoesRetryTimer = null; }
       updateVarietyCounter(tomatoesData.length);
+      renderColorFilters();
       renderGrid();
       if (detailCurrentId) {
         refreshDetailLikeBtn();
@@ -1367,6 +1812,7 @@ function renderGrid() {
   });
 
   filtered = sortTomatoes(filtered, currentSort, currentProfile, currentUser ? currentUser.uid : null);
+  updateFilterUI(filtered.length);
 
   if (filtered.length === 0) {
     if (tomatoesLoadError) {
@@ -1413,7 +1859,7 @@ function renderGrid() {
     let imagesHtml = '';
     let imgCountBadge = '';
     if (imagesArray.length > 0) {
-      imagesHtml = `<div class="card-img-wrapper"><img src="${imagesArray[0]}" class="card-img" alt="${t.name}" loading="lazy"></div>`;
+      imagesHtml = `<div class="card-img-wrapper"><img src="${FV.thumb(imagesArray[0], 640)}" data-o="${imagesArray[0]}" referrerpolicy="no-referrer" onerror="if(this.dataset.o&&this.src!==this.dataset.o){this.src=this.dataset.o}" class="card-img" alt="${t.name}" loading="lazy" decoding="async"></div>`;
       if (imagesArray.length > 1) imgCountBadge = `<div class="img-count"><i class="fa-regular fa-images"></i> ${imagesArray.length}</div>`;
     } else {
       imagesHtml = `<div class="card-img-wrapper" style="background:#eee"></div>`;
@@ -1432,7 +1878,7 @@ function renderGrid() {
           </h3>
           <div class="card-meta">
             ${t.probableError ? `<span class="badge" style="background:#fef2f2; color:#d92d20; border-color:#fecaca"><i class="fa-solid fa-triangle-exclamation"></i> Erreur probable</span>` : ''}
-            <span class="badge"><i class="color-dot" style="background:${colorBg}"></i> ${trColor(t.color)}</span>
+            <span class="badge">${FV.tomato(t.color, 18)} ${trColor(t.color)}</span>
             ${t.weight ? `<span class="badge"><i class="fa-solid fa-scale-balanced"></i> ${t.weight}g</span>` : ''}
             ${countryBadge}
           </div>
@@ -1454,7 +1900,13 @@ function renderGrid() {
     `);
   });
 
-  grid.innerHTML = htmlParts.join('');
+  const gridHtml = htmlParts.join('');
+  if (window.__gridHtml === gridHtml && grid.firstElementChild && grid.firstElementChild.classList.contains('card')) {
+    renderPagination(totalPages);
+    return;
+  }
+  window.__gridHtml = gridHtml;
+  grid.innerHTML = gridHtml;
   renderPagination(totalPages);
 
   // Attacher les événements sur les boutons des bandeaux de partage
@@ -1574,9 +2026,10 @@ document.getElementById('btn-submit-comment').onclick = async () => {
   }
 };
 
-function openDetailModal(tomatoId) {
+function openDetailModal(tomatoId, fromPop) {
   const t = tomatoesData.find(x => x.id === tomatoId);
   if (!t) return;
+  const wasOpen = !!detailCurrentId;
   detailCurrentId = tomatoId;
 
   if (typeof recordClick === 'function') recordClick(t);
@@ -1591,7 +2044,7 @@ function openDetailModal(tomatoId) {
     ? imagesArray.map(url => `
         <div class="detail-img-slide">
           <div class="detail-carousel-blur" style="background-image:url('${url}')"></div>
-          <img src="${url}" alt="${t.name}" data-zoom="${url}" style="cursor:zoom-in">
+          <img src="${url}" referrerpolicy="no-referrer" alt="${t.name}" data-zoom="${url}" style="cursor:zoom-in">
         </div>
       `).join('')
     : `<div class="detail-img-slide" style="background:#eee"></div>`;
@@ -1609,10 +2062,17 @@ function openDetailModal(tomatoId) {
   nextBtn.style.display = showNav ? 'flex' : 'none';
   prevBtn.onclick = () => carousel.scrollBy({ left: -carousel.offsetWidth, behavior: 'smooth' });
   nextBtn.onclick = () => carousel.scrollBy({ left: carousel.offsetWidth, behavior: 'smooth' });
+  const thumbs = document.getElementById('detail-thumbs');
+  thumbs.innerHTML = imagesArray.length > 1 ? imagesArray.map((u, i) => `<img src="${u}" referrerpolicy="no-referrer" alt="" class="${i === 0 ? 'active' : ''}" data-i="${i}">`).join('') : '';
+  thumbs.querySelectorAll('img').forEach(im => {
+    im.onclick = () => carousel.scrollTo({ left: Number(im.dataset.i) * carousel.offsetWidth, behavior: 'smooth' });
+  });
+  carousel.scrollLeft = 0;
   carousel.onscroll = () => {
     if (imagesArray.length <= 1) return;
     const index = Math.round(carousel.scrollLeft / carousel.offsetWidth);
     dots.querySelectorAll('span').forEach((d, i) => d.classList.toggle('active', i === index));
+    thumbs.querySelectorAll('img').forEach((im, i) => im.classList.toggle('active', i === index));
   };
 
   document.getElementById('detail-title').innerHTML = `
@@ -1631,13 +2091,29 @@ function openDetailModal(tomatoId) {
   const sizeLabel = trSize(t.averageSize);
   document.getElementById('detail-meta').innerHTML = `
     ${t.probableError ? `<span class="badge" style="background:#fef2f2; color:#d92d20; border-color:#fecaca"><i class="fa-solid fa-triangle-exclamation"></i> Erreur probable</span>` : ''}
-    <span class="badge"><i class="color-dot" style="background:${colorBg}"></i> ${trColor(t.color)}</span>
+    <span class="badge">${FV.tomato(t.color, 18)} ${trColor(t.color)}</span>
     ${t.weight ? `<span class="badge"><i class="fa-solid fa-scale-balanced"></i> ${t.weight}g</span>` : ''}
     ${sizeLabel ? `<span class="badge"><i class="fa-solid fa-ruler"></i> ${sizeLabel}</span>` : ''}
     ${countryBadge}
   `;
 
   document.getElementById('detail-desc').textContent = t.description || '-';
+  document.getElementById('detail-article').innerHTML = t.article ? ART.block(t.article, t.articleSource) : '';
+  document.getElementById('detail-crumb').innerHTML = `Recensement &rsaquo; <b>${t.name}</b>`;
+  const cObj = countriesList.find(c => c.name === t.country);
+  const specRows = [
+    [tr('t_color') ? tr('t_color').replace(' *', '') : 'Couleur', `<span class="fv-inline">${FV.tomato(t.color, 30)} <span>${trColor(t.color)}</span></span>`],
+    [tr('t_country') || "Pays d'origine", t.country ? FV.country(t.country, cObj ? cObj.code : '') : ''],
+    ['Ajoutée le', t.createdAt ? new Date(t.createdAt).toLocaleDateString(currentLang) : '']
+  ].filter(r => r[1]);
+  const culture = FV.parseCulture(t);
+  const specsEl = document.getElementById('detail-specs');
+  specsEl.innerHTML = (specRows.length ? `<div class="detail-section-title">${tr('specs_title') || 'Caractéristiques'}</div><table class="specs-table">${specRows.map(r => `<tr><td>${r[0]}</td><td>${r[1]}</td></tr>`).join('')}</table>` : '')
+    + FV.weightScale(t.weight, sizeLabel, t.color, t.averageSize)
+    + FV.cycle(culture.cycle, culture.semis, t.color)
+    + (t.article ? '' : WK.block(t));
+  FV.hydrate(specsEl);
+  WK.hydrate(specsEl);
 
   const verifiedBadgeSvg = `<svg fill="#1d9bf0" version="1.1" xmlns="http://www.w3.org/2000/svg" width="16px" height="16px" viewBox="0 0 910.288 910.287" style="flex-shrink:0; margin-left:4px;"><path d="M873.206,202.06l-1.212-28.51l-28.386-2.915c-109.036-11.198-202.773-51.887-262.21-84.049 c-65.099-35.226-104.56-68.274-104.922-68.579L455.165,0L433.84,17.981c-0.392,0.33-39.853,33.379-104.951,68.604 c-59.437,32.162-153.173,72.851-262.209,84.049l-28.387,2.915l-1.212,28.51c-0.217,5.104-4.777,126.698,42.059,273.937 c27.637,86.887,67.549,164.736,118.627,231.396c64.139,83.701,145.948,149.68,243.155,196.102l14.221,6.793l14.221-6.793 c97.207-46.422,179.017-112.398,243.155-196.102c51.079-66.658,90.991-144.51,118.628-231.395 C877.982,328.759,873.423,207.165,873.206,202.06z M455.143,836.93c-81.095-41.209-149.731-97.887-204.194-168.646 c-46.393-60.275-82.812-130.998-108.248-210.201c-31.088-96.808-38.06-183.144-39.471-225.538 c43.735-6.494,87.949-17.421,131.833-32.597c42.9-14.836,85.598-33.752,126.907-56.221c41.915-22.798,73.81-44.573,93.172-58.812 c19.362,14.238,51.258,36.014,93.173,58.812c41.309,22.47,84.007,41.385,126.907,56.221 c43.896,15.181,88.123,26.108,131.87,32.602c-1.359,41.978-8.194,127.098-38.842,223.443 c-25.317,79.594-61.694,150.672-108.12,211.258C605.537,738.494,536.632,795.52,455.143,836.93z"/></svg>`;
   const authorEl = document.getElementById('detail-author');
@@ -1652,9 +2128,9 @@ function openDetailModal(tomatoId) {
 
   document.getElementById('detail-date').textContent = new Date(t.createdAt).toLocaleDateString(currentLang);
 
-  const isOwner = currentUser && t.uid && currentUser.uid === t.uid;
+  const isOwner = !!(currentUser && t.uid && currentUser.uid === t.uid);
   document.getElementById('detail-edit-btn').style.display = 'flex';
-  document.getElementById('detail-delete-btn').style.display = isOwner ? 'flex' : 'none';
+  document.getElementById('detail-delete-btn').style.display = (isOwner || isAdmin) ? 'flex' : 'none';
 
   renderContributors(t);
 
@@ -1667,7 +2143,7 @@ function openDetailModal(tomatoId) {
       const sImg = sImgs[0] || '';
       return `<div class="similar-card" data-id="${s.id}">
         <div class="similar-card-imgwrap">
-          ${sImg ? `<img src="${sImg}" alt="${s.name}" loading="lazy">` : `<div class="no-img"><i class="fa-solid fa-image"></i></div>`}
+          ${sImg ? `<img src="${FV.thumb(sImg, 360)}" data-o="${sImg}" referrerpolicy="no-referrer" onerror="if(this.dataset.o&&this.src!==this.dataset.o){this.src=this.dataset.o}" alt="${s.name}" loading="lazy" decoding="async">` : `<div class="no-img"><i class="fa-solid fa-image"></i></div>`}
         </div>
         <div class="similar-name">${s.name}</div>
       </div>`;
@@ -1682,8 +2158,14 @@ function openDetailModal(tomatoId) {
   refreshDetailLikeBtn();
   renderComments(t);
   
-  document.getElementById('detail-modal').classList.add('active');
-  history.replaceState(null, '', `?tomato=${tomatoId}`);
+  const dm = document.getElementById('detail-modal');
+  dm.classList.add('active');
+  dm.scrollTop = 0;
+  document.body.classList.add('detail-open');
+  if (!fromPop) {
+    if (wasOpen) history.replaceState({ detail: 1 }, '', `?tomato=${tomatoId}`);
+    else history.pushState({ detail: 1 }, '', `?tomato=${tomatoId}`);
+  }
 }
 
 function refreshDetailLikeBtn() {
@@ -1699,13 +2181,30 @@ function refreshDetailLikeBtn() {
 
 document.getElementById('detail-like-btn').onclick = () => { if (detailCurrentId) toggleLike(detailCurrentId); };
 
-function closeDetailModal() {
-  document.getElementById('detail-modal').classList.remove('active');
-  detailCurrentId = null;
-  history.replaceState(null, '', window.location.pathname);
+function unlockScrollIfNoDetail() {
+  const d = document.getElementById('detail-modal');
+  if (!d || !d.classList.contains('active')) document.body.classList.remove('detail-open');
 }
+function closeDetailModal(fromPop) {
+  if (!detailCurrentId) return;
+  document.getElementById('detail-modal').classList.remove('active');
+  document.body.classList.remove('detail-open');
+  detailCurrentId = null;
+  if (fromPop === true) return;
+  if (history.state && history.state.detail) history.back();
+  else history.replaceState(null, '', window.location.pathname);
+}
+window.addEventListener('popstate', () => {
+  if (document.getElementById('add-modal').classList.contains('active')) {
+    if (isFormDirty() && !confirm(tr('leave_confirm') || 'Voulez-vous vraiment annuler ? Vos modifications seront perdues.')) { history.pushState({ ed: 1 }, '', location.href); return; }
+    editorHist = false; closeEditor();
+  }
+  const id = new URLSearchParams(window.location.search).get('tomato');
+  if (id && tomatoesData.find(t => t.id === id)) openDetailModal(id, true);
+  else closeDetailModal(true);
+});
 document.getElementById('close-detail-modal').onclick = closeDetailModal;
-document.getElementById('detail-modal').addEventListener('click', (e) => { if (e.target.id === 'detail-modal') closeDetailModal(); });
+document.getElementById('detail-back').onclick = closeDetailModal;
 
 // ─── PARTAGE ──────────────────────────────────────────────────────────────────
 document.getElementById('detail-share-btn').onclick = async () => {
@@ -1829,11 +2328,14 @@ document.getElementById('detail-print-btn').onclick = () => {
   window.print();
 };
 
+// Pont vers ai.js (assistant)
+window.TL = { getToken: () => (currentUser ? currentUser.getIdToken() : Promise.resolve(null)), getTomatoes: () => tomatoesData, openDetail: (id) => openDetailModal(id), toast: showToast, detailId: () => detailCurrentId };
+
 function maybeOpenSharedTomato() {
   if (detailCurrentId) return;
   const params = new URLSearchParams(window.location.search);
   const id = params.get('tomato');
-  if (id && tomatoesData.find(t => t.id === id)) openDetailModal(id);
+  if (id && tomatoesData.find(t => t.id === id)) openDetailModal(id, true);
 }
 
 // ─── LIGHTBOX ─────────────────────────────────────────────────────────────────
@@ -1891,7 +2393,7 @@ function openAuthorModal(uid, name) {
       const img = imgs[0] || '';
       const likesCount = t.likes ? Object.keys(t.likes).length : 0;
       return `<div class="card" data-id="${t.id}">
-        <div class="card-img-wrapper">${img ? `<img src="${img}" class="card-img" alt="${t.name}" loading="lazy">` : ''}</div>
+        <div class="card-img-wrapper">${img ? `<img src="${img}" referrerpolicy="no-referrer" class="card-img" alt="${t.name}" loading="lazy">` : ''}</div>
         <div class="card-body">
           <h3 class="card-title">${t.name}</h3>
           <div class="card-desc">${t.description || '-'}</div>
@@ -2064,9 +2566,9 @@ function addImageToGallery(value) {
   div.querySelector('.del-btn').onclick = () => {
     const idx = currentImagesData.indexOf(value);
     if (idx > -1) currentImagesData.splice(idx, 1);
-    div.remove();
+    div.remove(); schedulePreview();
   };
-  gallery.insertBefore(div, addBtn);
+  gallery.insertBefore(div, addBtn); schedulePreview();
 }
 function resizeImage(file) {
   return new Promise((resolve) => {
@@ -2107,7 +2609,7 @@ document.getElementById('btn-submit').onclick = async () => {
     }
   }
 
-  const isOwnerEdit = editingTomatoId && currentUser && editOwnerUid && currentUser.uid === editOwnerUid;
+  const isOwnerEdit = editingTomatoId && currentUser && ((editOwnerUid && currentUser.uid === editOwnerUid) || isAdmin);
   let authorNameValue = document.getElementById('f-author-name').value.trim();
   
   if (isVerified && !authorNameValue) {
@@ -2146,6 +2648,7 @@ document.getElementById('btn-submit').onclick = async () => {
         description: document.getElementById('f-desc').value || "", 
         country: document.getElementById('f-country-value').value || "",
         verified: isVerified,
+        ...extraFields(true),
         author: isAnon ? 'Anonyme' : (document.getElementById('f-author-name').value.trim() || 'Anonyme')
       };
       if (!isOwnerEdit) {
@@ -2155,7 +2658,7 @@ document.getElementById('btn-submit').onclick = async () => {
       }
       await update(ref(db, `tomatoes/${editingTomatoId}`), updates);
       fill.style.width = '100%';
-      setTimeout(() => { document.getElementById('add-modal').classList.remove('active'); resetForm(); showToast(tr('update_done'), 'fa-seedling'); }, 400);
+      setTimeout(() => { closeEditor(); showToast(tr('update_done'), 'fa-seedling'); }, 400);
     } else {
       let authorName = "Anonyme";
       if (!isAnon) authorName = document.getElementById('f-author-name').value.trim() || 'Anonyme';
@@ -2168,17 +2671,170 @@ document.getElementById('btn-submit').onclick = async () => {
         country: document.getElementById('f-country-value').value || "", 
         author: authorName, uid: currentUser ? currentUser.uid : null, 
         createdAt: Date.now(),
-        verified: isVerified
+        verified: isVerified,
+        ...extraFields(false)
       };
       await push(ref(db, 'tomatoes'), tomatoData);
       fill.style.width = '100%';
-      setTimeout(() => { document.getElementById('add-modal').classList.remove('active'); resetForm(); showToast(tr('publish_success'), 'fa-seedling'); }, 500);
+      setTimeout(() => { closeEditor(); showToast(tr('publish_success'), 'fa-seedling'); }, 500);
     }
   } catch(e) {
     errBox.textContent = "Erreur de connexion. L'image est-elle trop lourde ?";
     errBox.style.display = 'block'; fill.style.width = '0%'; btn.disabled = false;
   }
 };
+
+
+// ─── ÉDITEUR COMPLET ──────────────────────────────────────────────────────────
+const $id = x => document.getElementById(x);
+let articleSource = null, editorHist = false, prevRaf = 0;
+
+function renderColorPicker() {
+  const g = $id('cp-grid'), sel = $id('f-color');
+  if (!g || !sel) return;
+  const cur = sel.value;
+  g.innerHTML = allColorNames().map(n => `<button type="button" class="cp-item${n === cur ? ' sel' : ''}" role="radio" aria-checked="${n === cur}" data-val="${escHtml(n)}"><span class="cp-t">${FV.tomato(n, 46)}</span><span class="cp-n">${escHtml(trColor(n))}</span></button>`).join('');
+}
+$id('cp-grid').addEventListener('click', e => {
+  const b = e.target.closest('.cp-item');
+  if (!b) return;
+  $id('f-color').value = b.dataset.val;
+  renderColorPicker(); schedulePreview();
+});
+$id('cp-add').onclick = openColorModal;
+
+const cycleStr = (a, b) => {
+  a = parseInt(a) || 0; b = parseInt(b) || 0;
+  if (a && b && a !== b) return Math.min(a, b) + '-' + Math.max(a, b) + ' jours';
+  const n = a || b;
+  return n ? n + ' jours' : '';
+};
+function extraFields(forEdit) {
+  const art = $id('f-article').value.trim();
+  const o = {
+    cycle: cycleStr($id('f-cycle-min').value, $id('f-cycle-max').value) || null,
+    semis: $id('f-semis').value.trim() || null,
+    article: art || null,
+    articleSource: (art && articleSource) ? articleSource : null
+  };
+  if (!forEdit) Object.keys(o).forEach(k => { if (o[k] === null) delete o[k]; });
+  return o;
+}
+function fillEditorExtras(t) {
+  const c = FV.parseCulture(t);
+  const n = (String(c.cycle).match(/\d+/g) || []).map(Number);
+  $id('f-cycle-min').value = n.length ? Math.min(...n) : '';
+  $id('f-cycle-max').value = n.length > 1 ? Math.max(...n) : '';
+  $id('f-semis').value = c.semis || '';
+  $id('f-article').value = t.article || '';
+  $id('f-wiki-title').value = '';
+  articleSource = t.articleSource || null;
+  renderArSrc(); updateArCount(); setArTab('write');
+  renderColorPicker();
+  schedulePreview();
+}
+function resetEditorExtras() {
+  ['f-cycle-min', 'f-cycle-max', 'f-semis', 'f-article', 'f-wiki-title'].forEach(i => { $id(i).value = ''; });
+  $id('f-color').value = 'Rouge'; $id('f-size').value = '';
+  articleSource = null;
+  renderArSrc(); updateArCount(); setArTab('write');
+  renderColorPicker();
+  schedulePreview();
+}
+
+// Éditeur ouvert / fermé (avec le bouton Retour du navigateur)
+function openEditor() {
+  $id('add-modal').classList.add('active');
+  document.body.classList.add('editor-open');
+  $id('add-modal').querySelector('.ed-shell').scrollTop = 0;
+  if (!editorHist) { history.pushState({ ed: 1 }, '', location.href); editorHist = true; }
+  renderColorPicker(); schedulePreview();
+}
+function closeEditor() {
+  $id('add-modal').classList.remove('active');
+  document.body.classList.remove('editor-open');
+  unlockScrollIfNoDetail();
+  resetForm();
+  if (editorHist) { editorHist = false; history.back(); }
+}
+
+// Article : onglets, barre d'outils, compteur, import Wikipédia
+function updateArCount() { const n = $id('f-article').value.length; $id('ar-count').textContent = n.toLocaleString('fr-FR') + ' / ' + ART.MAX.toLocaleString('fr-FR'); }
+function renderArSrc() {
+  const box = $id('ar-src');
+  if (articleSource && $id('f-article').value.trim()) {
+    box.hidden = false;
+    box.innerHTML = `<i class="fa-brands fa-wikipedia-w"></i><span>Texte issu de Wikipédia : « ${escHtml(articleSource.title)} » (CC BY-SA 4.0)</span><button type="button" id="ar-src-x">Retirer la source</button>`;
+    $id('ar-src-x').onclick = () => { articleSource = null; renderArSrc(); };
+  } else { box.hidden = true; box.innerHTML = ''; }
+}
+function setArTab(tab) {
+  const prev = tab === 'preview';
+  $id('f-article').hidden = prev; $id('ar-tools').style.display = prev ? 'none' : '';
+  $id('ar-prev').hidden = !prev;
+  if (prev) { const r = ART.render($id('f-article').value); $id('ar-prev').innerHTML = (r.html ? r.toc + r.html : '<p class="ar-empty">Rien à afficher pour l’instant.</p>'); }
+  document.querySelectorAll('.ar-tabs button').forEach(b => b.classList.toggle('on', b.dataset.tab === tab));
+}
+document.querySelector('.ar-tabs').addEventListener('click', e => { const b = e.target.closest('button[data-tab]'); if (b) setArTab(b.dataset.tab); });
+$id('ar-tools').addEventListener('click', e => {
+  const b = e.target.closest('button[data-act]');
+  if (!b) return;
+  const ta = $id('f-article'), a = b.dataset.act;
+  if (a === 'h2') ART.line(ta, '## ');
+  else if (a === 'h3') ART.line(ta, '### ');
+  else if (a === 'ul') ART.line(ta, '- ');
+  else if (a === 'ol') ART.line(ta, '1. ');
+  else if (a === 'q') ART.line(ta, '> ');
+  else if (a === 'b') ART.wrap(ta, '**', '**', 'texte en gras');
+  else if (a === 'i') ART.wrap(ta, '*', '*', 'texte en italique');
+  else if (a === 'a') { const u = prompt('Adresse du lien (https://…)'); if (u && /^https?:\/\//i.test(u.trim())) ART.wrap(ta, '[', '](' + u.trim() + ')', 'texte du lien'); }
+});
+$id('f-article').addEventListener('input', () => { updateArCount(); if (!$id('f-article').value.trim()) { articleSource = null; renderArSrc(); } });
+$id('btn-wiki-import').onclick = async () => {
+  const name = $id('f-name').value.trim(), title = $id('f-wiki-title').value.trim();
+  if (!name && !title) { showToast('Indique d’abord le nom de la variété ou un titre de page.', 'fa-circle-exclamation'); return; }
+  if ($id('f-article').value.trim() && !confirm('Remplacer l’article actuel par celui de Wikipédia ?')) return;
+  const btn = $id('btn-wiki-import'), lab = btn.querySelector('span');
+  btn.disabled = true; lab.textContent = 'Recherche…';
+  const r = await ART.importWiki(name, title);
+  btn.disabled = false; lab.textContent = 'Importer depuis Wikipédia';
+  if (!r) { showToast('Aucun article trouvé. Essaie avec le titre exact de la page Wikipédia.', 'fa-circle-exclamation'); return; }
+  $id('f-article').value = r.markdown;
+  articleSource = { title: r.title, url: r.url };
+  renderArSrc(); updateArCount(); setArTab('write'); schedulePreview();
+  showToast('Article « ' + r.title + ' » importé', 'fa-check');
+};
+
+// Aperçu en direct + complétude
+function schedulePreview() { if (!prevRaf) prevRaf = requestAnimationFrame(() => { prevRaf = 0; renderEdPreview(); }); }
+function renderEdPreview() {
+  const box = $id('ed-prev');
+  if (!box) return;
+  if (!box.firstChild) {
+    box.innerHTML = `<div class="ed-cap">Aperçu de la carte</div><div class="ed-pcard"><div class="ed-pimg"><i class="fa-regular fa-image"></i></div><div class="ed-pbody"><b></b><div class="ed-pmeta"></div><div class="ed-pmeta2"></div></div></div><div class="ed-prog"><div class="ed-prog-h"></div><div class="ed-meter"><i></i></div><ul></ul></div>`;
+  }
+  const name = $id('f-name').value.trim(), color = $id('f-color').value || 'Rouge', country = $id('f-country-value').value;
+  const w = $id('f-weight').value, cyc = cycleStr($id('f-cycle-min').value, $id('f-cycle-max').value);
+  const semis = $id('f-semis').value.trim(), desc = $id('f-desc').value.trim(), art = $id('f-article').value.trim();
+  const img = currentImagesData[0] || '';
+  const wrap = box.querySelector('.ed-pimg');
+  if (wrap.__src !== img) {
+    wrap.__src = img;
+    wrap.innerHTML = img ? '<img alt="">' : '<i class="fa-regular fa-image"></i>';
+    if (img) wrap.firstChild.src = img;
+  }
+  box.querySelector('.ed-pbody b').textContent = name || 'Nom de la variété';
+  box.querySelector('.ed-pmeta').innerHTML = FV.tomato(color, 18) + '<span>' + escHtml(trColor(color)) + '</span>';
+  box.querySelector('.ed-pmeta2').textContent = [w ? w + ' g' : '', cyc, country].filter(Boolean).join(' · ');
+  const items = [['Photo', !!img], ['Nom', !!name], ['Pays', !!country], ['Poids', !!w], ['Cycle', !!cyc], ['Semis', !!semis], ['Description', desc.length > 20], ['Article', art.length > 200]];
+  const pct = Math.round(items.filter(x => x[1]).length / items.length * 100);
+  box.querySelector('.ed-prog-h').innerHTML = '<b>Fiche complète à ' + pct + ' %</b>';
+  box.querySelector('.ed-meter i').style.width = pct + '%';
+  box.querySelector('.ed-prog ul').innerHTML = items.map(([l, ok]) => `<li class="${ok ? 'ok' : ''}"><i class="fa-solid ${ok ? 'fa-circle-check' : 'fa-circle'}"></i>${l}</li>`).join('');
+}
+$id('add-modal').addEventListener('input', schedulePreview);
+$id('add-modal').addEventListener('change', schedulePreview);
+document.addEventListener('keydown', e => { if (e.key === 'Escape' && $id('add-modal').classList.contains('active') && !$id('color-modal').classList.contains('active')) closeAddModalWithConfirm(); });
 
 function resetForm() {
   editingTomatoId = null; editOwnerUid = null;
@@ -2190,6 +2846,7 @@ function resetForm() {
   document.getElementById('btn-submit-label').textContent = tr('submit');
   document.getElementById('f-name').value = '';
   document.getElementById('f-desc').value = '';
+  resetEditorExtras();
   document.getElementById('f-weight').value = '';
   document.getElementById('f-country-value').value = '';
   document.getElementById('f-country-btn').innerHTML = `<span>Sélectionner un pays...</span> <i class="fa-solid fa-chevron-down" style="color:var(--text-muted)"></i>`;
@@ -2213,17 +2870,16 @@ function resetForm() {
 }
 
 function isFormDirty() {
-  return !!document.getElementById('f-name').value.trim() || !!document.getElementById('f-desc').value.trim() || currentImagesData.length > 0;
+  return !!document.getElementById('f-name').value.trim() || !!document.getElementById('f-desc').value.trim() || !!document.getElementById('f-article').value.trim() || currentImagesData.length > 0;
 }
 function closeAddModalWithConfirm() {
   if (isFormDirty() && !confirm(tr('leave_confirm') || 'Voulez-vous vraiment annuler ? Vos modifications seront perdues.')) return;
-  document.getElementById('add-modal').classList.remove('active');
-  resetForm();
+  closeEditor();
 }
 
 function openEditModal(t) {
   editingTomatoId = t.id; editOwnerUid = t.uid || null;
-  const isOwner = currentUser && editOwnerUid && currentUser.uid === editOwnerUid;
+  const isOwner = !!(currentUser && ((editOwnerUid && currentUser.uid === editOwnerUid) || isAdmin));
   document.getElementById('add-modal-title').removeAttribute('data-i18n');
   document.getElementById('add-modal-title').textContent = tr('edit_title') || 'Modifier';
   document.getElementById('btn-submit-label').removeAttribute('data-i18n');
@@ -2259,20 +2915,25 @@ function openEditModal(t) {
   const imgs = t.imageURLs || (t.imageURL ? [t.imageURL] : []);
   imgs.forEach(url => addImageToGallery(url));
   document.getElementById('detail-modal').classList.remove('active');
-  document.getElementById('add-modal').classList.add('active');
+  document.body.classList.remove('detail-open');
+  fillEditorExtras(t);
+  openEditor();
 }
 
 document.getElementById('detail-edit-btn').onclick = () => { const t = tomatoesData.find(x => x.id === detailCurrentId); if (t) openEditModal(t); };
 document.getElementById('detail-delete-btn').onclick = async () => {
   if (!detailCurrentId) return;
   const t = tomatoesData.find(x => x.id === detailCurrentId);
-  if (!t || !currentUser || currentUser.uid !== t.uid) { showToast(tr('not_owner'), 'fa-lock'); return; }
+  if (!t || !currentUser || !(isAdmin || currentUser.uid === t.uid)) { showToast(tr('not_owner'), 'fa-lock'); return; }
   if (!confirm(tr('delete_confirm'))) return;
   try { await remove(ref(db, `tomatoes/${detailCurrentId}`)); closeDetailModal(); showToast(tr('delete_done'), 'fa-check'); }
   catch (e) { showToast("Erreur lors de la suppression.", 'fa-triangle-exclamation'); }
 };
 
-document.getElementById('btn-add-modal').onclick = () => { editingTomatoId = null; resetForm(); document.getElementById('add-modal').classList.add('active'); };
+document.getElementById('btn-add-modal').onclick = () => {
+  if (!currentUser) { showToast(tr('login_required') || 'Connecte-toi pour recenser une variété.', 'fa-lock'); setTimeout(() => { window.location.href = 'auth.html'; }, 900); return; }
+  editingTomatoId = null; resetForm(); openEditor();
+};
 document.getElementById('close-modal').onclick = closeAddModalWithConfirm;
 document.getElementById('add-modal').addEventListener('click', (e) => { if (e.target.id === 'add-modal') closeAddModalWithConfirm(); });
 
