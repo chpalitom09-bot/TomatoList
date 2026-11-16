@@ -250,6 +250,32 @@
   .cm-sw { aspect-ratio: 1; border-radius: 50%; border: none; cursor: pointer; position: relative; box-shadow: inset 0 -3px 5px rgba(0,0,0,.18), inset 0 2px 3px rgba(255,255,255,.3), 0 0 0 1px rgba(0,0,0,.1); transition: transform .15s; }
   .cm-sw:hover { transform: scale(1.12); }
   .cm-sw.sel { box-shadow: 0 0 0 2px #fff, 0 0 0 4px var(--text-main); transform: scale(1.05); }
+
+  /* Vérification des couleurs (modérateurs) */
+  .cc-modal { max-width: 560px; }
+  .cc-bar { display: flex; align-items: center; justify-content: space-between; gap: 10px; font-size: 13px; color: var(--text-muted); margin-bottom: 12px; }
+  .cc-prog { flex: 1; height: 6px; background: #f3f4f6; border-radius: 99px; overflow: hidden; }
+  .cc-prog > i { display: block; height: 100%; width: 0; background: var(--primary); transition: width .3s; }
+  .cc-photo { position: relative; background: #f3f4f6; border-radius: 14px; overflow: hidden; aspect-ratio: 4 / 3; display: flex; align-items: center; justify-content: center; }
+  .cc-photo img { width: 100%; height: 100%; object-fit: contain; }
+  .cc-thumbs { display: flex; gap: 6px; margin-top: 8px; }
+  .cc-thumbs img { width: 46px; height: 46px; object-fit: cover; border-radius: 8px; cursor: pointer; opacity: .6; border: 2px solid transparent; }
+  .cc-thumbs img.on { opacity: 1; border-color: var(--primary); }
+  .cc-name { font-weight: 700; font-size: 17px; margin: 14px 0 4px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .cc-now { font-size: 12px; font-weight: 600; color: var(--text-muted); background: #f3f4f6; padding: 3px 9px; border-radius: 99px; display: inline-flex; align-items: center; gap: 6px; }
+  .cc-sugg { display: flex; flex-wrap: wrap; gap: 8px; margin: 10px 0 4px; min-height: 44px; align-items: center; }
+  .cc-chip { display: inline-flex; align-items: center; gap: 8px; padding: 8px 12px; border-radius: 99px; border: 1.5px solid var(--line); background: #fff; font-size: 14px; font-weight: 600; cursor: pointer; font-family: inherit; color: var(--text-main); }
+  .cc-chip:hover { border-color: var(--line-h); }
+  .cc-chip.sel { border-color: var(--primary); background: #fef2f2; }
+  .cc-chip small { font-weight: 500; color: var(--text-muted); }
+  .cc-chip .sw-dot { width: 16px; height: 16px; border-radius: 50%; display: inline-block; box-shadow: inset 0 0 0 1px rgba(0,0,0,.12); }
+  .cc-conf { font-size: 12px; color: var(--text-muted); margin-bottom: 8px; }
+  .cc-all { display: flex; flex-wrap: wrap; gap: 6px; margin: 6px 0 14px; max-height: 120px; overflow-y: auto; }
+  .cc-all .cc-chip { padding: 5px 10px; font-size: 12.5px; }
+  .cc-actions { display: flex; gap: 10px; }
+  .cc-actions .btn { flex: 1; padding: 13px; }
+  .cc-empty { text-align: center; padding: 30px 10px; color: var(--text-muted); }
+  .cc-hint { font-size: 11.5px; color: var(--text-muted); text-align: center; margin-top: 10px; }
   .cm-top { display: flex; gap: 18px; align-items: center; margin-bottom: 18px; }
   .cm-prev { width: 84px; height: 84px; flex-shrink: 0; border-radius: 20px; background: #fef2f2; display: flex; align-items: center; justify-content: center; }
   .cm-exact { display: flex; align-items: center; gap: 10px; margin-top: 14px; font-size: 13px; color: var(--text-muted); }
@@ -811,7 +837,7 @@
         </div>
       </section>
       <section class="fp-sec">
-        <div class="fp-lab"><i class="fa-solid fa-palette"></i><span data-i18n="color">Couleur</span><button class="fp-add" id="btn-add-color" type="button" style="display:none"><i class="fa-solid fa-plus"></i> Ajouter une couleur</button></div>
+        <div class="fp-lab"><i class="fa-solid fa-palette"></i><span data-i18n="color">Couleur</span><button class="fp-add" id="btn-add-color" type="button" style="display:none"><i class="fa-solid fa-plus"></i> Ajouter une couleur</button><button class="fp-add" id="btn-color-check" type="button" style="display:none"><i class="fa-solid fa-wand-magic-sparkles"></i> Vérifier les couleurs</button></div>
         <div class="fp-colors" id="color-group"></div>
       </section>
       <section class="fp-sec">
@@ -1001,6 +1027,17 @@
 </div>
 
 <div id="print-area"></div>
+
+<!-- Vérification des couleurs (modérateurs) -->
+<div class="modal-overlay" id="cc-modal">
+  <div class="modal cc-modal">
+    <div class="modal-header">
+      <div class="modal-title"><i class="fa-solid fa-wand-magic-sparkles" style="color:var(--primary);margin-right:8px"></i>Vérifier les couleurs</div>
+      <button class="modal-close" id="cc-close" type="button" aria-label="Fermer"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="modal-body" id="cc-body"></div>
+  </div>
+</div>
 
 <!-- Modale couleurs (modérateurs) -->
 <div class="modal-overlay" id="color-modal">
@@ -1201,6 +1238,7 @@
 </div>
 
 <script src="fiche-visuals.js"></script>
+<script src="color-detect.js"></script>
 <script src="article.js"></script>
 <script src="wiki.js"></script>
 <script src="ai.js"></script>
@@ -1485,6 +1523,7 @@ function renderColorFilters() {
   const add = document.getElementById('btn-add-color');
   if (add) add.style.display = isAdmin ? '' : 'none';
   const cpAdd = document.getElementById('cp-add'); if (cpAdd) cpAdd.style.display = isAdmin ? '' : 'none';
+  const ccBtn = document.getElementById('btn-color-check'); if (ccBtn) ccBtn.style.display = isAdmin ? '' : 'none';
   syncColorSelect();
   renderColorPicker();
 }
@@ -1630,6 +1669,133 @@ document.getElementById('cm-list').addEventListener('click', async e => {
   try { await remove(ref(db, 'colors/' + c.key)); } catch (err) { colorError('Suppression refusée.'); }
 });
 document.addEventListener('keydown', e => { if (e.key === 'Escape') closeColorModal(); });
+
+
+// ─── VÉRIFICATION DES COULEURS (modérateurs) ──────────────────────────────────
+// Affiche une tomate, détecte sa couleur sur la photo (color-detect.js) et laisse le modérateur valider ou changer.
+let ccQueue = [], ccIndex = 0, ccDone = 0, ccChoice = null, ccRun = 0, ccPhoto = 0, ccBusy = false;
+const ccEl = id => document.getElementById(id);
+const ccDot = n => `<i class="sw-dot" style="background:${colorMap[n] || '#ccc'}"></i>`;
+const ccImgs = t => (t.imageURLs || (t.imageURL ? [t.imageURL] : [])).filter(u => /^https?:\/\//i.test(u));
+const ccExtra = () => { const o = {}; Object.values(customColors).forEach(c => { o[c.name] = c.hex; }); return o; };
+
+function ccBuildQueue() {
+  // uniquement les variétés avec photo et dont la couleur n'a pas déjà été vérifiée ; les plus anciennes d'abord
+  return tomatoesData
+    .filter(t => !t.colorChecked && ccImgs(t).length)
+    .sort((a, b) => (a.createdAt || 0) - (b.createdAt || 0))
+    .map(t => t.id);
+}
+function openColorCheck() {
+  if (!isAdmin) return;
+  ccQueue = ccBuildQueue(); ccIndex = 0; ccDone = 0;
+  ccEl('cc-modal').classList.add('active');
+  ccShow();
+}
+function closeColorCheck() { ccRun++; ccEl('cc-modal').classList.remove('active'); }
+
+function ccCurrent() {
+  while (ccIndex < ccQueue.length) {
+    const t = tomatoesData.find(x => x.id === ccQueue[ccIndex]);
+    if (t && !t.colorChecked) return t;
+    ccIndex++;
+  }
+  return null;
+}
+function ccShow() {
+  const body = ccEl('cc-body'), t = ccCurrent();
+  const total = ccQueue.length;
+  if (!t) {
+    body.innerHTML = `<div class="cc-empty"><i class="fa-solid fa-circle-check" style="font-size:38px;color:#059669;margin-bottom:12px"></i><div style="font-weight:700;color:var(--text-main)">${total ? 'Toutes les couleurs ont été passées en revue' : 'Aucune couleur à vérifier'}</div><div style="margin-top:6px;font-size:13px">${ccDone} validée${ccDone > 1 ? 's' : ''} pendant cette session.</div></div>`;
+    return;
+  }
+  const imgs = ccImgs(t);
+  ccPhoto = 0; ccChoice = null;
+  const pct = total ? Math.round(ccIndex / total * 100) : 0;
+  body.innerHTML = `
+    <div class="cc-bar"><div class="cc-prog"><i style="width:${pct}%"></i></div><span>${ccIndex + 1} / ${total}</span></div>
+    <div class="cc-photo"><img id="cc-img" src="${escHtml(FV.thumb(imgs[0], 900))}" data-o="${escHtml(imgs[0])}" referrerpolicy="no-referrer" alt="${escHtml(t.name)}"></div>
+    ${imgs.length > 1 ? `<div class="cc-thumbs">${imgs.map((u, i) => `<img src="${escHtml(FV.thumb(u, 120))}" data-i="${i}" referrerpolicy="no-referrer" alt="" class="${i === 0 ? 'on' : ''}">`).join('')}</div>` : ''}
+    <div class="cc-name">${escHtml(t.name)}<span class="cc-now">Couleur actuelle : ${ccDot(t.color)} ${escHtml(trColor(t.color) || t.color || '—')}</span></div>
+    <div class="cc-sugg" id="cc-sugg"><span class="cc-conf"><i class="fa-solid fa-spinner fa-spin"></i> Analyse de la photo…</span></div>
+    <div class="cc-conf" id="cc-conf"></div>
+    <div class="cc-all" id="cc-all">${allColorNames().map(n => `<button type="button" class="cc-chip" data-c="${escHtml(n)}">${ccDot(n)}${escHtml(trColor(n))}</button>`).join('')}</div>
+    <div class="cc-actions">
+      <button type="button" class="btn btn-outline" id="cc-skip"><i class="fa-solid fa-forward"></i> Passer</button>
+      <button type="button" class="btn btn-primary" id="cc-ok" disabled><i class="fa-solid fa-check"></i> <span id="cc-ok-txt">Valider</span></button>
+    </div>
+    <div class="cc-hint">Entrée = valider · → = passer · 1 2 3 = choisir une proposition</div>`;
+  const img = ccEl('cc-img');
+  img.onerror = () => { if (img.dataset.o && img.src !== img.dataset.o) img.src = img.dataset.o; };
+  ccChoose(t.color && allColorNames().includes(t.color) ? t.color : null, true);
+  const run = ++ccRun;
+  ColorDetect.analyserPhotos(imgs, ccExtra()).then(r => { if (run === ccRun && ccCurrent() === t) ccSuggest(t, r); });
+}
+function ccChoose(name, silent) {
+  ccChoice = name;
+  document.querySelectorAll('#cc-body .cc-chip').forEach(b => b.classList.toggle('sel', b.dataset.c === name));
+  const ok = ccEl('cc-ok'), txt = ccEl('cc-ok-txt');
+  if (!ok) return;
+  ok.disabled = !name;
+  txt.textContent = name ? 'Valider « ' + (trColor(name) || name) + ' »' : 'Valider';
+}
+function ccSuggest(t, r) {
+  const box = ccEl('cc-sugg'), conf = ccEl('cc-conf');
+  if (!box) return;
+  if (!r || !r.suggestions.length) {
+    box.innerHTML = '<span class="cc-conf">Photo illisible : choisis la couleur ci-dessous.</span>';
+    return;
+  }
+  const names = allColorNames();
+  const sugg = r.suggestions.filter(s => names.includes(s.nom));
+  box.innerHTML = sugg.map((s, i) => `<button type="button" class="cc-chip" data-c="${escHtml(s.nom)}">${ccDot(s.nom)}${escHtml(trColor(s.nom) || s.nom)} <small>${Math.round(s.part * 100)} %</small><small>${i + 1}</small></button>`).join('');
+  const same = sugg[0] && sugg[0].nom === t.color;
+  conf.textContent = 'Confiance de la détection : ' + r.confiance + (same ? ' · identique à la couleur actuelle' : '') + (sugg[0] && sugg[0].detail ? ' (' + sugg[0].detail + ')' : '') + (r.photos > 1 ? ' · ' + r.photos + ' photos analysées' : '');
+  if (sugg[0]) ccChoose(sugg[0].nom);
+}
+async function ccValidate() {
+  const t = ccCurrent();
+  if (!t || !ccChoice || ccBusy || !isAdmin || !currentUser) return;
+  ccBusy = true;
+  const ok = ccEl('cc-ok'); if (ok) ok.disabled = true;
+  try {
+    await update(ref(db, 'tomatoes/' + t.id), { color: ccChoice, colorChecked: { by: currentUser.uid, at: Date.now() } });
+    t.color = ccChoice; t.colorChecked = { by: currentUser.uid, at: Date.now() };
+    ccDone++; ccIndex++;
+    showToast('« ' + t.name + ' » : ' + (trColor(ccChoice) || ccChoice), 'fa-palette');
+    ccShow();
+  } catch (e) {
+    showToast('Enregistrement refusé (règles Firebase ?)', 'fa-lock');
+    if (ok) ok.disabled = false;
+  }
+  ccBusy = false;
+}
+function ccSkip() { if (ccCurrent()) { ccIndex++; ccShow(); } }
+
+ccEl('btn-color-check').onclick = () => { openColorCheck(); };
+ccEl('cc-close').onclick = closeColorCheck;
+ccEl('cc-modal').addEventListener('click', e => { if (e.target.id === 'cc-modal') closeColorCheck(); });
+ccEl('cc-body').addEventListener('click', e => {
+  const chip = e.target.closest('.cc-chip');
+  if (chip) { ccChoose(chip.dataset.c); return; }
+  const th = e.target.closest('.cc-thumbs img');
+  if (th) {
+    const t = ccCurrent(); if (!t) return;
+    const u = ccImgs(t)[+th.dataset.i];
+    const big = ccEl('cc-img'); big.dataset.o = u; big.src = FV.thumb(u, 900);
+    document.querySelectorAll('.cc-thumbs img').forEach(x => x.classList.toggle('on', x === th));
+    return;
+  }
+  if (e.target.closest('#cc-skip')) ccSkip();
+  else if (e.target.closest('#cc-ok')) ccValidate();
+});
+document.addEventListener('keydown', e => {
+  if (!ccEl('cc-modal').classList.contains('active')) return;
+  if (e.key === 'Escape') { closeColorCheck(); return; }
+  if (e.key === 'Enter') { e.preventDefault(); ccValidate(); }
+  else if (e.key === 'ArrowRight') { e.preventDefault(); ccSkip(); }
+  else if (/^[1-3]$/.test(e.key)) { const b = document.querySelectorAll('#cc-sugg .cc-chip')[+e.key - 1]; if (b) ccChoose(b.dataset.c); }
+});
 
 // ─── AUTHENTIFICATION & TOGGLE ANONYME ────────────────────────────────────────
 const anonToggle = document.getElementById('toggle-anon');

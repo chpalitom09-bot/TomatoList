@@ -1,4 +1,4 @@
-const CACHE_NAME = 'tomatolist-v2';
+const CACHE_NAME = 'tomatolist-v3';
 const APP_SHELL = [
   './',
   './index.html',
@@ -6,6 +6,7 @@ const APP_SHELL = [
   './lang.json',
   './algo.js',
   './fiche-visuals.js',
+  './color-detect.js',
   './wiki.js',
   './article.js',
   './ai.js',
