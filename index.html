@@ -782,6 +782,7 @@
         <button data-lang="en">English</button>
       </div>
     </div>
+    <button class="btn btn-outline" id="btn-color-check-nav" type="button" style="display:none" title="Vérifier les couleurs à la chaîne (modérateurs)" aria-label="Vérifier les couleurs à la chaîne"><svg viewBox="0 0 64 64" width="22" height="22" aria-hidden="true"><defs><linearGradient id="rbT" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ef4444"/><stop offset=".2" stop-color="#f97316"/><stop offset=".4" stop-color="#eab308"/><stop offset=".6" stop-color="#22c55e"/><stop offset=".8" stop-color="#3b82f6"/><stop offset="1" stop-color="#8b5cf6"/></linearGradient></defs><path d="M32 16c-15 0-25 9-25 21 0 12 11 20 25 20s25-8 25-20c0-12-10-21-25-21z" fill="url(#rbT)"/><ellipse cx="22" cy="31" rx="4.5" ry="8" transform="rotate(28 22 31)" fill="#fff" opacity=".35"/><path d="M32 20l-7-6 5 1-2-6 5 4 3-5 2 5 5-2-3 6 5 1-6 3z" fill="#4d7c0f"/></svg></button>
     <button class="btn btn-outline" id="btn-auth"><i class="fa-solid fa-user"></i> <span class="hide-mobile" id="auth-label" data-i18n="login">Connexion</span></button>
     <button class="btn btn-primary" id="btn-add-modal"><i class="fa-solid fa-plus"></i> <span class="hide-mobile" data-i18n="add">Ajouter</span></button>
   </div>
@@ -1319,6 +1320,7 @@ let countriesList = [];
 let currentUser = null;
 const OWNERS = ["C2FrKuBXBzRYcqCG7pW8eEzm5RI3", "1uKGbtsFGOYKTwge7lT88yAfnx92", "ptNpn0JJF1Serl8Ej7yAJLtpPti2", "pJVYaoxxs2UReJ2bcp5VWSLvl6x2"];
 let isAdmin = false;
+let isOwner4 = false;
 async function resolveAdmin(user) {
   let ok = false;
   if (user) {
@@ -1328,6 +1330,8 @@ async function resolveAdmin(user) {
     }
   }
   isAdmin = ok;
+  isOwner4 = !!(user && OWNERS.includes(user.uid));
+  const ccNav = document.getElementById('btn-color-check-nav'); if (ccNav) ccNav.style.display = isOwner4 ? '' : 'none';
   const vb = document.getElementById('verified-block'); if (vb) vb.style.display = ok ? '' : 'none';
   if (typeof renderColorFilters === 'function') renderColorFilters();
     if (typeof renderColorFilters === 'function') renderColorFilters();
@@ -1523,7 +1527,7 @@ function renderColorFilters() {
   const add = document.getElementById('btn-add-color');
   if (add) add.style.display = isAdmin ? '' : 'none';
   const cpAdd = document.getElementById('cp-add'); if (cpAdd) cpAdd.style.display = isAdmin ? '' : 'none';
-  const ccBtn = document.getElementById('btn-color-check'); if (ccBtn) ccBtn.style.display = isAdmin ? '' : 'none';
+  const ccBtn = document.getElementById('btn-color-check'); if (ccBtn) ccBtn.style.display = isOwner4 ? '' : 'none';
   syncColorSelect();
   renderColorPicker();
 }
@@ -1687,7 +1691,7 @@ function ccBuildQueue() {
     .map(t => t.id);
 }
 function openColorCheck() {
-  if (!isAdmin) return;
+  if (!isOwner4) return;
   ccQueue = ccBuildQueue(); ccIndex = 0; ccDone = 0;
   ccEl('cc-modal').classList.add('active');
   ccShow();
@@ -1755,7 +1759,7 @@ function ccSuggest(t, r) {
 }
 async function ccValidate() {
   const t = ccCurrent();
-  if (!t || !ccChoice || ccBusy || !isAdmin || !currentUser) return;
+  if (!t || !ccChoice || ccBusy || !isOwner4 || !currentUser) return;
   ccBusy = true;
   const ok = ccEl('cc-ok'); if (ok) ok.disabled = true;
   try {
@@ -1773,6 +1777,7 @@ async function ccValidate() {
 function ccSkip() { if (ccCurrent()) { ccIndex++; ccShow(); } }
 
 ccEl('btn-color-check').onclick = () => { openColorCheck(); };
+ccEl('btn-color-check-nav').onclick = () => { openColorCheck(); };
 ccEl('cc-close').onclick = closeColorCheck;
 ccEl('cc-modal').addEventListener('click', e => { if (e.target.id === 'cc-modal') closeColorCheck(); });
 ccEl('cc-body').addEventListener('click', e => {
