@@ -1883,8 +1883,8 @@ onAuthStateChanged(auth, async (user) => {
   const authLabel = document.getElementById('auth-label');
   const btnAuth = document.getElementById('btn-auth');
   if (user) {
-    authLabel.textContent = tr('logout') || "Déconnexion";
-    btnAuth.onclick = () => { signOut(auth); showToast('Déconnexion réussie', 'fa-check'); };
+    authLabel.textContent = 'Mon compte';
+    btnAuth.onclick = () => { if (window.QX && QX.profile) QX.profile(); else { signOut(auth); showToast('Déconnexion réussie', 'fa-check'); } };
     const snap = await get(ref(db, `users/${user.uid}/profile`));
     if (snap.exists()) {
       currentProfile = snap.val();
@@ -2154,7 +2154,7 @@ function renderGrid() {
   grid.querySelectorAll('[data-share-copy]').forEach(btn => {
     btn.onclick = async (e) => {
       e.stopPropagation();
-      const url = window.location.origin + window.location.pathname;
+      const url = (window.qxl || (u => u))(window.location.origin + window.location.pathname);
       try {
         await navigator.clipboard.writeText(url); window.QX && QX.award('share');
         showToast('Lien copié dans le presse-papier !', 'fa-link');
@@ -2166,7 +2166,7 @@ function renderGrid() {
   grid.querySelectorAll('[data-share-native]').forEach(btn => {
     btn.onclick = async (e) => {
       e.stopPropagation();
-      const url = window.location.origin + window.location.pathname;
+      const url = (window.qxl || (u => u))(window.location.origin + window.location.pathname);
       if (navigator.share) {
         try {
           await navigator.share({ title: 'TomatoList', text: 'Découvrez des centaines de variétés de tomates 🍅', url }); window.QX && QX.award('share');
@@ -2197,7 +2197,7 @@ async function toggleLike(tomatoId) {
   const updates = {};
   updates[`tomatoes/${tomatoId}/likes/${currentUser.uid}`] = isLiked ? null : true;
   updates[`users/${currentUser.uid}/likes/${tomatoId}`] = isLiked ? null : true;
-  try { await update(ref(db), updates); if (!isLiked && window.QX) QX.award('like', tomatoId); } catch(err) { showToast("Erreur lors de l'action.", 'fa-triangle-exclamation'); }
+  try { await update(ref(db), updates); if (!isLiked && window.QX) { QX.award('like', tomatoId); if (QX.notify) QX.notify(tomato.uid, 'like', { tid: tomatoId, tname: tomato.name }); } } catch(err) { showToast("Erreur lors de l'action.", 'fa-triangle-exclamation'); }
 }
 
 document.getElementById('tomatoes-grid').addEventListener('click', async (e) => {
@@ -2258,7 +2258,7 @@ document.getElementById('btn-submit-comment').onclick = async () => {
       at: Date.now()
     });
     input.value = '';
-    if (text.length >= 5 && window.QX) QX.award('comment');
+    if (text.length >= 5 && window.QX) { QX.award('comment'); const tt = tomatoesData.find(x => x.id === detailCurrentId); if (tt && QX.notify) QX.notify(tt.uid, 'comment', { tid: tt.id, tname: tt.name }); }
     showToast('Commentaire ajouté !', 'fa-check');
   } catch(e) {
     showToast('Erreur lors de l\'envoi du commentaire.', 'fa-triangle-exclamation');
@@ -2451,7 +2451,7 @@ document.getElementById('detail-back').onclick = closeDetailModal;
 // ─── PARTAGE ──────────────────────────────────────────────────────────────────
 document.getElementById('detail-share-btn').onclick = async () => {
   if (!detailCurrentId) return;
-  const url = `${window.location.origin}${window.location.pathname}?tomato=${detailCurrentId}`;
+  const url = (window.qxl || (u => u))(`${window.location.origin}${window.location.pathname}?tomato=${detailCurrentId}`);
   if (navigator.share) {
     try { await navigator.share({ title: 'TomatoList', text: document.getElementById('detail-title').textContent, url }); window.QX && QX.award('share'); return; } catch(_) {}
   }
@@ -2623,6 +2623,7 @@ function renderContributors(t) {
 
 // ─── PAGE AUTEUR ──────────────────────────────────────────────────────────────
 function openAuthorModal(uid, name) {
+  if (window.QX && QX.profile && uid) { QX.profile(uid); return; }
   if (!uid) return;
   const list = tomatoesData.filter(t => t.uid === uid);
   document.getElementById('author-modal-title').textContent = `${tr('author_title')} ${name}`;
@@ -3244,5 +3245,6 @@ if ('serviceWorker' in navigator) {
 })();
 </script>
 <script type="module" src="quetes.js"></script>
+<script type="module" src="profil.js"></script>
 </body>
 </html>

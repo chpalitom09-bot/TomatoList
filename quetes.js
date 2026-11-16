@@ -8,8 +8,11 @@ const RULES = {
   pub: { xp: 20, cap: 5, label: 'Publier une variété' },
   comment: { xp: 5, cap: 10, label: 'Poster un commentaire' },
   like: { xp: 2, cap: 20, label: 'Aimer une variété' },
-  share: { xp: 1, cap: 100, label: 'Partager le site' }
+  share: { xp: 1, cap: 100, label: 'Partager le site' },
+  visit: { xp: 5, cap: 1, label: 'Passer sur le site chaque jour' },
+  ref: { xp: 50, cap: 20, label: 'Inviter un ami qui crée un compte' }
 };
+const HID = { welcome: { xp: 25, cap: 1 } };
 const QUEST = { need: 3, xp: 100 };
 const LEVELS = [
   { n: 'Graine', x: 0 },
@@ -20,7 +23,7 @@ const LEVELS = [
   { n: 'Maître jardinier', x: 3000 }
 ];
 
-let db = null, auth = null, user = null, state = null, name = 'Cultivateur', tab = 'quests', board = 'week', lbData = null, busy = false;
+let db = null, auth = null, user = null, state = null, pubData = null, name = 'Cultivateur', tab = 'quests', board = 'week', lbData = null, busy = false;
 
 const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const fmtDay = new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Paris', year: 'numeric', month: '2-digit', day: '2-digit' });
@@ -81,17 +84,31 @@ function compute(cur, kind, id) {
   s.days = s.days || {};
   const d = s.days[day] = Object.assign({ pub: 0, comment: 0, like: 0, share: 0, quest: 0 }, s.days[day] || {});
   Object.keys(s.days).sort().slice(0, -3).forEach(k => { delete s.days[k]; });
-  const r = RULES[kind];
-  if (!r || d[kind] >= r.cap) return null;
+  const r = RULES[kind] || HID[kind];
+  if (!r || (d[kind] || 0) >= r.cap) return null;
   let gain = r.xp, bonus = 0;
+  if (kind === 'ref' || kind === 'welcome') {
+    s.once = s.once || {};
+    if (s.once[kind + ':' + id]) return null;
+    s.once[kind + ':' + id] = true;
+  }
   if (kind === 'like') {
     s.liked = s.liked || {};
     if (s.liked[id]) return null;
     s.liked[id] = true;
   }
-  d[kind]++;
+  d[kind] = (d[kind] || 0) + 1;
+  s.cnt = s.cnt || {};
+  s.cnt[kind] = (s.cnt[kind] || 0) + 1;
+  const yest = dayKey(Date.now() - 864e5);
+  const st = s.streak || { last: '', n: 0 };
+  if (st.last !== day) { st.n = st.last === yest ? st.n + 1 : 1; st.last = day; }
+  s.streak = st;
   if (kind === 'pub' && d.pub >= QUEST.need && !d.quest) { d.quest = 1; bonus = QUEST.xp; gain += bonus; }
   s.total += gain;
+  s.hist = s.hist || {};
+  s.hist[day] = (s.hist[day] || 0) + gain;
+  Object.keys(s.hist).sort().slice(0, -40).forEach(k => { delete s.hist[k]; });
   if (contestOn()) {
     if (!s.week || s.week.k !== wk) s.week = { k: wk, xp: 0 };
     s.week.xp += gain;
@@ -113,6 +130,9 @@ async function award(kind, id) {
     up['lb/' + user.uid + '/name'] = name;
     up['lb/' + user.uid + '/total'] = state.total;
     if (contestOn() && state.week) up['lb/' + user.uid + '/weeks/' + state.week.k] = state.week.xp;
+    up['lb/' + user.uid + '/hist/' + dayKey()] = (state.hist || {})[dayKey()] || 0;
+    up['lb/' + user.uid + '/cnt'] = state.cnt || {};
+    up['lb/' + user.uid + '/streak'] = state.streak ? state.streak.n : 0;
     await update(ref(db), up);
     lbData = null;
     notify(kind, out);
@@ -130,7 +150,7 @@ function notify(kind, out) {
 
 async function loadState() {
   state = null;
-  if (!user) return;
+  if (!user) { pubData = null; return; }
   try {
     const s = await get(ref(db, 'quest/' + user.uid));
     state = s.exists() ? s.val() : { total: 0 };
@@ -140,6 +160,9 @@ async function loadState() {
       const f = String(v.firstname || '').trim(), l = String(v.lastname || '').trim();
       name = (f + (l ? ' ' + l.charAt(0).toUpperCase() + '.' : '')).trim().slice(0, 40) || 'Cultivateur';
     }
+    const pb = await get(ref(db, 'pub/' + user.uid));
+    if (pb.exists()) { pubData = pb.val(); if (pubData.name) name = pubData.name; }
+    else { pubData = { name, since: Date.now() }; await update(ref(db, 'pub/' + user.uid), pubData); }
   } catch (e) {}
 }
 
@@ -148,6 +171,86 @@ async function loadBoard() {
     const s = await get(ref(db, 'lb'));
     lbData = s.exists() ? s.val() : {};
   } catch (e) { lbData = {}; }
+}
+
+function link(u) {
+  try {
+    const x = new URL(u, window.location.href);
+    if (user) x.searchParams.set('ref', user.uid);
+    return x.toString();
+  } catch (e) { return u; }
+}
+
+async function inviteShare() {
+  const url = link(window.location.origin + window.location.pathname);
+  try {
+    if (navigator.share) await navigator.share({ title: 'TomatoList', text: 'Rejoins-moi sur TomatoList, le recensement collaboratif de variétés de tomates', url });
+    else await navigator.clipboard.writeText(url);
+    if (!navigator.share && window.TL) window.TL.toast('Lien d\'invitation copié', 'fa-link');
+    award('share');
+  } catch (e) {}
+}
+
+async function afterLogin() {
+  await loadState();
+  if (!user) { paint(); return; }
+  const r = (() => { try { return localStorage.getItem('tl_ref'); } catch (e) { return null; } })();
+  if (r && r !== user.uid && pubData && !pubData.refBy) {
+    try {
+      const up = {};
+      up['pub/' + user.uid + '/refBy'] = r;
+      up['referrals/' + r + '/' + user.uid] = true;
+      await update(ref(db), up);
+      pubData.refBy = r;
+      await award('welcome', user.uid);
+    } catch (e) {}
+  }
+  try { localStorage.removeItem('tl_ref'); } catch (e) {}
+  await award('visit');
+  try {
+    const rs = await get(ref(db, 'referrals/' + user.uid));
+    if (rs.exists()) {
+      for (const k of Object.keys(rs.val())) {
+        if (!(state && state.once && state.once['ref:' + k])) await award('ref', k);
+      }
+    }
+  } catch (e) {}
+  paint();
+}
+
+function dayList(n) {
+  const out = [];
+  for (let i = n - 1; i >= 0; i--) out.push(dayKey(Date.now() - i * 864e5));
+  return out;
+}
+
+function chart(vals, labels, color) {
+  const W = 520, H = 170, P = 28, n = vals.length;
+  const max = Math.max(10, ...vals);
+  const x = i => P + i * (W - 2 * P) / (n > 1 ? n - 1 : 1);
+  const y = v => H - P - (v / max) * (H - 2 * P);
+  const pts = vals.map((v, i) => x(i).toFixed(1) + ',' + y(v).toFixed(1));
+  const area = 'M' + x(0).toFixed(1) + ',' + (H - P) + ' L' + pts.join(' L') + ' L' + x(n - 1).toFixed(1) + ',' + (H - P) + ' Z';
+  const lab = i => labels[i].slice(8, 10) + '/' + labels[i].slice(5, 7);
+  const dots = vals.map((v, i) => n <= 16 ? '<circle cx="' + x(i).toFixed(1) + '" cy="' + y(v).toFixed(1) + '" r="3" fill="' + color + '"/>' : '').join('');
+  return '<svg class="qx-chart" viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="Évolution de l\'XP"><line x1="' + P + '" y1="' + (H - P) + '" x2="' + (W - P) + '" y2="' + (H - P) + '" stroke="#e5e7eb"/><line x1="' + P + '" y1="' + y(max) + '" x2="' + (W - P) + '" y2="' + y(max) + '" stroke="#f3f4f6" stroke-dasharray="3 4"/><path d="' + area + '" fill="' + color + '" opacity=".12"/><polyline points="' + pts.join(' ') + '" fill="none" stroke="' + color + '" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>' + dots + '<text x="' + (P - 4) + '" y="' + (y(max) + 4) + '" text-anchor="end" font-size="11" fill="#6b7280">' + max + '</text><text x="' + (P - 4) + '" y="' + (H - P + 4) + '" text-anchor="end" font-size="11" fill="#6b7280">0</text><text x="' + x(0) + '" y="' + (H - 8) + '" font-size="11" fill="#6b7280">' + lab(0) + '</text><text x="' + x(Math.floor((n - 1) / 2)) + '" y="' + (H - 8) + '" text-anchor="middle" font-size="11" fill="#6b7280">' + lab(Math.floor((n - 1) / 2)) + '</text><text x="' + x(n - 1) + '" y="' + (H - 8) + '" text-anchor="end" font-size="11" fill="#6b7280">' + lab(n - 1) + '</text></svg>';
+}
+
+function viewActivity() {
+  if (!lbData) return '<div class="qx-empty">Chargement</div>';
+  const ds = dayList(14), tot = ds.map(() => 0);
+  let players = 0, all = 0;
+  Object.keys(lbData).forEach(u => {
+    const v = lbData[u] || {};
+    if (v.total) players++;
+    all += v.total || 0;
+    ds.forEach((d, i) => { tot[i] += (v.hist && v.hist[d]) || 0; });
+  });
+  const mine = user && lbData[user.uid] ? ds.map(d => (lbData[user.uid].hist && lbData[user.uid].hist[d]) || 0) : null;
+  let h = '<div class="qx-stats"><div><b>' + players + '</b><span>joueurs</span></div><div><b>' + all + '</b><span>XP au total</span></div><div><b>' + tot[tot.length - 1] + '</b><span>XP aujourd\'hui</span></div></div>';
+  h += '<div class="qx-card"><div class="qx-t" style="margin-bottom:6px">XP gagnés par la communauté, 14 jours</div>' + chart(tot, ds, '#b91c1c') + '</div>';
+  if (mine) h += '<div class="qx-card"><div class="qx-t" style="margin-bottom:6px">Vos XP, 14 jours</div>' + chart(mine, ds, '#15803d') + '</div>';
+  return h;
 }
 
 function css() {
@@ -196,6 +299,12 @@ function css() {
   .qx-intro li b{color:var(--primary);white-space:nowrap}
   .qx-acts{display:flex;gap:8px;margin-top:6px}
   .qx-acts .qx-btn{flex:1}
+  .qx-chart{width:100%;height:auto;display:block}
+  .qx-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+  .qx-stats div{border:1px solid var(--line);border-radius:12px;padding:10px 8px;text-align:center;display:flex;flex-direction:column;gap:2px}
+  .qx-stats b{font-family:var(--display);font-size:20px}
+  .qx-stats span{font-size:11.5px;color:var(--text-muted)}
+  .qx-rk[data-uid]{cursor:pointer}
   .qx-empty{text-align:center;color:var(--text-muted);font-size:14px;padding:18px 0}
   @media(max-width:640px){
     .qx-ov{align-items:flex-end;padding:0}
@@ -227,6 +336,7 @@ function viewQuests() {
   });
   rows.push('<div class="qx-card"><div class="qx-t" style="margin-bottom:6px">Activités du jour</div><div class="qx-list">' + list + '</div></div>');
   const wx = weekXp(state);
+  rows.push('<div class="qx-card"><div class="qx-row"><span class="qx-t">Inviter un ami</span><span class="qx-xp">+50 XP</span></div><p class="qx-sub">Vous gagnez 50 XP quand un ami crée un compte depuis votre lien, et il en reçoit 25.</p><button class="qx-btn" style="margin-top:10px;width:100%" data-act="invite">Partager mon lien</button></div>');
   rows.push('<div class="qx-card"><div class="qx-row"><span class="qx-t">Concours de la semaine</span><span class="qx-xp">' + wx + ' XP</span></div><p class="qx-sub">' + (contestOn() ? 'Fin de la semaine dans ' + fmtLeft(nextWeekStart() - Date.now()) + '. Concours ouvert jusqu\'au 1er janvier 2027 à minuit (dans ' + fmtLeft(END - Date.now()) + ').' : 'Le concours est terminé.') + '</p></div>');
   return rows.join('');
 }
@@ -250,7 +360,7 @@ function viewBoard() {
   let h = seg;
   if (board === 'week') h += '<p class="qx-sub" style="margin:0">' + (contestOn() ? 'Le classement repart à zéro dans ' + fmtLeft(nextWeekStart() - Date.now()) + '.' : 'Concours terminé.') + '</p>';
   if (!top.length) return h + '<div class="qx-empty">Personne n\'a encore marqué de points. Soyez le premier.</div>';
-  h += '<div>' + top.map((x, i) => '<div class="qx-rk' + (user && x.uid === user.uid ? ' me' : '') + (i < 3 ? ' top' : '') + '"><span class="qx-n">' + (i + 1) + '</span><span class="qx-nm">' + esc(x.name) + '</span><span class="qx-xp">' + x.xp + ' XP</span></div>').join('') + '</div>';
+  h += '<div>' + top.map((x, i) => '<div data-uid="' + esc(x.uid) + '" class="qx-rk' + (user && x.uid === user.uid ? ' me' : '') + (i < 3 ? ' top' : '') + '"><span class="qx-n">' + (i + 1) + '</span><span class="qx-nm">' + esc(x.name) + '</span><span class="qx-xp">' + x.xp + ' XP</span></div>').join('') + '</div>';
   if (user) {
     const idx = arr.findIndex(x => x.uid === user.uid);
     if (idx >= 50) h += '<p class="qx-sub">Votre position : ' + (idx + 1) + 'e avec ' + arr[idx].xp + ' XP</p>';
@@ -267,7 +377,7 @@ function paint() {
   const lv = levelOf(xp);
   document.getElementById('qx-head').innerHTML = '<div>' + tom('Rouge', 46) + '</div><div style="flex:1;min-width:0"><h2>' + (user ? esc(lv.name) : 'Quêtes TomatoList') + '</h2>' + (user ? '<div style="margin-top:8px">' + bar(lv.pct) + '</div><div class="qx-sub">' + xp + ' XP' + (lv.to ? ', encore ' + (lv.to - xp) + ' pour le niveau suivant' : ', niveau maximum') + '</div>' : '<div class="qx-sub">Gagnez de l\'XP en participant au site</div>') + '</div>';
   document.querySelectorAll('.qx-tab').forEach(b => b.classList.toggle('on', b.dataset.t === tab));
-  panel.innerHTML = tab === 'quests' ? viewQuests() : viewBoard();
+  panel.innerHTML = tab === 'quests' ? viewQuests() : tab === 'activity' ? viewActivity() : viewBoard();
 }
 
 function build() {
@@ -283,21 +393,24 @@ function build() {
   const ov = document.createElement('div');
   ov.className = 'qx-ov';
   ov.id = 'qx-ov';
-  ov.innerHTML = '<div class="qx-panel" role="dialog" aria-modal="true" aria-label="Quêtes"><button class="qx-x" id="qx-x" aria-label="Fermer"><i class="fa-solid fa-xmark"></i></button><div class="qx-head" id="qx-head"></div><div class="qx-tabs"><button class="qx-tab on" data-t="quests">Mes quêtes</button><button class="qx-tab" data-t="board">Classement</button></div><div class="qx-body" id="qx-body"></div></div>';
+  ov.innerHTML = '<div class="qx-panel" role="dialog" aria-modal="true" aria-label="Quêtes"><button class="qx-x" id="qx-x" aria-label="Fermer"><i class="fa-solid fa-xmark"></i></button><div class="qx-head" id="qx-head"></div><div class="qx-tabs"><button class="qx-tab on" data-t="quests">Mes quêtes</button><button class="qx-tab" data-t="board">Classement</button><button class="qx-tab" data-t="activity">Activité</button></div><div class="qx-body" id="qx-body"></div></div>';
   document.body.appendChild(ov);
   ov.addEventListener('click', e => {
     if (e.target === ov || e.target.closest('#qx-x')) { ov.classList.remove('show'); return; }
     const t = e.target.closest('.qx-tab');
-    if (t) { tab = t.dataset.t; if (tab === 'board' && !lbData) loadBoard().then(paint); paint(); return; }
+    if (t) { tab = t.dataset.t; if (tab !== 'quests' && !lbData) loadBoard().then(paint); paint(); return; }
     const bb = e.target.closest('[data-b]');
     if (bb) { board = bb.dataset.b; paint(); return; }
-    if (e.target.closest('[data-go="login"]')) window.location.href = 'auth.html';
+    if (e.target.closest('[data-go="login"]')) { window.location.href = 'auth.html'; return; }
+    if (e.target.closest('[data-act="invite"]')) { inviteShare(); return; }
+    const ru = e.target.closest('[data-uid]');
+    if (ru && window.QX && window.QX.profile) { ov.classList.remove('show'); window.QX.profile(ru.dataset.uid); }
   });
 
   const intro = document.createElement('div');
   intro.className = 'qx-ov qx-intro';
   intro.id = 'qx-intro';
-  intro.innerHTML = '<div class="qx-panel" role="dialog" aria-modal="true" aria-label="Présentation des quêtes"><div style="display:flex;justify-content:center">' + tom('Rouge', 56) + '</div><h2>Les quêtes arrivent sur TomatoList</h2><p>Chaque action utile fait grimper votre XP. Un compte est nécessaire pour participer et figurer au classement.</p><ul><li><span>Publier une variété</span><b>+20 XP</b></li><li><span>Quête du jour : 3 variétés publiées</span><b>+100 XP</b></li><li><span>Commentaire (10 par jour)</span><b>+5 XP</b></li><li><span>J\'aime</span><b>+2 XP</b></li><li><span>Partage du site</span><b>+1 XP</b></li></ul><p>Concours hebdomadaire avec classement, jusqu\'au 1er janvier 2027 à minuit.</p><div class="qx-acts" style="margin-top:16px"><button class="qx-btn ghost" id="qx-later">Plus tard</button><button class="qx-btn" id="qx-see">Voir les quêtes</button></div></div>';
+  intro.innerHTML = '<div class="qx-panel" role="dialog" aria-modal="true" aria-label="Présentation des quêtes"><div style="display:flex;justify-content:center">' + tom('Rouge', 56) + '</div><h2>Les quêtes arrivent sur TomatoList</h2><p>Chaque action utile fait grimper votre XP. Un compte est nécessaire pour participer et figurer au classement.</p><ul><li><span>Publier une variété</span><b>+20 XP</b></li><li><span>Quête du jour : 3 variétés publiées</span><b>+100 XP</b></li><li><span>Commentaire (10 par jour)</span><b>+5 XP</b></li><li><span>J\'aime</span><b>+2 XP</b></li><li><span>Partage du site</span><b>+1 XP</b></li><li><span>Ami invité qui s\'inscrit</span><b>+50 XP</b></li></ul><p>Concours hebdomadaire avec classement, jusqu\'au 1er janvier 2027 à minuit.</p><div class="qx-acts" style="margin-top:16px"><button class="qx-btn ghost" id="qx-later">Plus tard</button><button class="qx-btn" id="qx-see">Voir les quêtes</button></div></div>';
   document.body.appendChild(intro);
   const closeIntro = () => { intro.classList.remove('show'); try { localStorage.setItem(INTRO_KEY, '1'); } catch (e) {} };
   intro.querySelector('#qx-later').onclick = closeIntro;
@@ -318,6 +431,8 @@ function open(t) {
   loadState().then(paint);
 }
 
+function setName(n) { name = n; lbData = null; }
+
 function boot() {
   let tries = 0;
   const iv = setInterval(() => {
@@ -330,10 +445,12 @@ function boot() {
     auth = getAuth(app);
     css();
     build();
-    onAuthStateChanged(auth, async u => { user = u; await loadState(); paint(); });
+    try { const q = new URLSearchParams(window.location.search).get('ref'); if (q && /^[A-Za-z0-9]{10,40}$/.test(q)) localStorage.setItem('tl_ref', q); } catch (e) {}
+    onAuthStateChanged(auth, async u => { user = u; await afterLogin(); });
   }, 100);
 }
 
-window.QX = { award, open };
+window.qxl = link;
+Object.assign(window.QX = window.QX || {}, { award, open, link, chart, dayList, esc, levelOf, tom, LEVELS, setName, ctx: () => ({ user, state, lbData, name, pubData }), board: async f => { if (!lbData || f) await loadBoard(); return lbData; } });
 
 if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();
