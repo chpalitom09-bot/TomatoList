@@ -276,6 +276,11 @@
   .cc-actions .btn { flex: 1; padding: 13px; }
   .cc-empty { text-align: center; padding: 30px 10px; color: var(--text-muted); }
   .cc-hint { font-size: 11.5px; color: var(--text-muted); text-align: center; margin-top: 10px; }
+  .cm-big { display: flex; align-items: center; gap: 8px; margin: 16px 0 6px; font-size: 14px; font-weight: 600; cursor: pointer; }
+  .cm-big input { width: 18px; height: 18px; accent-color: var(--primary); }
+  #cm-second { display: none; margin-top: 14px; padding-top: 14px; border-top: 1px dashed var(--line); }
+  .cc-ai { display: flex; align-items: center; gap: 8px; font-size: 12.5px; color: var(--text-muted); margin: 0 0 12px; cursor: pointer; flex-wrap: wrap; }
+  .cc-ai input { accent-color: var(--primary); }
   .cm-top { display: flex; gap: 18px; align-items: center; margin-bottom: 18px; }
   .cm-prev { width: 84px; height: 84px; flex-shrink: 0; border-radius: 20px; background: #fef2f2; display: flex; align-items: center; justify-content: center; }
   .cm-exact { display: flex; align-items: center; gap: 10px; margin-top: 14px; font-size: 13px; color: var(--text-muted); }
@@ -1057,9 +1062,15 @@
         </div>
       </div>
       <div class="form-group" style="margin-bottom:0">
-        <label>Palette</label>
+        <label id="cm-pal-label">Palette</label>
         <div class="cm-pal" id="cm-pal"></div>
         <div class="cm-exact"><input type="color" id="cm-hex" value="#ef4444" aria-label="Couleur exacte"> <span>Couleur exacte</span> <code id="cm-hex-txt">#ef4444</code></div>
+        <label class="cm-big"><input type="checkbox" id="cm-big"> Bigarrée : mélanger deux couleurs (ex. rose + vert)</label>
+        <div id="cm-second">
+          <label>2<sup>e</sup> couleur</label>
+          <div class="cm-pal" id="cm-pal2"></div>
+          <div class="cm-exact"><input type="color" id="cm-hex2" value="#22c55e" aria-label="Deuxième couleur exacte"> <span>Couleur exacte</span> <code id="cm-hex2-txt">#22c55e</code></div>
+        </div>
       </div>
       <div class="cm-list" id="cm-list"></div>
       <button class="btn btn-primary" id="cm-save" type="button" style="width:100%;margin-top:18px;padding:13px"><i class="fa-solid fa-plus"></i> Ajouter la couleur</button>
@@ -1240,6 +1251,7 @@
 
 <script src="fiche-visuals.js"></script>
 <script src="color-detect.js"></script>
+<script src="color-ai.js"></script>
 <script src="article.js"></script>
 <script src="wiki.js"></script>
 <script src="ai.js"></script>
@@ -1549,9 +1561,10 @@ function applyCustomColors(raw) {
   Object.keys(raw || {}).forEach(k => {
     const c = raw[k];
     if (c && typeof c.name === 'string' && /^#[0-9a-fA-F]{6}$/.test(c.hex || '')) {
-      customColors[k] = { key: k, name: c.name, hex: c.hex };
-      colorMap[c.name] = c.hex;
-      if (window.FV && FV.registerColor) FV.registerColor(c.name, c.hex);
+      const two = /^#[0-9a-fA-F]{6}$/.test(c.hex2 || '') ? c.hex2 : '';
+      customColors[k] = { key: k, name: c.name, hex: c.hex, hex2: two };
+      colorMap[c.name] = two ? `linear-gradient(135deg, ${c.hex} 50%, ${two} 50%)` : c.hex;
+      if (window.FV && FV.registerColor) FV.registerColor(c.name, c.hex, two || null);
     }
   });
   renderColorFilters();
@@ -1613,19 +1626,40 @@ function cmSetHex(h) {
   document.getElementById('cm-hex').value = cmHex;
   document.getElementById('cm-hex-txt').textContent = cmHex;
   document.querySelectorAll('#cm-pal .cm-sw').forEach(b => b.classList.toggle('sel', b.dataset.hex === cmHex));
-  if (window.FV && FV.registerColor) { FV.registerColor('__preview', cmHex); document.getElementById('cm-prev').innerHTML = FV.tomato('__preview', 62); }
+  cmPreview();
+}
+let cmHex2 = '#22c55e', cmBig = false;
+function cmPreview() {
+  if (window.FV && FV.registerColor) { FV.registerColor('__preview', cmHex, cmBig ? cmHex2 : null); document.getElementById('cm-prev').innerHTML = FV.tomato('__preview', 62); }
+}
+function cmSetHex2(h) {
+  cmHex2 = h.toLowerCase();
+  document.getElementById('cm-hex2').value = cmHex2;
+  document.getElementById('cm-hex2-txt').textContent = cmHex2;
+  document.querySelectorAll('#cm-pal2 .cm-sw').forEach(b => b.classList.toggle('sel', b.dataset.hex === cmHex2));
+  cmPreview();
+}
+function cmSetBig(on) {
+  cmBig = !!on;
+  document.getElementById('cm-big').checked = cmBig;
+  document.getElementById('cm-second').style.display = cmBig ? 'block' : 'none';
+  document.getElementById('cm-pal-label').textContent = cmBig ? '1re couleur' : 'Palette';
+  cmPreview();
 }
 function renderColorModalList() {
   const list = Object.values(customColors).sort((x, y) => x.name.localeCompare(y.name, 'fr'));
   const counts = {}; tomatoesData.forEach(t => { if (t.color) counts[t.color] = (counts[t.color] || 0) + 1; });
   document.getElementById('cm-list').innerHTML = list.length
-    ? `<div class="filter-title" style="margin-bottom:6px">Couleurs ajoutées</div>` + list.map(c => `<div class="cm-item"><i class="sw-dot" style="background:${c.hex}"></i><span>${escHtml(c.name)}</span><small>${counts[c.name] || 0} variété${(counts[c.name] || 0) > 1 ? 's' : ''}</small><button type="button" data-del="${escHtml(c.key)}" title="Supprimer" aria-label="Supprimer ${escHtml(c.name)}"><i class="fa-solid fa-trash-can"></i></button></div>`).join('')
+    ? `<div class="filter-title" style="margin-bottom:6px">Couleurs ajoutées</div>` + list.map(c => `<div class="cm-item"><i class="sw-dot" style="background:${colorMap[c.name] || c.hex}"></i><span>${escHtml(c.name)}</span><small>${counts[c.name] || 0} variété${(counts[c.name] || 0) > 1 ? 's' : ''}</small><button type="button" data-del="${escHtml(c.key)}" title="Supprimer" aria-label="Supprimer ${escHtml(c.name)}"><i class="fa-solid fa-trash-can"></i></button></div>`).join('')
     : '';
 }
 function openColorModal() {
   if (!isAdmin) return;
   const pal = document.getElementById('cm-pal');
   if (!pal.children.length) pal.innerHTML = PALETTE.map(h => `<button type="button" class="cm-sw" data-hex="${h}" style="background:${h}" aria-label="${h}"></button>`).join('');
+  const pal2 = document.getElementById('cm-pal2');
+  if (!pal2.children.length) pal2.innerHTML = PALETTE.map(h => `<button type="button" class="cm-sw" data-hex="${h}" style="background:${h}" aria-label="${h}"></button>`).join('');
+  cmSetBig(false); cmSetHex2(cmHex2);
   document.getElementById('color-error').style.display = 'none';
   document.getElementById('cm-name').value = '';
   cmSetHex(cmHex);
@@ -1640,6 +1674,9 @@ document.getElementById('close-color-modal').onclick = closeColorModal;
 document.getElementById('color-modal').addEventListener('click', e => { if (e.target.id === 'color-modal') closeColorModal(); });
 document.getElementById('cm-pal').addEventListener('click', e => { const b = e.target.closest('.cm-sw'); if (b) cmSetHex(b.dataset.hex); });
 document.getElementById('cm-hex').oninput = e => cmSetHex(e.target.value);
+document.getElementById('cm-pal2').addEventListener('click', e => { const b = e.target.closest('.cm-sw'); if (b) cmSetHex2(b.dataset.hex); });
+document.getElementById('cm-hex2').oninput = e => cmSetHex2(e.target.value);
+document.getElementById('cm-big').onchange = e => cmSetBig(e.target.checked);
 document.getElementById('cm-name').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); document.getElementById('cm-save').click(); } });
 document.getElementById('cm-save').onclick = async () => {
   if (!isAdmin || !currentUser) return;
@@ -1648,12 +1685,13 @@ document.getElementById('cm-save').onclick = async () => {
   if (/[<>&"]/.test(name)) return colorError('Le nom ne peut pas contenir < > & ou ".');
   const slug = slugColor(name);
   if (!slug) return colorError('Ce nom n’est pas valide.');
+  if (cmBig && cmHex2 === cmHex) return colorError('Choisis deux couleurs différentes pour une couleur bigarrée.');
   const existing = allColorNames().some(n => normName(n) === normName(name) || slugColor(n) === slug);
   if (existing) return colorError('Cette couleur existe déjà.');
   const btn = document.getElementById('cm-save');
   btn.disabled = true;
   try {
-    await update(ref(db, 'colors/' + slug), { name, hex: cmHex, by: currentUser.uid, at: Date.now() });
+    await update(ref(db, 'colors/' + slug), Object.assign({ name, hex: cmHex, by: currentUser.uid, at: Date.now() }, cmBig ? { hex2: cmHex2 } : {}));
     document.getElementById('cm-name').value = '';
     document.getElementById('color-error').style.display = 'none';
     showToast('Couleur « ' + name + ' » ajoutée', 'fa-palette');
@@ -1681,7 +1719,9 @@ let ccQueue = [], ccIndex = 0, ccDone = 0, ccChoice = null, ccRun = 0, ccPhoto =
 const ccEl = id => document.getElementById(id);
 const ccDot = n => `<i class="sw-dot" style="background:${colorMap[n] || '#ccc'}"></i>`;
 const ccImgs = t => (t.imageURLs || (t.imageURL ? [t.imageURL] : [])).filter(u => /^https?:\/\//i.test(u));
-const ccExtra = () => { const o = {}; Object.values(customColors).forEach(c => { o[c.name] = c.hex; }); return o; };
+const ccExtra = () => { const o = {}; Object.values(customColors).forEach(c => { o[c.name] = c.hex2 ? { hex: c.hex, hex2: c.hex2 } : c.hex; }); return o; };
+let ccAI = false, ccManual = false;
+try { ccAI = localStorage.getItem('tl_cc_ai') === '1'; } catch (e) {}
 
 function ccBuildQueue() {
   // uniquement les variétés avec photo et dont la couleur n'a pas déjà été vérifiée ; les plus anciennes d'abord
@@ -1714,13 +1754,14 @@ function ccShow() {
     return;
   }
   const imgs = ccImgs(t);
-  ccPhoto = 0; ccChoice = null;
+  ccPhoto = 0; ccChoice = null; ccManual = false;
   const pct = total ? Math.round(ccIndex / total * 100) : 0;
   body.innerHTML = `
     <div class="cc-bar"><div class="cc-prog"><i style="width:${pct}%"></i></div><span>${ccIndex + 1} / ${total}</span></div>
     <div class="cc-photo"><img id="cc-img" src="${escHtml(FV.thumb(imgs[0], 900))}" data-o="${escHtml(imgs[0])}" referrerpolicy="no-referrer" alt="${escHtml(t.name)}"></div>
     ${imgs.length > 1 ? `<div class="cc-thumbs">${imgs.map((u, i) => `<img src="${escHtml(FV.thumb(u, 120))}" data-i="${i}" referrerpolicy="no-referrer" alt="" class="${i === 0 ? 'on' : ''}">`).join('')}</div>` : ''}
     <div class="cc-name">${escHtml(t.name)}<span class="cc-now">Couleur actuelle : ${ccDot(t.color)} ${escHtml(trColor(t.color) || t.color || '—')}</span></div>
+    <label class="cc-ai"><input type="checkbox" id="cc-ai" ${ccAI ? 'checked' : ''}> Analyse IA locale (CLIP, téléchargement unique du modèle) <span id="cc-ai-st"></span></label>
     <div class="cc-sugg" id="cc-sugg"><span class="cc-conf"><i class="fa-solid fa-spinner fa-spin"></i> Analyse de la photo…</span></div>
     <div class="cc-conf" id="cc-conf"></div>
     <div class="cc-all" id="cc-all">${allColorNames().map(n => `<button type="button" class="cc-chip" data-c="${escHtml(n)}">${ccDot(n)}${escHtml(trColor(n))}</button>`).join('')}</div>
@@ -1732,8 +1773,24 @@ function ccShow() {
   const img = ccEl('cc-img');
   img.onerror = () => { if (img.dataset.o && img.src !== img.dataset.o) img.src = img.dataset.o; };
   ccChoose(t.color && allColorNames().includes(t.color) ? t.color : null, true);
-  const run = ++ccRun;
-  ColorDetect.analyserPhotos(imgs, ccExtra()).then(r => { if (run === ccRun && ccCurrent() === t) ccSuggest(t, r); });
+  ccAnalyse(t, imgs);
+}
+async function ccAnalyse(t, imgs) {
+  const run = ++ccRun, extra = ccExtra();
+  const st = txt => { const e = ccEl('cc-ai-st'); if (e) e.textContent = txt; };
+  const r = await ColorDetect.analyserPhotos(imgs, extra);
+  if (run !== ccRun || ccCurrent() !== t) return;
+  ccSuggest(t, r);
+  if (!ccAI || !r.recadrages || !r.recadrages.length) return;
+  st('· chargement de l’IA…');
+  try {
+    const ia = await ColorAI.classer(r.recadrages, extra, pct => st('· téléchargement du modèle ' + pct + ' %'));
+    if (run !== ccRun || ccCurrent() !== t) return;
+    if (ia) { ccSuggest(t, ColorDetect.fusionner(r, ia)); st('· IA prête'); } else st('· IA sans résultat');
+  } catch (e) {
+    console.warn('IA couleur :', e);
+    st('· IA indisponible, pixels seuls');
+  }
 }
 function ccChoose(name, silent) {
   ccChoice = name;
@@ -1754,8 +1811,8 @@ function ccSuggest(t, r) {
   const sugg = r.suggestions.filter(s => names.includes(s.nom));
   box.innerHTML = sugg.map((s, i) => `<button type="button" class="cc-chip" data-c="${escHtml(s.nom)}">${ccDot(s.nom)}${escHtml(trColor(s.nom) || s.nom)} <small>${Math.round(s.part * 100)} %</small><small>${i + 1}</small></button>`).join('');
   const same = sugg[0] && sugg[0].nom === t.color;
-  conf.textContent = 'Confiance de la détection : ' + r.confiance + (same ? ' · identique à la couleur actuelle' : '') + (sugg[0] && sugg[0].detail ? ' (' + sugg[0].detail + ')' : '') + (r.photos > 1 ? ' · ' + r.photos + ' photos analysées' : '');
-  if (sugg[0]) ccChoose(sugg[0].nom);
+  conf.textContent = 'Confiance de la détection : ' + r.confiance + (same ? ' · identique à la couleur actuelle' : '') + (sugg[0] && sugg[0].detail ? ' (' + sugg[0].detail + ')' : '') + (r.ia ? ' · avis IA + pixels' : ' · pixels seuls') + (r.photos > 1 ? ' · ' + r.photos + ' photos analysées' : '');
+  if (sugg[0] && !ccManual) ccChoose(sugg[0].nom);
 }
 async function ccValidate() {
   const t = ccCurrent();
@@ -1782,13 +1839,19 @@ ccEl('cc-close').onclick = closeColorCheck;
 ccEl('cc-modal').addEventListener('click', e => { if (e.target.id === 'cc-modal') closeColorCheck(); });
 ccEl('cc-body').addEventListener('click', e => {
   const chip = e.target.closest('.cc-chip');
-  if (chip) { ccChoose(chip.dataset.c); return; }
+  if (chip) { ccManual = true; ccChoose(chip.dataset.c); return; }
   const th = e.target.closest('.cc-thumbs img');
   if (th) {
     const t = ccCurrent(); if (!t) return;
     const u = ccImgs(t)[+th.dataset.i];
     const big = ccEl('cc-img'); big.dataset.o = u; big.src = FV.thumb(u, 900);
     document.querySelectorAll('.cc-thumbs img').forEach(x => x.classList.toggle('on', x === th));
+    return;
+  }
+  if (e.target.id === 'cc-ai') {
+    ccAI = e.target.checked;
+    try { localStorage.setItem('tl_cc_ai', ccAI ? '1' : '0'); } catch (err) {}
+    const t = ccCurrent(); if (t) ccAnalyse(t, ccImgs(t));
     return;
   }
   if (e.target.closest('#cc-skip')) ccSkip();
@@ -1799,7 +1862,7 @@ document.addEventListener('keydown', e => {
   if (e.key === 'Escape') { closeColorCheck(); return; }
   if (e.key === 'Enter') { e.preventDefault(); ccValidate(); }
   else if (e.key === 'ArrowRight') { e.preventDefault(); ccSkip(); }
-  else if (/^[1-3]$/.test(e.key)) { const b = document.querySelectorAll('#cc-sugg .cc-chip')[+e.key - 1]; if (b) ccChoose(b.dataset.c); }
+  else if (/^[1-3]$/.test(e.key)) { const b = document.querySelectorAll('#cc-sugg .cc-chip')[+e.key - 1]; if (b) { ccManual = true; ccChoose(b.dataset.c); } }
 });
 
 // ─── AUTHENTIFICATION & TOGGLE ANONYME ────────────────────────────────────────

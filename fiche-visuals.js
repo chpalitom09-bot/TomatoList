@@ -19,10 +19,13 @@
     ocre: '#cf9a3c', prune: '#722a4e', grise: '#a3a9b3', doree: '#d9b23a',
     bicolore: '#ee7a2c', rayee: '#a8b83a', 'arc-en-ciel': '#e05a7a'
   };
+  const PAIR = {}; // couleurs bigarrées créées par les modérateurs : { nom normalisé: [hex1, hex2] }
   const baseColor = c => PAL[norm(c)] || PAL.rouge;
 
   function fillDef(color, id) {
     const k = norm(color);
+    if (PAIR[k])
+      return `<linearGradient id="${id}f" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${PAIR[k][0]}"/><stop offset=".42" stop-color="${PAIR[k][0]}"/><stop offset=".58" stop-color="${PAIR[k][1]}"/><stop offset="1" stop-color="${PAIR[k][1]}"/></linearGradient>`;
     if (k === 'bicolore')
       return `<linearGradient id="${id}f" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#e53935"/><stop offset=".42" stop-color="#ec5a35"/><stop offset=".6" stop-color="#f5a623"/><stop offset="1" stop-color="#f7c52a"/></linearGradient>`;
     if (k === 'rayee')
@@ -340,10 +343,11 @@
   }
 
   // Couleurs ajoutées par les modérateurs : on enregistre la teinte, et on force la régénération du dégradé
-  function registerColor(name, hex) {
+  function registerColor(name, hex, hex2) {
     if (!/^#[0-9a-fA-F]{6}$/.test(hex || '')) return;
     const k = norm(name);
     PAL[k] = hex;
+    if (/^#[0-9a-fA-F]{6}$/.test(hex2 || '')) PAIR[k] = [hex, hex2]; else delete PAIR[k];
     const id = 'fvt-' + (k.replace(/[^a-z]/g, '') || 'rouge');
     delete defsDone[id];
     const old = document.getElementById(id + 'f');

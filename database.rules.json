@@ -137,6 +137,9 @@
         "hex": {
           ".validate": "newData.isString() && newData.val().matches(/^#[0-9a-fA-F]{6}$/)"
         },
+        "hex2": {
+          ".validate": "newData.isString() && newData.val().matches(/^#[0-9a-fA-F]{6}$/)"
+        },
         "by": {
           ".validate": "newData.isString()"
         },

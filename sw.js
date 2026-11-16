@@ -1,4 +1,4 @@
-const CACHE_NAME = 'tomatolist-v3';
+const CACHE_NAME = 'tomatolist-v4';
 const APP_SHELL = [
   './',
   './index.html',
@@ -7,6 +7,7 @@ const APP_SHELL = [
   './algo.js',
   './fiche-visuals.js',
   './color-detect.js',
+  './color-ai.js',
   './wiki.js',
   './article.js',
   './ai.js',
@@ -38,6 +39,8 @@ self.addEventListener('fetch', (event) => {
 
   // App shell : cache d'abord, puis réseau (fonctionne hors-ligne)
   const url = new URL(req.url);
+  // Modèles d'IA et bibliothèque (Hugging Face / jsDelivr) : gros fichiers, déjà mis en cache par transformers.js → on ne s'en mêle pas
+  if (/(^|\.)(huggingface\.co|hf\.co|jsdelivr\.net)$/.test(url.hostname) || url.hostname.includes('xethub')) return;
   const isAppShell = url.origin === self.location.origin;
 
   if (isAppShell) {

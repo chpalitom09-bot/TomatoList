@@ -55,12 +55,19 @@
     Object.keys(ANCHORS).forEach(function (nom) { var a = ANCHORS[nom]; refs.push({ nom: nom, lab: rgb2lab(a[0], a[1], a[2]) }); });
     Object.keys(extra || {}).forEach(function (nom) {
       if (ANCHORS[nom]) return;
-      var rgb = hex2rgb(extra[nom]);
+      var v = extra[nom];
+      if (v && typeof v === 'object') { if (v.hex2) return; v = v.hex; } // une couleur bigarrée n'est pas une ancre : elle est traitée comme une paire
+      var rgb = hex2rgb(v);
       if (rgb) refs.push({ nom: nom, lab: rgb2lab(rgb[0], rgb[1], rgb[2]) });
     });
     return refs;
   }
 
+  function ancreDe(hex) {
+    var rgb = hex2rgb(hex);
+    if (!rgb) return null;
+    return plusProche(rgb2lab(rgb[0], rgb[1], rgb[2]), construireRefs({}));
+  }
   function plusProche(lab, refs) {
     var best = null, bd = 1e9;
     for (var k = 0; k < refs.length; k++) {
@@ -93,7 +100,7 @@
       fondFiable = ecarts[Math.floor(ecarts.length * 0.75)] < 14;
     }
     function passe(retirerFond) {
-      var poids = {}, total = 0, cx = w / 2, cy = h / 2;
+      var poids = {}, total = 0, cx = w / 2, cy = h / 2, x0 = w, y0 = h, x1 = -1, y1 = -1;
       for (var yy = 0; yy < h; yy++) for (var xx = 0; xx < w; xx++) {
         var q = (yy * w + xx) * 4;
         if (data[q + 3] < 128) continue;
@@ -107,17 +114,18 @@
         var nom = plusProche(l, refs);
         poids[nom] = (poids[nom] || 0) + pd;
         total += pd;
+        if (pd > 0.15) { if (xx < x0) x0 = xx; if (xx > x1) x1 = xx; if (yy < y0) y0 = yy; if (yy > y1) y1 = yy; }
       }
-      return { poids: poids, total: total };
+      return { poids: poids, total: total, boite: x1 >= 0 ? [x0, y0, x1, y1] : null };
     }
     var r = passe(fondFiable);
     var pleinTotal = w * h * 0.25; // poids max approximatif d'une image remplie
     if (fondFiable && r.total < pleinTotal * 0.08) { r = passe(false); r.sansRetraitFond = true; } // tomate blanche sur fond blanc
-    return { poids: r.poids, total: r.total, fondFiable: fondFiable };
+    return { poids: r.poids, total: r.total, fondFiable: fondFiable, boite: r.boite };
   }
 
   // Transforme des poids en parts + propositions triées
-  function proposer(poids) {
+  function proposer(poids, extra) {
     var total = 0;
     Object.keys(poids).forEach(function (k) { total += poids[k]; });
     if (total <= 0) return { suggestions: [], parts: {}, confiance: 'aucune' };
@@ -127,7 +135,8 @@
     // calice / feuilles : le vert est ignoré s'il est minoritaire face à une autre couleur
     var autreMax = 0;
     Object.keys(parts).forEach(function (k) { if (k !== 'Verte' && parts[k] > autreMax) autreMax = parts[k]; });
-    if (parts['Verte'] && parts['Verte'] < 0.25 && autreMax > 0.4) delete parts['Verte'];
+    var vertePaire = Object.keys(extra || {}).some(function (n) { var v = extra[n]; return v && typeof v === 'object' && v.hex2 && (ancreDe(v.hex) === 'Verte' || ancreDe(v.hex2) === 'Verte'); });
+    if (!vertePaire && parts['Verte'] && parts['Verte'] < 0.25 && autreMax > 0.4) delete parts['Verte']; // calice
     if (parts['Grise'] && parts['Grise'] < 0.2 && autreMax > 0.5) delete parts['Grise']; // tige, ombre
     var somme = 0;
     Object.keys(parts).forEach(function (k) { somme += parts[k]; });
@@ -143,8 +152,23 @@
       sugg = [{ nom: 'Bicolore', part: tri[0].part + tri[1].part, detail: tri[0].nom + ' + ' + tri[1].nom }]
         .concat(tri.slice(0, 2)).slice(0, 3);
     }
+    // couleurs bigarrées créées par les modérateurs (ex. Rose + Verte) : on les propose si les deux teintes sont bien présentes
+    var paires = [];
+    Object.keys(extra || {}).forEach(function (nom) {
+      var v = extra[nom];
+      if (!v || typeof v !== 'object' || !v.hex2) return;
+      var a = ancreDe(v.hex), b = ancreDe(v.hex2);
+      if (!a || !b || a === b) return;
+      var pa = parts[a] || 0, pb = parts[b] || 0;
+      if (pa >= 0.2 && pb >= 0.2 && pa + pb >= 0.55) paires.push({ nom: nom, part: pa + pb, detail: a + ' + ' + b });
+    });
+    if (paires.length) {
+      paires.sort(function (x, y) { return y.part - x.part; });
+      sugg = [paires[0]].concat(sugg.filter(function (x) { return x.nom !== paires[0].nom; })).slice(0, 3);
+    }
+
     // confiance : on regarde la part de toute la famille de couleurs de la tête de liste (une tomate jaune peut se répartir entre Jaune et Dorée)
-    var tete = sugg[0].nom === 'Bicolore' ? null : sugg[0].nom, fam = sugg[0].part;
+    var tete = (sugg[0].nom === 'Bicolore' || sugg[0].detail) ? null : sugg[0].nom, fam = sugg[0].part;
     if (tete) { fam = 0; Object.keys(parts).forEach(function (k) { if (k === tete || memeFamille(k, tete)) fam += parts[k]; }); }
     var confiance = (fam >= 0.75 && sugg[0].part >= 0.4) ? 'haute' : (fam >= 0.55 ? 'moyenne' : 'faible');
     return { suggestions: sugg, parts: parts, confiance: confiance };
@@ -153,7 +177,8 @@
   function analyserPixels(data, w, h, extra) {
     var refs = construireRefs(extra);
     var c = classifier(data, w, h, refs);
-    var r = proposer(c.poids);
+    var r = proposer(c.poids, extra);
+    r.boite = c.boite;
     r.poids = c.poids; r.total = c.total; r.fondFiable = c.fondFiable;
     return r;
   }
@@ -185,26 +210,58 @@
     ctx.drawImage(img, 0, 0, w, h);
     var data;
     try { data = ctx.getImageData(0, 0, w, h).data; } catch (e) { return null; } // image « tainted » (pas de CORS)
-    return analyserPixels(data, w, h, extra);
+    var res = analyserPixels(data, w, h, extra);
+    res.recadrage = recadrer(cv, res.boite);
+    return res;
+  }
+  // Recadre sur le sujet détecté (avec une marge) ; si la boîte est suspecte, on garde toute l'image
+  function recadrer(cv, b) {
+    if (!b) return cv;
+    var w = cv.width, h = cv.height, mx = Math.round((b[2] - b[0]) * 0.1) + 2, my = Math.round((b[3] - b[1]) * 0.1) + 2;
+    var x0 = Math.max(0, b[0] - mx), y0 = Math.max(0, b[1] - my), x1 = Math.min(w - 1, b[2] + mx), y1 = Math.min(h - 1, b[3] + my);
+    var cw = x1 - x0 + 1, ch = y1 - y0 + 1;
+    if (cw * ch < w * h * 0.08) return cv;
+    var out = document.createElement('canvas');
+    out.width = cw; out.height = ch;
+    out.getContext('2d').drawImage(cv, x0, y0, cw, ch, 0, 0, cw, ch);
+    return out;
   }
 
   // Plusieurs photos : on additionne les poids de chaque photo analysée
   async function analyserPhotos(urls, extra) {
-    var cumul = {}, utiles = 0, resultats = [];
+    var cumul = {}, utiles = 0, resultats = [], recadrages = [];
     for (var i = 0; i < Math.min(3, urls.length); i++) {
       var r = await analyserUrl(urls[i], extra);
       resultats.push(r);
       if (!r || !r.total) continue;
       utiles++;
+      if (r.recadrage) recadrages.push(r.recadrage);
       Object.keys(r.poids).forEach(function (k) { cumul[k] = (cumul[k] || 0) + r.poids[k] / r.total; });
     }
     if (!utiles) return { suggestions: [], parts: {}, confiance: 'aucune', photos: resultats.length };
-    var fin = proposer(cumul);
-    fin.photos = utiles;
+    var fin = proposer(cumul, extra);
+    fin.photos = utiles; fin.recadrages = recadrages;
     return fin;
   }
 
-  var API = { analyserPixels: analyserPixels, analyserUrl: analyserUrl, analyserPhotos: analyserPhotos, ANCHORS: ANCHORS };
+  // Fusionne l'avis de l'IA (probabilités par couleur, somme = 1) et celui des pixels
+  function fusionner(pixels, ia) {
+    var noms = {};
+    Object.keys(pixels.parts || {}).forEach(function (k) { noms[k] = 1; });
+    Object.keys(ia || {}).forEach(function (k) { noms[k] = 1; });
+    (pixels.suggestions || []).forEach(function (s) { noms[s.nom] = 1; });
+    var sp = {};
+    (pixels.suggestions || []).forEach(function (s) { sp[s.nom] = s.part; });
+    var sc = Object.keys(noms).map(function (k) {
+      var px = sp[k] != null ? sp[k] : (pixels.parts[k] || 0);
+      return { nom: k, part: 0.6 * (ia[k] || 0) + 0.4 * px, ia: ia[k] || 0, detail: (pixels.suggestions.filter(function (s) { return s.nom === k; })[0] || {}).detail };
+    }).sort(function (a, b) { return b.part - a.part; });
+    var top = sc.slice(0, 3);
+    var gap = top.length > 1 ? top[0].part - top[1].part : top[0] ? top[0].part : 0;
+    return { suggestions: top, parts: pixels.parts, confiance: top[0] && top[0].part >= 0.55 && gap > 0.15 ? 'haute' : (top[0] && top[0].part >= 0.35 ? 'moyenne' : 'faible'), photos: pixels.photos, ia: true };
+  }
+
+  var API = { fusionner: fusionner, ancreDe: ancreDe, analyserPixels: analyserPixels, analyserUrl: analyserUrl, analyserPhotos: analyserPhotos, ANCHORS: ANCHORS };
   if (typeof module !== 'undefined' && module.exports) module.exports = API;
   root.ColorDetect = API;
 })(typeof window !== 'undefined' ? window : globalThis);
